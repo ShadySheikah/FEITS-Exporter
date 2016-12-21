@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace FEITS.Model
@@ -198,7 +199,7 @@ namespace FEITS.Model
 
                 if (compiledFileText != string.Empty)
                 {
-                    File.WriteAllText(filePath, compiledFileText);
+                    File.WriteAllText(filePath, compiledFileText, new UTF8Encoding(true));
                     return true;
                 }
                 else
