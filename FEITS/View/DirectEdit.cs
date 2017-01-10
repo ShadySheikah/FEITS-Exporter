@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Windows.Forms;
 using FEITS.Controller;
 
@@ -36,15 +33,7 @@ namespace FEITS.View
         public bool AllowImport
         {
             get { return B_LoadScript.Enabled; }
-            set
-            {
-                B_LoadScript.Enabled = value;
-
-                if (B_LoadScript.Enabled)
-                    B_LoadScript.DialogResult = DialogResult.OK;
-                else
-                    B_LoadScript.DialogResult = DialogResult.None;
-            }
+            set { B_LoadScript.SetEnabledAndUpdateDialogResult(value); }
         }
 
         public bool ContainsGenderCode

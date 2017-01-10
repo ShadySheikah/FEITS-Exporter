@@ -4509,6 +4509,15 @@ namespace FEITS.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PNG Files (*.png)|*.png.
+        /// </summary>
+        internal static string PngFileFilter {
+            get {
+                return ResourceManager.GetString("PngFileFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Reminder_0 {
@@ -4565,6 +4574,24 @@ namespace FEITS.Properties {
             get {
                 object obj = ResourceManager.GetObject("TextBox_Nohr", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text files (*.txt)|*.txt.
+        /// </summary>
+        internal static string TextFileFilter {
+            get {
+                return ResourceManager.GetString("TextFileFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text files (*.txt)|*.txt|All files (*.*)|*.*.
+        /// </summary>
+        internal static string TextFileOrAllFileFilter {
+            get {
+                return ResourceManager.GetString("TextFileOrAllFileFilter", resourceCulture);
             }
         }
         

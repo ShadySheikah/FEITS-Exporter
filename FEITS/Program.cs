@@ -17,9 +17,9 @@ namespace FEITS
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            CompactMainForm mainView = new CompactMainForm();
-            ConversationModel model = new ConversationModel();
-            MainController controller = new MainController(mainView, model);
+            var mainView = new CompactMainForm();
+            var model = new ConversationModel();
+            var controller = new MainController(mainView, model);
             controller.LoadAssets();
             Application.Run(mainView);
         }

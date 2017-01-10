@@ -2,7 +2,7 @@
 {
     public class Command
     {
-        public string cmd;
+        public string CommandWithPrefix;
         public int numParams;
         public string[] Params;
     }

@@ -6,29 +6,27 @@ namespace FEITS.Controller
 {
     public class ImportExportController
     {
-        private IExportImportView view;
-        private string messageScript;
-        public string MessageScript { get { return messageScript; } }
+        private readonly IExportImportView view;
+        public string MessageScript { get; private set; }
 
-        bool[] validChars = AssetGeneration.ValidCharacters;
+        private readonly bool[] validChars = AssetGeneration.ValidCharacters;
 
         public ImportExportController(IExportImportView v, string currentMessage)
         {
             view = v;
-            messageScript = currentMessage;
+            MessageScript = currentMessage;
             view.SetController(this);
             SetupView();
         }
 
         private void SetupView()
         {
-            view.MessageText = messageScript;
+            view.MessageText = MessageScript;
         }
 
         public void OnImportMsgChanged()
         {
-            if(messageScript != view.MessageText)
-                messageScript = view.MessageText;
+            MessageScript = view.MessageText;
 
             CheckForValidChars();
             view.ContainsGenderCode = HasGenderCode();
@@ -36,27 +34,27 @@ namespace FEITS.Controller
 
         private void CheckForValidChars()
         {
-            if (messageScript.StartsWith("MESS_"))
+            if (MessageScript.StartsWith("MESS_"))
             {
                 view.AllowImport = true;
                 view.StatusText = "";
                 return;
             }
 
-            bool containsInvalids = false;
-            List<char> inv = new List<char>();
-            foreach(char c in messageScript.Where(c => !validChars[AssetGeneration.GetValue(c)]))
+            var containsInvalids = false;
+            var invalidChars = new SortedSet<char>();
+            foreach (var c in MessageScript.Where(c => !validChars[AssetGeneration.GetValue(c)]))
             {
-                if (!containsInvalids)
-                    containsInvalids = true;
-                if (!inv.Contains(c))
-                    inv.Add(c);
+                containsInvalids = true;
+                if (!invalidChars.Contains(c))
+                    invalidChars.Add(c);
             }
 
             if (containsInvalids)
             {
                 view.AllowImport = false;
-                view.StatusText = string.Format("Warning! Text contains one or more unsupported characters: {0}", string.Join(",", inv));
+                view.StatusText =
+                    $"Warning! Text contains one or more unsupported characters: {string.Join(",", invalidChars)}";
             }
             else
             {
@@ -67,20 +65,19 @@ namespace FEITS.Controller
 
         private bool HasGenderCode()
         {
-            if(messageScript.Contains("VOICE_PLAYER"))
-                return true;
-            else
-                return false;
+            return MessageScript.Contains("VOICE_PLAYER");
         }
 
         public void SwapGenderCode()
         {
-            if (view.MessageText.Contains("VOICE_PLAYER_M#"))
-                view.MessageText = messageScript.Replace("VOICE_PLAYER_M#", "VOICE_PLAYER_F#");
-            else
-                view.MessageText = messageScript.Replace("VOICE_PLAYER_F#", "VOICE_PLAYER_M#");
+            const string vpMale = "VOICE_PLAYER_M#",
+                         vpFemale = "VOICE_PLAYER_F#";
+            view.MessageText = view.MessageText.Contains(vpMale)
+                ? MessageScript.Replace(vpMale, vpFemale)
+                : MessageScript.Replace(vpFemale, vpMale);
 
-            view.StatusText = "NOTE: Gender has been swapped in code, but words like \"Lord\" and \"Lady\" remain unchanged in dialogue.";
+            view.StatusText =
+                "NOTE: Gender has been swapped in code, but words like \"Lord\" and \"Lady\" remain unchanged in dialogue.";
         }
     }
 }

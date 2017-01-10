@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CompactMainForm));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(CompactMainForm));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.TSL_PageNumber = new System.Windows.Forms.ToolStripStatusLabel();
             this.TSL_Status = new System.Windows.Forms.ToolStripStatusLabel();

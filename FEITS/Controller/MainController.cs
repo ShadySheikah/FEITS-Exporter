@@ -1,48 +1,51 @@
 ﻿using FEITS.Model;
 using FEITS.View;
 using System;
-using System.Collections;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
+using FEITS.Properties;
 
 namespace FEITS.Controller
 {
     public class MainController
     {
-        private IMainView mainView;
-        private ConversationModel conv;
+        private IMainView MainView { get; }
+        private ConversationModel MainConversation { get; }
 
-        protected OpenFileDialog ofd = new OpenFileDialog();
-        protected SaveFileDialog sfd = new SaveFileDialog();
+        protected OpenFileDialog OpenFileDialog { get; } = new OpenFileDialog();
+        protected SaveFileDialog SaveFileDialog { get; } = new SaveFileDialog();
 
-        private bool reminderOpen;
-        public bool ReminderOpen { set { reminderOpen = value; } }
+        public bool IsReminderOpen { private get; set; }
 
-        public MainController(IMainView view, ConversationModel model)
+        public MainController(IMainView view, ConversationModel conversationModel)
         {
-            mainView = view;
-            conv = model;
-            mainView.SetController(this);
+            MainView = view;
+            MainConversation = conversationModel;
+            MainView.SetController(this);
             //mainView.SetMessageList(conv.File.MessageList);
         }
 
         #region Menu Bar
+
         public virtual bool OpenFile()
         {
-            ofd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            ofd.FileName = string.Empty;
+            OpenFileDialog.Filter = Resources.TextFileOrAllFileFilter;
+            OpenFileDialog.FilterIndex = 1;
+            OpenFileDialog.FileName = string.Empty;
 
-            if(ofd.ShowDialog() == DialogResult.OK)
+            if (OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if (conv.File.LoadFromFile(ofd.FileName))
+                    if (MainConversation.File.LoadFromFile(OpenFileDialog.FileName))
                     {
-                        mainView.FormName = conv.File.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
-                        mainView.SetMessageList(conv.File.MessageList);
+                        MainView.FormName =
+                            MainConversation.File.FileName = Path.GetFileNameWithoutExtension(OpenFileDialog.FileName);
+                        MainView.SetMessageList(MainConversation.File.MessageList);
                         return true;
                     }
                 }
@@ -62,32 +65,28 @@ namespace FEITS.Controller
         /// </summary>
         public bool SaveFile()
         {
-            if(conv.File.FilePath != string.Empty)
-            {
-                conv.File.SaveToFile(conv.File.FilePath);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(MainConversation.File.FilePath)) return false;
+
+            MainConversation.File.SaveToFile(MainConversation.File.FilePath);
+            return true;
         }
 
         public virtual bool SaveFileAs()
         {
-            sfd.Filter = "Text files (*.txt)|*.txt";
-            sfd.FilterIndex = 1;
+            SaveFileDialog.Filter = Resources.TextFileFilter;
+            SaveFileDialog.FilterIndex = 1;
 
-            if (conv.File.FileName != string.Empty)
-                sfd.FileName = conv.File.FileName;
+            if (!string.IsNullOrEmpty(MainConversation.File.FileName))
+                SaveFileDialog.FileName = MainConversation.File.FileName;
 
-            if(sfd.ShowDialog() == DialogResult.OK)
+            if (SaveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if (conv.File.SaveToFile(sfd.FileName))
+                    if (MainConversation.File.SaveToFile(SaveFileDialog.FileName))
                     {
-                        mainView.FormName = conv.File.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                        MainView.FormName =
+                            MainConversation.File.FileName = Path.GetFileNameWithoutExtension(SaveFileDialog.FileName);
                         return true;
                     }
                     else
@@ -107,273 +106,292 @@ namespace FEITS.Controller
 
         public bool ImportMessageScript()
         {
-            ScriptImport messageImporter = new ScriptImport();
+            var messageImporter = new ScriptImport();
             try
             {
-                ImportExportController importCont = new ImportExportController(messageImporter, "");
-                DialogResult dialogResult = messageImporter.ShowDialog();
+                var importCont = new ImportExportController(messageImporter, "");
+                var dialogResult = messageImporter.ShowDialog();
 
                 if (dialogResult == DialogResult.OK)
                 {
-                    if (conv.File.LoadFromString(importCont.MessageScript))
+                    if (MainConversation.File.LoadFromString(importCont.MessageScript))
                     {
-                        mainView.SetMessageList(conv.File.MessageList);
+                        MainView.SetMessageList(MainConversation.File.MessageList);
                     }
                     else
                     {
-                        MessageBox.Show("There was a problem parsing the message. Please double-check the text and try again.", "Failed to Import Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(
+                            "There was a problem parsing the message. Please double-check the text and try again.",
+                            "Failed to Import Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return false;
                     }
                 }
             }
             finally
             {
-                if (messageImporter != null)
-                    messageImporter.Dispose();
+                messageImporter.Dispose();
             }
             return true;
         }
 
         public void ExportMessageScript(bool allMessages)
         {
-            ScriptExport messageExporter = new ScriptExport();
+            var messageExporter = new ScriptExport();
             try
             {
-                ImportExportController exportCont = new ImportExportController(messageExporter, allMessages ? conv.File.CompileFileText() : conv.File.MessageList[conv.MessageIndex].CompileMessage(false));
+                var exportCont = new ImportExportController(messageExporter,
+                    allMessages
+                        ? MainConversation.File.CompileFileText()
+                        : MainConversation.File.MessageList[MainConversation.MessageIndex].CompileMessage(false));
                 messageExporter.ShowDialog();
             }
             catch
             {
+                //TODO(Robin): Better logging
                 MessageBox.Show("Nothing to export.", "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             finally
             {
-                if(messageExporter != null)
-                    messageExporter.Dispose();
+                messageExporter.Dispose();
             }
         }
 
         public void EditMessageScript(bool currentLineOnly)
         {
-            if(conv.File.MessageList.Count < 1)
+            var messageList = MainConversation.File.MessageList;
+            if (messageList.Count < 1)
             {
-                MessageBox.Show("There is nothing to edit.", "Cannot Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("There is nothing to edit.", "Cannot Edit", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
-            string rawLine = string.Empty;
+            var rawLine = string.Empty;
             if (currentLineOnly)
             {
-                conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].UpdateRawWithNewDialogue();
-                rawLine = conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].RawLine;
+                messageList[MainConversation.MessageIndex].MessageLines[MainConversation.LineIndex]
+                    .UpdateRawWithNewDialogue();
+                rawLine = messageList[MainConversation.MessageIndex].MessageLines[MainConversation.LineIndex].RawLine;
                 rawLine = rawLine.Replace(Environment.NewLine, "\\n").Replace("\n", "\\n");
             }
 
-            using (DirectEdit messageEdit = new DirectEdit())
+            using (var messageEdit = new DirectEdit())
             {
-                ImportExportController editCont = new ImportExportController(messageEdit, currentLineOnly ? rawLine : conv.File.MessageList[conv.MessageIndex].CompileMessage(false));
+                var editCont = new ImportExportController(messageEdit,
+                    currentLineOnly ? rawLine : messageList[MainConversation.MessageIndex].CompileMessage(false));
 
-                if (messageEdit.ShowDialog() == DialogResult.OK)
+                if (messageEdit.ShowDialog() != DialogResult.OK) return;
+
+                var newMessage = string.Empty;
+                if (currentLineOnly)
                 {
-                    string newMessage = string.Empty;
-                    if (currentLineOnly)
-                    {
-                        conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].RawLine = editCont.MessageScript;
+                    messageList[MainConversation.MessageIndex].MessageLines[MainConversation.LineIndex].RawLine =
+                        editCont.MessageScript;
 
-                        foreach (MessageLine msg in conv.File.MessageList[conv.MessageIndex].MessageLines)
-                        {
-                            newMessage += msg.RawLine;
-                        }
-                    }
-                    else
-                    {
-                        newMessage = editCont.MessageScript;
-                    }
-
-                    conv.File.MessageList[conv.MessageIndex].MessageLines.Clear();
-                    conv.File.MessageList[conv.MessageIndex].ParseMessage(newMessage);
-
-                    if (currentLineOnly)
-                        SetCurrentLine();
-                    else
-                        SetCurrentMessage();
+                    newMessage = messageList[MainConversation.MessageIndex].MessageLines
+                                                                           .Aggregate(newMessage,
+                                                                               (current, msg) => current + msg.RawLine);
                 }
+                else
+                {
+                    newMessage = editCont.MessageScript;
+                }
+
+                messageList[MainConversation.MessageIndex].MessageLines.Clear();
+                messageList[MainConversation.MessageIndex].ParseMessage(newMessage);
+
+                if (currentLineOnly)
+                    SetCurrentLine();
+                else
+                    SetCurrentMessage();
             }
         }
 
         public void OpenHalfBoxEditor()
         {
-            using (HalfBoxTester halfBox = new HalfBoxTester())
+            using (var halfBox = new HalfBoxTester())
             {
-                HalfBoxController hbCont = new HalfBoxController(halfBox);
+                var hbCont = new HalfBoxController(halfBox);
                 halfBox.ShowDialog();
             }
         }
 
         public void ShowFriendlyReminder()
         {
-            if(!reminderOpen)
-            {
-                reminderOpen = true;
-                FriendlyReminder reminder = new FriendlyReminder();
-                reminder.SetController(this);
-                reminder.Show();
-            }
+            if (IsReminderOpen) return;
+
+            IsReminderOpen = true;
+            var reminder = new FriendlyReminder();
+            reminder.SetController(this);
+            reminder.Show();
         }
 
         public void ExitApplication()
         {
             Application.Exit();
         }
+
         #endregion
 
         protected ParsedFileContainer GetConversationFile()
         {
-            return conv.File;
+            return MainConversation.File;
         }
 
         public void SetOptions()
         {
-            mainView.ProtagonistName = conv.PlayerName;
-            mainView.CurrentTextbox = conv.TextboxIndex;
-            mainView.EnableBackgrounds = conv.EnableBackgrounds;
+            MainView.ProtagonistName = MainConversation.PlayerName;
+            MainView.CurrentTextbox = MainConversation.TextboxIndex;
+            MainView.EnableBackgrounds = MainConversation.EnableBackgrounds;
         }
 
         public void LoadAssets()
         {
-            IList dictList = ((CompactMainForm)mainView).GetCustomDictionary();
-            LoadingPopup loader = new LoadingPopup();
+            var dictList = ((CompactMainForm) MainView).GetCustomDictionary();
+            var loader = new LoadingPopup();
             loader.BeginLoading(dictList);
             loader.ShowDialog();
         }
 
         public void SetCurrentMessage()
         {
-            conv.MessageIndex = mainView.MsgListIndex;
-            Console.WriteLine(conv.MessageIndex);
+            MainConversation.MessageIndex = MainView.MsgListIndex;
+            Debug.WriteLine(MainConversation.MessageIndex);
             SetCurrentLine();
 
-            mainView.PlayerGender = conv.File.MessageList[conv.MessageIndex].Prefix.Contains("PCF") ? 1 : 0;
+            MainView.PlayerGender = MainConversation.GetPlayerGenderFromMessageList();
         }
 
         public void NextPage()
         {
-            if(conv.File.MessageList.Count > 0)
-            {
-                conv.LineIndex++;
-                SetCurrentLine();
-            }
+            if (MainConversation.File.MessageList.Count <= 0) return;
+
+            MainConversation.LineIndex++;
+            SetCurrentLine();
         }
 
         public void PreviousPage()
         {
-            if (conv.File.MessageList.Count > 0)
-            {
-                conv.LineIndex--;
-                conv.GetCommandsUpUntilIndex();
-                SetCurrentLine();
-            }
+            if (MainConversation.File.MessageList.Count <= 0) return;
+
+            MainConversation.LineIndex--;
+            MainConversation.GetCommandsUpUntilIndex();
+            SetCurrentLine();
         }
 
         public void GoToPage(int page)
         {
-            if (conv.File.MessageList.Count > 0)
-            {
-                if (page >= conv.File.MessageList[conv.MessageIndex].MessageLines.Count)
-                    page = conv.File.MessageList[conv.MessageIndex].MessageLines.Count - 1;
+            var messageList = MainConversation.File.MessageList;
 
-                if (page < 0)
-                    page = 0;
+            if (messageList.Count <= 0) return;
 
-                conv.LineIndex = page;
-                conv.GetCommandsUpUntilIndex();
-                SetCurrentLine();
-            }
+            if (page >= messageList[MainConversation.MessageIndex].MessageLines.Count)
+                page = messageList[MainConversation.MessageIndex].MessageLines.Count - 1;
+
+            if (page < 0)
+                page = 0;
+
+            MainConversation.LineIndex = page;
+            MainConversation.GetCommandsUpUntilIndex();
+            SetCurrentLine();
         }
 
         private void SetCurrentLine()
         {
-            mainView.CurrentPage = conv.LineIndex;
-            mainView.PageCount = conv.File.MessageList[conv.MessageIndex].MessageLines.Count.ToString();
-            mainView.CurrentLine = conv.GetParsedCommands(conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex]);
-            mainView.PrevLine = (conv.LineIndex > 0) ? true : false;
-            mainView.NextLine = (conv.LineIndex < conv.File.MessageList[conv.MessageIndex].MessageLines.Count - 1) ? true : false;
+            var conv = MainConversation;
+            var lineIndex = conv.LineIndex;
+            var msgList = conv.File.MessageList;
+            var msgIndex = conv.MessageIndex;
+
+            MainView.CurrentPage = lineIndex;
+            MainView.PageCount = msgList[msgIndex].MessageLines.Count.ToString();
+            MainView.CurrentLine = conv.GetParsedCommands(msgList[msgIndex].MessageLines[lineIndex]);
+            MainView.PrevLine = (lineIndex > 0);
+            MainView.NextLine = (lineIndex < msgList[msgIndex].MessageLines.Count - 1);
         }
 
         public void OnMsgLineChanged()
         {
             try
             {
-                conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].SpokenText = mainView.CurrentLine;
+                MainConversation.File.MessageList[MainConversation.MessageIndex].MessageLines[MainConversation.LineIndex
+                    ].SpokenText = MainView.CurrentLine;
 
-                if (conv.File.MessageList[conv.MessageIndex] != null)
-                    mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+                //TODO(Robin): Test for null here but count elsewhere, why?
+                if (MainConversation.File.MessageList[MainConversation.MessageIndex] != null)
+                    MainView.PreviewImage = MainConversation.RenderPreviewBox(MainView.CurrentLine);
             }
             catch
             {
-                
+                //TODO(Robin): ???
             }
         }
 
         public virtual void OnNameChanged()
         {
-            conv.PlayerName = mainView.ProtagonistName;
+            MainConversation.PlayerName = MainView.ProtagonistName;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+            ResyncMainViewPreview();
         }
 
         public virtual void OnTextboxChanged()
         {
-            conv.TextboxIndex = mainView.CurrentTextbox;
+            MainConversation.TextboxIndex = MainView.CurrentTextbox;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+            ResyncMainViewPreview();
+        }
+
+        private void ResyncMainViewPreview()
+        {
+            if (MainConversation.File.MessageList.Count > 0)
+                MainView.PreviewImage = MainConversation.RenderPreviewBox(MainView.CurrentLine);
         }
 
         public void OnPlayerGenderChanged()
         {
-            conv.PlayerGender = mainView.PlayerGender;
+            MainConversation.PlayerGender = MainView.PlayerGender;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+            ResyncMainViewPreview();
         }
 
         public virtual void OnBackgroundEnabledChanged()
         {
-            conv.EnableBackgrounds = mainView.EnableBackgrounds;
+            MainConversation.EnableBackgrounds = MainView.EnableBackgrounds;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+            ResyncMainViewPreview();
 
-            if (mainView.EnableBackgrounds)
+            if (MainView.EnableBackgrounds)
             {
-                MessageBox.Show("Backgrounds enabled." + Environment.NewLine + "Drag/drop an image onto the Picture Box to change the background." + Environment.NewLine + "Disable and then re-enable to reset the background image.", "Alert", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    "Backgrounds enabled." + Environment.NewLine +
+                    "Drag/drop an image onto the Picture Box to change the background." + Environment.NewLine +
+                    "Disable and then re-enable to reset the background image.", "Alert", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
         }
 
         public virtual bool HandleNewBackgroundImage(DragEventArgs e)
         {
-            string file = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+            var file = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
 
-            if(File.Exists(file))
+            if (File.Exists(file))
             {
                 try
                 {
-                    Image img = Image.FromFile(file);
-                    if(img.Width > 1 && img.Height > 1)
+                    var img = Image.FromFile(file);
+                    if (img.Width > 1 && img.Height > 1)
                     {
-                        conv.BackgroundImage = img;
+                        MainConversation.BackgroundImage = img;
 
-                        if (conv.File.MessageList.Count > 0)
-                            mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+                        ResyncMainViewPreview();
 
                         return true;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Background Could Not Be Changed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(ex.Message, "Background Could Not Be Changed", MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                     return false;
                 }
             }
@@ -383,38 +401,36 @@ namespace FEITS.Controller
 
         public void SavePreview(bool fullConversation)
         {
-            sfd.Filter = "PNG Files (*.png)|*.png";
-            
-            if(fullConversation)
+            SaveFileDialog.Filter = Resources.PngFileFilter;
+
+            if (fullConversation)
             {
-                sfd.FileName = conv.File.FileName + "_Conversation";
+                SaveFileDialog.FileName = MainConversation.File.FileName + "_Conversation";
 
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    Image imageFile = conv.RenderConversation();
-                    conv.GetCommandsUpUntilIndex();
-                    SetCurrentLine();
+                if (SaveFileDialog.ShowDialog() != DialogResult.OK) return;
 
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
-                }
+                var imageFile = MainConversation.RenderConversation();
+                MainConversation.GetCommandsUpUntilIndex();
+                SetCurrentLine();
+
+                imageFile.Save(SaveFileDialog.FileName, ImageFormat.Png);
             }
             else
             {
-                sfd.FileName = conv.File.FileName + "_Page" + mainView.CurrentPage.ToString();
-                
-                if(sfd.ShowDialog() == DialogResult.OK)
-                {
-                    Image imageFile = mainView.PreviewImage;
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
-                }
+                SaveFileDialog.FileName = MainConversation.File.FileName + "_Page" + MainView.CurrentPage;
+
+                if (SaveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+                var imageFile = MainView.PreviewImage;
+                imageFile.Save(SaveFileDialog.FileName, ImageFormat.Png);
             }
         }
 
         public void SetupCompareMode()
         {
-            TwoFileForm compareForm = new TwoFileForm();
-            TwoFileController controller = new TwoFileController(compareForm, conv);
-            CompactMainForm form = (CompactMainForm)mainView;
+            var compareForm = new TwoFileForm();
+            var controller = new TwoFileController(compareForm, MainConversation);
+            var form = (CompactMainForm) MainView;
             controller.SetNormalFormRefs(form);
             form.Hide();
 

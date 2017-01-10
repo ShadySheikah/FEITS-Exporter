@@ -1,9 +1,5 @@
-﻿using FEITS.Properties;
-using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using FEITS.Controller;
 
