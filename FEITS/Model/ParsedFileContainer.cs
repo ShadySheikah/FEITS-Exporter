@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace FEITS.Model
@@ -12,7 +15,7 @@ namespace FEITS.Model
     {
         public string FileName;
         public string FilePath;
-        public string[] Header;
+        private string[] Header;
         public List<MessageBlock> MessageList;
 
         public ParsedFileContainer()
@@ -24,7 +27,7 @@ namespace FEITS.Model
         /// Removes any previous message data
         /// and returns the file to an empty state.
         /// </summary>
-        public void EmptyFileData()
+        private void EmptyFileData()
         {
             FileName = FilePath = string.Empty;
             Header = null;
@@ -32,6 +35,7 @@ namespace FEITS.Model
         }
 
         #region Loading
+
         /// <summary>
         /// Reads lines from specified file
         /// and parses the information
@@ -39,26 +43,20 @@ namespace FEITS.Model
         /// <param name="filePath">Specified file name</param>
         public bool LoadFromFile(string filePath)
         {
-            if(filePath != string.Empty)
+            if (!string.IsNullOrEmpty(filePath))
             {
                 EmptyFileData();
 
                 //Store the file path
                 FilePath = filePath;
 
-                string[] fileSplitByLinebreak = File.ReadAllLines(filePath);
+                var fileSplitByLinebreak = File.ReadAllLines(filePath);
 
-                if (LoadConversationFromString(fileSplitByLinebreak))
-                    return true;
-                else
-                    return false;
+                return LoadConversationFromString(fileSplitByLinebreak);
             }
-            else
-            {
-                EmptyFileData();
-                Console.WriteLine("Opened file was empty; treating as a new object and keeping the file path.");
-                return true;
-            }
+            EmptyFileData();
+            Debug.WriteLine("Opened file was empty; treating as a new object and keeping the file path.");
+            return true;
         }
 
         public bool LoadFromString(string messageString)
@@ -67,19 +65,15 @@ namespace FEITS.Model
 
             try
             {
-                if(messageString.StartsWith("MESS_"))
+                if (messageString.StartsWith("MESS_"))
                 {
-                    string[] fileSplitByLinebreak = messageString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                    var fileSplitByLinebreak = messageString.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
 
-                    if (LoadConversationFromString(fileSplitByLinebreak))
-                        return true;
-                    else
-                        return false;
+                    return LoadConversationFromString(fileSplitByLinebreak);
                 }
                 else
                 {
-                    MessageBlock newMessage = new MessageBlock();
-                    newMessage.Prefix = "Imported Message";
+                    var newMessage = new MessageBlock {Prefix = "Imported Message"};
                     newMessage.ParseMessage(messageString);
                     MessageList.Add(newMessage);
                 }
@@ -92,52 +86,46 @@ namespace FEITS.Model
             return true;
         }
 
-        public bool LoadConversationFromString(string[] fileLines)
+        private bool LoadConversationFromString(IReadOnlyList<string> fileLines)
         {
             //Parse for header and message blocks
             if (fileLines[0].StartsWith("MESS_"))
             {
                 //Find where the header ends
                 //Should be after "Message Name: Message"
-                int headerEndIndex = 0;
-                for (int i = 0; i < fileLines.Length; i++)
+                var headerEndIndex = 0;
+                for (var i = 0; i < fileLines.Count; i++)
                 {
-                    if (fileLines[i].Contains(":"))
+                    if (!fileLines[i].Contains(":")) continue;
+                    if (headerEndIndex != 0)
                     {
-                        if (headerEndIndex != 0)
-                        {
-                            headerEndIndex = i;
-                            break;
-                        }
-                        else
-                        {
-                            headerEndIndex = i;
-                            continue;
-                        }
+                        headerEndIndex = i;
+                        break;
                     }
+                    headerEndIndex = i;
                 }
 
                 //If we found the header, add it to Header
                 if (headerEndIndex != 0)
                 {
                     Header = new string[headerEndIndex];
-                    for (int i = 0; i < headerEndIndex; i++)
+                    for (var i = 0; i < headerEndIndex; i++)
                     {
                         Header[i] = fileLines[i];
                     }
 
                     //Create messages from the rest of the lines
-                    for (int i = headerEndIndex; i < fileLines.Length; i++)
+                    for (var i = headerEndIndex; i < fileLines.Count; i++)
                     {
                         //Separate the prefix from the message itself
                         if (fileLines[i].Contains(":"))
                         {
-                            MessageBlock newMessage = new MessageBlock();
-                            int prefixIndex = fileLines[i].IndexOf(":");
+                            var newMessage = new MessageBlock();
+                            var prefixIndex = fileLines[i].IndexOf(":", StringComparison.Ordinal);
                             newMessage.Prefix = fileLines[i].Substring(0, prefixIndex);
 
                             //Get the message by itself
-                            string message = fileLines[i].Substring(prefixIndex + 2);
+                            var message = fileLines[i].Substring(prefixIndex + 2);
 
                             //Make sure we didn't leave any prefix stuff behind
                             if (message.StartsWith(":"))
@@ -146,7 +134,7 @@ namespace FEITS.Model
 
                                 return false;
                             }
-                            else if (char.IsWhiteSpace(message[0]))
+                            if (char.IsWhiteSpace(message[0]))
                             {
                                 message = message.Remove(0, 1);
                             }
@@ -159,29 +147,37 @@ namespace FEITS.Model
                         }
                         else
                         {
-                            MessageBox.Show("Message lines don't appear to be formatted correctly. Please make sure each message is preceeded with a Message Name.", "Error");
+                            MessageBox.Show(
+                                "Message lines don't appear to be formatted correctly. Please make sure each message is preceeded with a Message Name.",
+                                "Error");
                             return false;
                         }
-                        //messageProgress = (int)((float)i / fileLines.Length * 100);
+                        //TODO: messageProgress = (int)((float)i / fileLines.Length * 100);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("File header doesn't appear to be formatted correctly. Please make sure the formatting is correct.", "Error");
+                    MessageBox.Show(
+                        "File header doesn't appear to be formatted correctly. Please make sure the formatting is correct.",
+                        "Error");
                     return false;
                 }
             }
             else
             {
-                MessageBox.Show("File contents don't appear to be formatted correctly. Please make sure the formatting is correct and the file is compatible with FEITS.", "Error");
+                MessageBox.Show(
+                    "File contents don't appear to be formatted correctly. Please make sure the formatting is correct and the file is compatible with FEITS.",
+                    "Error");
                 return false;
             }
 
             return true;
         }
+
         #endregion
 
         #region Saving
+
         /// <summary>
         /// Compiles the message list and
         /// writes contents with header to file.
@@ -189,46 +185,29 @@ namespace FEITS.Model
         /// <param name="filePath">File to save as</param>
         public bool SaveToFile(string filePath)
         {
-            if(filePath != string.Empty)
-            {
-                //Update file path in case different
-                FilePath = filePath;
+            if (string.IsNullOrEmpty(filePath)) return false;
 
-                string compiledFileText = CompileFileText();
+            //Update file path in case different
+            FilePath = filePath;
 
-                if (compiledFileText != string.Empty)
-                {
-                    File.WriteAllText(filePath, compiledFileText);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
+            var compiledFileText = CompileFileText();
+
+            if (string.IsNullOrEmpty(compiledFileText)) return false;
+            File.WriteAllText(filePath, compiledFileText, new UTF8Encoding(true));
+            return true;
         }
 
         public string CompileFileText()
         {
             //Start compiling a string to make up the new file
-            string newFileText = string.Empty;
-            foreach (string str in Header)
-            {
-                newFileText += str + Environment.NewLine;
-            }
+            var newFileText = Header.Aggregate(string.Empty,
+                (current, str) => current + str + Environment.NewLine);
 
-            foreach (MessageBlock msg in MessageList)
-            {
-                string compiledMsg = msg.CompileMessage();
-                newFileText += (compiledMsg + Environment.NewLine);
-            }
-
-            return newFileText;
+            return MessageList.Select(msg => msg.CompileMessage())
+                              .Aggregate(newFileText,
+                                  (current, s) => current + s + Environment.NewLine);
         }
+
         #endregion
     }
 }

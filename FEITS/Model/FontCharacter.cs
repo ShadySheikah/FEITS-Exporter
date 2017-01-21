@@ -2,93 +2,62 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace FEITS.Model
 {
     public class FontCharacter
     {
-        public ushort Value;
-        public ushort IMG;
-        public ushort XOfs;
-        public ushort YOfs;
-        public byte Width;
-        public byte Height;
-        public byte Padding1;
-        public int CropHeight;
-        public int CropWidth;
-        public byte[] Padding2; // Size = 3;
+        public FontCharacterData Data { get; }
+        private Image Glyph { get; set; }
 
-        public char Character;
-
-        public Image Glyph;
-
-        public FontCharacter() { }
-
-        public FontCharacter(byte[] Data) : this(Data, 0) { }
-
-        public FontCharacter(byte[] Data, int ofs)
+        public FontCharacter(byte[] data, int ofs = 0)
         {
-            Value = BitConverter.ToUInt16(Data, ofs + 0);
-            IMG = BitConverter.ToUInt16(Data, ofs + 2);
-            XOfs = BitConverter.ToUInt16(Data, ofs + 4);
-            YOfs = BitConverter.ToUInt16(Data, ofs + 6);
-            Width = Data[ofs + 8];
-            Height = Data[ofs + 9];
-            Padding1 = Data[ofs + 0xA];
-            CropHeight = Data[ofs + 0xB];
-            if (CropHeight > 0x7F)
-                CropHeight -= 256;
-            CropWidth = Data[ofs + 0xC];
-            if (CropWidth > 0x7F)
-                CropWidth -= 256;
-            Padding2 = new byte[0x3];
-            Array.Copy(Data, ofs + 0xD, Padding2, 0, 3);
-
-            Character = Encoding.Unicode.GetString(Data, ofs + 0, 2)[0];
+            Data = new FontCharacterData(data, ofs);
         }
 
         public void SetGlyph(Image img)
         {
-            Bitmap crop = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(crop))
+            var crop = new Bitmap(Data.Width, Data.Height);
+            using (var g = Graphics.FromImage(crop))
             {
-                g.DrawImage(img as Bitmap, new Rectangle(0, 0, Width, Height), new Rectangle(XOfs, YOfs, Width, Height), GraphicsUnit.Pixel);
+                g.DrawImage((Bitmap) img,
+                    new Rectangle(0, 0, Data.Width, Data.Height),
+                    new Rectangle(Data.XOffset, Data.YOffset, Data.Width, Data.Height),
+                    GraphicsUnit.Pixel);
             }
             Glyph = crop;
         }
 
-        public Image GetGlyph(Color NewColor)
+        public Image GetGlyph(Color newColor)
         {
-            Bitmap ColoredGlyph = Glyph as Bitmap;
+            var coloredGlyph = (Bitmap) Glyph;
 
-            Rectangle rect = new Rectangle(0, 0, ColoredGlyph.Width, ColoredGlyph.Height);
-            BitmapData bmpData = ColoredGlyph.LockBits(rect, ImageLockMode.ReadWrite, ColoredGlyph.PixelFormat);
+            var rect = new Rectangle(0, 0, coloredGlyph.Width, coloredGlyph.Height);
+            var bmpData = coloredGlyph.LockBits(rect, ImageLockMode.ReadWrite, coloredGlyph.PixelFormat);
 
-            IntPtr ptr = bmpData.Scan0;
+            var ptr = bmpData.Scan0;
 
-            int bytes = Math.Abs(bmpData.Stride) * ColoredGlyph.Height;
-            byte[] rgbaValues = new byte[bytes];
+            var bytes = Math.Abs(bmpData.Stride)*coloredGlyph.Height;
+            var rgbaValues = new byte[bytes];
 
             // Copy the RGB values into the array.
             Marshal.Copy(ptr, rgbaValues, 0, bytes);
 
-            for (int i = 0; i < rgbaValues.Length; i += 4)
+            for (var i = 0; i < rgbaValues.Length; i += 4)
             {
-                if (rgbaValues[i + 3] > 0) // If CurrentColor.A > 0
-                {
-                    rgbaValues[i + 2] = NewColor.R;
-                    rgbaValues[i + 1] = NewColor.G;
-                    rgbaValues[i + 0] = NewColor.B;
-                }
+                if (rgbaValues[i + 3] <= 0) // Skip if CurrentColor.A <= 0
+                    continue;
+                rgbaValues[i + 2] = newColor.R;
+                rgbaValues[i + 1] = newColor.G;
+                rgbaValues[i + 0] = newColor.B;
             }
 
             // Copy the RGB values back to the bitmap
             Marshal.Copy(rgbaValues, 0, ptr, bytes);
 
             // Unlock the bits.
-            ColoredGlyph.UnlockBits(bmpData);
-            return ColoredGlyph;
+            coloredGlyph.UnlockBits(bmpData);
+            return coloredGlyph;
         }
     }
 }

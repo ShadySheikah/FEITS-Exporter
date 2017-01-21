@@ -40,7 +40,7 @@ namespace FEITS.View
 
         private void assetLoader_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker worker = sender as BackgroundWorker;
+            var worker = sender as BackgroundWorker;
             AssetGeneration.Initialize(worker, e, dictList);
         }
     }
