@@ -46,7 +46,7 @@ namespace FEITS.Model
                 //Store the file path
                 FilePath = filePath;
 
-                string[] fileSplitByLinebreak = File.ReadAllLines(filePath);
+                string[] fileSplitByLinebreak = File.ReadAllLines(filePath, System.Text.Encoding.UTF8);
 
                 if (LoadConversationFromString(fileSplitByLinebreak))
                     return true;

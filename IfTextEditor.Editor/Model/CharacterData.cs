@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -28,10 +29,6 @@ namespace FEITS.Model
         private static Dictionary<string, byte[]> faceData;
         private static List<string> resourceList = new List<string>();
 
-        //Lexicon
-        private static readonly string tempPath = Path.Combine(Path.GetTempPath(), "FEITS\\");
-        private static Uri lexUri;
-
         //Kamui
         private static string[] EyeStyles = { "a", "b", "c", "d", "e", "f", "g" };
         private static string[] Kamuis = { "マイユニ男1", "マイユニ女2" };
@@ -41,7 +38,7 @@ namespace FEITS.Model
             
         }
 
-        public static void Initialize(BackgroundWorker worker, DoWorkEventArgs e, IList dictList)
+        public static void Initialize(BackgroundWorker worker, DoWorkEventArgs e)
         {
             if(isInitialized)
             {
@@ -54,15 +51,25 @@ namespace FEITS.Model
                 //Set up font, generate list of valid chars
                 validCharacters = new bool[0x10000];
                 characters = new FontCharacter[0x10000];
+                var charWidths = new Dictionary<char, int>();
                 for (int i = 0; i < Resources.chars.Length / 0x10; i++)
                 {
-                    FontCharacter fc = new FontCharacter(Resources.chars, i * 0x10);
+                    var fc = new FontCharacter(Resources.chars, i * 0x10);
                     validCharacters[fc.Value] = true;
                     fc.SetGlyph(Images[fc.IMG]);
                     characters[fc.Value] = fc;
+                    if (!charWidths.ContainsKey(fc.Character))
+                        charWidths.Add(fc.Character, fc.CropWidth);
                 }
 
-                worker.ReportProgress(25);
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FontData");
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                List<string> lines = charWidths.Select(entry => entry.Key + "\t" + entry.Value).ToList();
+                File.WriteAllLines(Path.Combine(path, "charWidths.txt"), lines, Encoding.UTF8);
+
+                worker.ReportProgress(33);
 
                 //Grab face data and assign to dictionary
                 faceData = new Dictionary<string, byte[]>();
@@ -74,10 +81,29 @@ namespace FEITS.Model
                     faceData[fids[i]] = dat;
                 }
 
-                worker.ReportProgress(50);
+                var stageBlush = new List<string>();
+                var stageSweat = new List<string>();
+                var BuCropDimensions = new List<string>();
+                var BuCropPos = new List<string>();
+                foreach (KeyValuePair<string, byte[]> entry in faceData)
+                {
+                    if (entry.Key.Contains("_ST_"))
+                    {
+                        stageBlush.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x38) + "," + BitConverter.ToUInt16(entry.Value, 0x3A));
+                        stageSweat.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x40) + "," + BitConverter.ToUInt16(entry.Value, 0x42));
+                        continue;
+                    }
 
-                dictList.Add(new Uri(@"pack://application:,,,/FEITS Exporter;component/Resources/txt/FE_Dictionary.lex"));
-                worker.ReportProgress(75);
+                    BuCropDimensions.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x34) + "," + BitConverter.ToUInt16(entry.Value, 0x36));
+                    BuCropPos.Add(entry.Key.Substring(8) + '\t' + -BitConverter.ToUInt16(entry.Value, 0x30) + "," + -BitConverter.ToUInt16(entry.Value, 0x32));
+                }
+
+                File.WriteAllLines(Path.Combine(path, "FaceSweat.txt"), stageSweat, Encoding.UTF8);
+                File.WriteAllLines(Path.Combine(path, "FaceBlush.txt"), stageBlush, Encoding.UTF8);
+                File.WriteAllLines(Path.Combine(path, "CroppedDimensions.txt"), BuCropDimensions, Encoding.UTF8);
+                File.WriteAllLines(Path.Combine(path, "CroppedPositions.txt"), BuCropPos, Encoding.UTF8);
+
+                worker.ReportProgress(66);
 
                 ResourceSet set = Resources.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
                 foreach (DictionaryEntry o in set)
@@ -98,8 +124,13 @@ namespace FEITS.Model
             int CurX = StartX;
             int CurY = StartY;
             Bitmap NewImage = BaseImage.Clone() as Bitmap;
+
+            //var charWidths = new List<string>();
+
             using (Graphics g = Graphics.FromImage(NewImage))
             {
+                g.Clear(Color.DeepSkyBlue);
+
                 foreach (char c in Message)
                 {
                     if (c == '\n')
@@ -112,14 +143,22 @@ namespace FEITS.Model
                         FontCharacter cur = characters[GetValue(c)];
                         g.DrawImage(cur.GetGlyph(TextColor), new Point(CurX, CurY - cur.CropHeight));
                         CurX += cur.CropWidth;
+
+                        //charWidths.Add(string.Format(c + "\t" + cur.CropWidth));
                     }
                 }
             }
+
+            //foreach (string str in charWidths)
+            //{
+            //    Debug.WriteLine(str);
+            //}
             return NewImage;
         }
 
         public static Image GetCharacterStageImage(string CName, string CEmo, Color HairColor, bool Slot1, int PGender)
         {
+            //Names
             bool USER = CName == "username";
             string hairname = "_st_髪";
             string dat_id = "FSID_ST_" + CName;
@@ -131,21 +170,24 @@ namespace FEITS.Model
             }
             else
                 hairname = CName + hairname + "0";
+
+            //Emotion parsing
             var Emos = CEmo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             string resname = CName + "_st_" + Emos[0];
+
+            //Grab image
             Image C;
             if (resourceList.Contains(resname))
                 C = Resources.ResourceManager.GetObject(resname) as Image;
             else
                 C = new Bitmap(1, 1);
+
+            //Drawing
             using (Graphics g = Graphics.FromImage(C))
             {
-                if (USER && 0 > 0)
-                {
-                    g.DrawImage(Resources.ResourceManager.GetObject((new[] { "マイユニ男1", "マイユニ女2" })[PGender] + "_st_アクセサリ1_" + 0) as Image, new Point(0, 0));
-                }
                 for (int i = 1; i < Emos.Length; i++)
                 {
+                    //Secondary emotions
                     string exresname = CName + "_st_" + Emos[i];
                     if (Emos[i] == "汗" && resourceList.Contains(exresname))
                     {
@@ -156,18 +198,19 @@ namespace FEITS.Model
                         g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x38), BitConverter.ToUInt16(faceData[dat_id], 0x3A)));
                     }
                 }
+
+                //Hair
                 if (resourceList.Contains(hairname))
                 {
                     Bitmap hair = Resources.ResourceManager.GetObject(hairname) as Bitmap;
                     g.DrawImage(ColorHair(hair, HairColor), new Point(0, 0));
                 }
-                if (USER && 0 > 0)
-                {
-                    g.DrawImage(Resources.ResourceManager.GetObject((new[] { "マイユニ男1", "マイユニ女2" })[PGender] + "_st_アクセサリ2_" + 0) as Image, new Point(133, 28));
-                }
             }
+
+            //Mirror
             if (Slot1)
                 C.RotateFlip(RotateFlipType.RotateNoneFlipX);
+
             return C;
         }
 
@@ -193,19 +236,17 @@ namespace FEITS.Model
                 C = new Bitmap(1, 1);
             using (Graphics g = Graphics.FromImage(C))
             {
-                if (USER && 0 > 0)
-                {
-                    g.DrawImage(Resources.ResourceManager.GetObject((new[] { "マイユニ男1", "マイユニ女2" })[PGender] + "_bu_アクセサリ1_" + 0) as Image, new Point(0, 0));
-                }
                 for (int i = 1; i < Emos.Length; i++)
                 {
                     string exresname = CName + "_bu_" + Emos[i];
                     if (Emos[i] == "汗" && resourceList.Contains(exresname))
                     {
+                        Debug.WriteLine(dat_id + ": " + BitConverter.ToUInt16(faceData[dat_id], 0x40) + "," + BitConverter.ToUInt16(faceData[dat_id], 0x42));
                         g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x40), BitConverter.ToUInt16(faceData[dat_id], 0x42)));
                     }
                     else if (Emos[i] == "照" && resourceList.Contains(exresname))
                     {
+                        Debug.WriteLine(dat_id + ": " + BitConverter.ToUInt16(faceData[dat_id], 0x38) + "," + BitConverter.ToUInt16(faceData[dat_id], 0x3A));
                         g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x38), BitConverter.ToUInt16(faceData[dat_id], 0x3A)));
                     }
                 }
@@ -213,11 +254,6 @@ namespace FEITS.Model
                 {
                     Bitmap hair = Resources.ResourceManager.GetObject(hairname) as Bitmap;
                     g.DrawImage(ColorHair(hair, HairColor), new Point(0, 0));
-                }
-                if (USER && 0 > 0)
-                {
-                    Point Acc = new[] { new Point(66, 5), new Point(65, 21) }[0 - 2];
-                    g.DrawImage(Resources.ResourceManager.GetObject((new[] { "マイユニ男1", "マイユニ女2" })[PGender] + "_bu_アクセサリ2_" + 0) as Image, Acc);
                 }
             }
             if (Crop)

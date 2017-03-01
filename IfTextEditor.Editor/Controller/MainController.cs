@@ -241,9 +241,8 @@ namespace FEITS.Controller
 
         public void LoadAssets()
         {
-            IList dictList = ((CompactMainForm)mainView).GetCustomDictionary();
             LoadingPopup loader = new LoadingPopup();
-            loader.BeginLoading(dictList);
+            loader.BeginLoading();
             loader.ShowDialog();
         }
 

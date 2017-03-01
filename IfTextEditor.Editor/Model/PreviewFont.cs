@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 
 namespace FEITS.Model
 {
@@ -46,6 +50,30 @@ namespace FEITS.Model
             Array.Copy(Data, ofs + 0xD, Padding2, 0, 3);
 
             Character = Encoding.Unicode.GetString(Data, ofs + 0, 2)[0];
+        }
+
+        public void PrintToFile(int index)
+        {
+            var lines = new List<string>
+            {
+                "Character\t" + Character,
+                "Value\t" + Value,
+                "IMG\t" + IMG,
+                "XOfs\t" + XOfs,
+                "YOfs\t" + YOfs,
+                "Width\t" + Width,
+                "Height\t" + Height,
+                "Padding1\t" + Padding1,
+                "CropHeight\t" + CropHeight,
+                "CropWidth\t" + CropWidth
+            };
+            lines.AddRange(Padding2.Select(b => "Padding2\t" + b));
+
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Font");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            File.WriteAllLines(Path.Combine(path, "FONT_CHARACTER_" + index + ".txt"), lines, Encoding.UTF8);
         }
 
         public void SetGlyph(Image img)

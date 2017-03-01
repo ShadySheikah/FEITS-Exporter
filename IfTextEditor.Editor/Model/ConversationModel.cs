@@ -254,30 +254,36 @@ namespace FEITS.Model
 
             using (Graphics g = Graphics.FromImage(box))
             {
+                //Background
                 if (enableBackgrounds)
                 {
                     g.DrawImage(BackgroundImage, new Point(0, 0));
                 }
 
+                //Character A
                 if (charA != string.Empty)
                 {
                     Image ca = AssetGeneration.GetCharacterStageImage(charA, emotionA, colorA, true, PlayerGender);
                     g.DrawImage((charActive == charA) ? ca : AssetGeneration.Fade(ca), new Point(-28, box.Height - ca.Height + 14));
                 }
 
+                //Character B
                 if (charB != string.Empty)
                 {
                     Image cb = AssetGeneration.GetCharacterStageImage(charB, emotionB, colorB, false, PlayerGender);
                     g.DrawImage((charActive == charB) ? cb : AssetGeneration.Fade(cb), new Point(box.Width - cb.Width + 28, box.Height - cb.Height + 14));
                 }
 
+                //Textbox
                 g.DrawImage(tb, new Point(10, box.Height - tb.Height + 2));
 
+                //Name box
                 if (charActive != string.Empty)
                 {
                     g.DrawImage(nb, charActive == charB ? new Point(box.Width - nb.Width - 6, box.Height - tb.Height - 14) : new Point(7, box.Height - tb.Height - 14));
                 }
 
+                //Arrow
                 if (lineIndex > File.MessageList[messageIndex].MessageLines.Count - 1)
                 {
                     g.DrawImage(Resources.KeyPress, new Point(box.Width - 33, box.Height - tb.Height + 32));
