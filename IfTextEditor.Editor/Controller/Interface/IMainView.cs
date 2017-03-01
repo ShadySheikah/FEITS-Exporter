@@ -18,7 +18,7 @@ namespace FEITS.Controller
         string ProtagonistName { get; set; }
         int CurrentTextbox { get; set; }
         bool EnableBackgrounds { get; set; }
-        int PlayerGender { get; set; }
+        PlayerGender PlayerGender { get; set; }
 
         //Status
         string FormName { set; }

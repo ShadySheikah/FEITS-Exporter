@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TwoFileForm));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(TwoFileForm));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.TSL_PageNumber_Source = new System.Windows.Forms.ToolStripStatusLabel();
             this.TSL_PageNumber_Target = new System.Windows.Forms.ToolStripStatusLabel();

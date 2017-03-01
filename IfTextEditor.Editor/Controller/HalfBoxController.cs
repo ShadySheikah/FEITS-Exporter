@@ -1,43 +1,42 @@
 ﻿using FEITS.Properties;
 using FEITS.Model;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FEITS.View;
-using System.Windows.Forms;
 
 namespace FEITS.Controller
 {
     public class HalfBoxController
     {
-        private IHalfBoxView view;
-        private Image[] textboxes = { Resources.HalfBox, Resources.HalfBox_Nohr, Resources.HalfBox_Hoshido };
+        private IHalfBoxView View { get; }
+        private Image[] Textboxes { get; } = {Resources.HalfBox, Resources.HalfBox_Nohr, Resources.HalfBox_Hoshido};
 
-        public HalfBoxController(IHalfBoxView v)
+        public HalfBoxController(IHalfBoxView view)
         {
-            view = v;
-            view.SetController(this);
+            View = view;
+            View.SetController(this);
             SetControls();
         }
 
         private void SetControls()
         {
-            view.CurrentTextboxIndex = 0;
-            view.CurrentLine = "This is an example\r\nmessage.";
+            View.CurrentTextboxIndex = 0;
+            View.CurrentLine = "This is an example\r\nmessage.";
         }
 
         public Image UpdatePreview()
         {
-            Image hb = textboxes[view.CurrentTextboxIndex].Clone() as Bitmap;
-            Image text = AssetGeneration.DrawString(new Bitmap(165, 50), view.CurrentLine.Replace(Environment.NewLine, "\n"), 0, 22, Color.FromArgb(68, 8, 0)) as Bitmap;
+            Image hb = (Bitmap) Textboxes[View.CurrentTextboxIndex].Clone();
+            Image text =
+                (Bitmap)
+                    AssetGeneration.DrawString(new Bitmap(165, 50), View.CurrentLine.Replace(Environment.NewLine, "\n"),
+                        0, 22, Color.FromArgb(68, 8, 0));
 
-            using (Graphics g = Graphics.FromImage(hb))
+            using (var g = Graphics.FromImage(hb))
             {
                 g.DrawImage(text, new Point(10, 0));
-                g.DrawImage(Resources.KeyPress, new Point(view.PreviewImage.Width - 30, view.PreviewImage.Height - hb.Height + 32));
+                g.DrawImage(Resources.KeyPress,
+                    new Point(View.PreviewImage.Width - 30, View.PreviewImage.Height - hb.Height + 32));
             }
 
             return hb;
@@ -45,10 +44,12 @@ namespace FEITS.Controller
 
         public void ExportText()
         {
-            using (ScriptExport lineExporter = new ScriptExport())
+            using (var lineExporter = new ScriptExport())
             {
-                ImportExportController exportCont = new ImportExportController(lineExporter, view.CurrentLine.Replace(Environment.NewLine, "\\n"));
-                DialogResult dialogResult = lineExporter.ShowDialog();
+                //TODO(Robin): ???
+                var exportCont = new ImportExportController(lineExporter,
+                    View.CurrentLine.Replace(Environment.NewLine, "\\n"));
+                var dialogResult = lineExporter.ShowDialog();
             }
         }
     }

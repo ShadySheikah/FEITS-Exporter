@@ -10417,4 +10417,16 @@
   <data name="Reminder_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\Reminder_1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="TextFileFilter" xml:space="preserve">
+    <value>Text files (*.txt)|*.txt</value>
+    <comment>Open/save file dialog filter for text files only.</comment>
+  </data>
+  <data name="TextFileOrAllFileFilter" xml:space="preserve">
+    <value>Text files (*.txt)|*.txt|All files (*.*)|*.*</value>
+    <comment>Open/save file dialog filter for text files or all files.</comment>
+  </data>
+  <data name="PngFileFilter" xml:space="preserve">
+    <value>PNG Files (*.png)|*.png</value>
+    <comment>Open/save file dialog filter for PNG image files only.</comment>
+  </data>
 </root>

@@ -25,7 +25,7 @@ namespace FEITS.View
 
         private void FriendlyReminder_FormClosed(object sender, FormClosedEventArgs e)
         {
-            cont.ReminderOpen = false;
+            cont.IsReminderOpen = false;
         }
     }
 }

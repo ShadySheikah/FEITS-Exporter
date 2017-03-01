@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -11,10 +12,8 @@ namespace FEITS.Model
     /// </summary>
     public class MessageBlock
     {
-        private string prefix = string.Empty;
-        public string Prefix { get { return prefix; } set { prefix = value; } }
-        private List<MessageLine> messageLines = new List<MessageLine>();
-        public List<MessageLine> MessageLines { get { return messageLines; } set { messageLines = value; } }
+        public string Prefix { get; set; } = string.Empty;
+        public List<MessageLine> MessageLines { get; } = new List<MessageLine>();
 
         #region Parsing
         /// <summary>
@@ -27,94 +26,89 @@ namespace FEITS.Model
 
             //Split the lines based on the line-end markers
             var delimiters = new List<string> { "$k$p", "$k\\n" };
-            string pattern = "(?<=" + string.Join("|", delimiters.Select(d => Regex.Escape(d)).ToArray()) + ")";
-            string[] splits = Regex.Split(message, pattern);
+            var pattern = "(?<=" + string.Join("|", delimiters.Select(Regex.Escape).ToArray()) + ")";
+            var splits = Regex.Split(message, pattern);
 
-            foreach(string str in splits)
+            foreach(var str in splits)
             {
-                MessageLine newLine = new MessageLine();
-                newLine.RawLine = str;
-                messageLines.Add(newLine);
+                var newLine = new MessageLine {RawLine = str};
+                MessageLines.Add(newLine);
             }
         }
 
         public static Tuple<string, Command> ParseCommand(string line, int offset)
         {
-            string trunc = line.Substring(offset);
+            var trunc = line.Substring(offset);
             string[] NoParams = { "$Wa", "$Wc", "$a", "$Nu", "$N0", "$N1", "$k\\n", "$k", "$t0", "$t1", "$p", "$Wd", "$Wv" };
             string[] SingleParams = { "$E", "$Sbs", "$Svp", "$Sre", "$Fw", "$Ws", "$VF", "$Ssp", "$Fo", "$VNMPID", "$Fi", "$b", "$w", "$l" };
             string[] DoubleParams = { "$Wm", "$Sbv", "$Sbp", "$Sls", "$Slp", "$Srp" };
-            Command newCmd = new Command();
+            var newCmd = new Command();
 
-            foreach(string delim in NoParams)
+            foreach(var delim in NoParams)
             {
-                if(trunc.StartsWith(delim))
-                {
-                    newCmd.cmd = delim;
-                    newCmd.numParams = 0;
-                    newCmd.Params = new string[newCmd.numParams];
-                    line = line.Substring(0, offset) + line.Substring(offset + delim.Length);
-                    break;
-                }
+                if (!trunc.StartsWith(delim)) continue;
+
+                newCmd.CommandWithPrefix = delim;
+                newCmd.numParams = 0;
+                newCmd.Params = new string[newCmd.numParams];
+                line = line.Substring(0, offset) + line.Substring(offset + delim.Length);
+                break;
             }
 
-            foreach(string delim in SingleParams)
+            foreach(var delim in SingleParams)
             {
-                if(trunc.StartsWith(delim))
+                if (!trunc.StartsWith(delim)) continue;
+
+                newCmd.CommandWithPrefix = delim;
+                newCmd.numParams = 1;
+                newCmd.Params = new string[newCmd.numParams];
+                var index = line.IndexOf("|", offset, StringComparison.Ordinal);
+                newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
+                line = line.Substring(0, offset) + line.Substring(index + 1);
+            }
+
+            foreach(var delim in DoubleParams)
+            {
+                if (!trunc.StartsWith(delim)) continue;
+
+                newCmd.CommandWithPrefix = delim;
+                newCmd.numParams = 2;
+                newCmd.Params = new string[newCmd.numParams];
+                var index = line.IndexOf("|", offset, StringComparison.Ordinal);
+                var index2 = line.IndexOf("|", index + 1, StringComparison.Ordinal);
+
+                if(delim == "$Srp")
                 {
-                    newCmd.cmd = delim;
-                    newCmd.numParams = 1;
-                    newCmd.Params = new string[newCmd.numParams];
-                    int index = line.IndexOf("|", offset);
+                    Debug.WriteLine(@"$Srp processed!");
+                }
+
+                if(delim == "$Wm")
+                {
                     newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                    line = line.Substring(0, offset) + line.Substring(index + 1);
+                    newCmd.Params[1] = line.Substring(index + 1, 1);
+                    line = line.Substring(0, offset) + line.Substring(index + 2);
                 }
-            }
-
-            foreach(string delim in DoubleParams)
-            {
-                if(trunc.StartsWith(delim))
+                else
                 {
-                    newCmd.cmd = delim;
-                    newCmd.numParams = 2;
-                    newCmd.Params = new string[newCmd.numParams];
-                    int index = line.IndexOf("|", offset);
-                    int index2 = line.IndexOf("|", index + 1);
-
-                    if(delim == "$Srp")
-                    {
-                        Console.WriteLine("$Srp processed!");
-                    }
-
-                    if(delim == "$Wm")
-                    {
-                        newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                        newCmd.Params[1] = line.Substring(index + 1, 1);
-                        line = line.Substring(0, offset) + line.Substring(index + 2);
-                    }
-                    else
-                    {
-                        newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                        newCmd.Params[1] = line.Substring(index + 1, index2 - (index + 1));
-                        line = line.Substring(0, offset) + line.Substring(index2 + 1);
-                    }
+                    newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
+                    newCmd.Params[1] = line.Substring(index + 1, index2 - (index + 1));
+                    line = line.Substring(0, offset) + line.Substring(index2 + 1);
                 }
             }
 
-            Tuple<string, Command> ret = new Tuple<string, Command>(line, newCmd);
-            return ret;
+            return new Tuple<string, Command>(line, newCmd);
         }
         #endregion
 
         public string CompileMessage(bool includePrefix = true)
         {
             //Recompile the message with the prefix and all lines
-            string combinedLines = string.Empty;
+            var combinedLines = string.Empty;
 
             if (includePrefix)
-                combinedLines = (prefix != string.Empty ? prefix + ": " : string.Empty);
+                combinedLines = (Prefix != string.Empty ? Prefix + ": " : string.Empty);
 
-            foreach (MessageLine line in messageLines)
+            foreach (var line in MessageLines)
             {
                 line.UpdateRawWithNewDialogue();
                 combinedLines += line.RawLine;

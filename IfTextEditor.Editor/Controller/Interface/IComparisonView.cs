@@ -16,7 +16,7 @@ namespace FEITS.Controller
 
         //Options
         bool SimultaneousControl { get; set; }
-        int SourcePlayerGender { get; set; }
+        PlayerGender SourcePlayerGender { get; set; }
 
         //Status
         string SourcePageCount { set; }

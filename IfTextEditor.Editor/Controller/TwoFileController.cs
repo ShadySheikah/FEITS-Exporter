@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
+using FEITS.Properties;
 
 namespace FEITS.Controller
 {
@@ -15,21 +16,22 @@ namespace FEITS.Controller
 
         private CompactMainForm hiddenForm;
 
-        public TwoFileController(IComparisonView view, ConversationModel model) : base(view, model)
+        public TwoFileController(IComparisonView view, ConversationModel conversationModel) : base(view, conversationModel)
         {
             sourceView = view;
             sourceConv = new ConversationModel();
 
             sourceView.SetController(this);
-            sourceView.SetMessageList(model.File.MessageList);
+            sourceView.SetMessageList(conversationModel.File.MessageList);
 
             SetOptions();
         }
 
         #region Menu Bar
+
         public override bool OpenFile()
         {
-            bool value = base.OpenFile();
+            var value = base.OpenFile();
             if (value)
                 SetViewName();
             return value;
@@ -37,23 +39,23 @@ namespace FEITS.Controller
 
         public bool OpenSourceFile()
         {
-            ofd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            ofd.FileName = string.Empty;
+            OpenFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            OpenFileDialog.FilterIndex = 1;
+            OpenFileDialog.FileName = string.Empty;
 
-            if(ofd.ShowDialog() == DialogResult.OK)
+            if (OpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if(sourceConv.File.LoadFromFile(ofd.FileName))
+                    if (sourceConv.File.LoadFromFile(OpenFileDialog.FileName))
                     {
                         sourceView.SetSourceMessageList(sourceConv.File.MessageList);
-                        sourceConv.File.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
+                        sourceConv.File.FileName = Path.GetFileNameWithoutExtension(OpenFileDialog.FileName);
                         SetViewName();
                         return true;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Could Not Read File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
@@ -65,7 +67,7 @@ namespace FEITS.Controller
 
         public bool SaveSourceFile()
         {
-            if(sourceConv.File.FilePath != string.Empty)
+            if (sourceConv.File.FilePath != string.Empty)
             {
                 sourceConv.File.SaveToFile(sourceConv.File.FilePath);
                 return true;
@@ -78,7 +80,7 @@ namespace FEITS.Controller
 
         public override bool SaveFileAs()
         {
-            bool value = base.SaveFileAs();
+            var value = base.SaveFileAs();
             if (value)
                 SetViewName();
             return value;
@@ -86,19 +88,19 @@ namespace FEITS.Controller
 
         public bool SaveSourceFileAs()
         {
-            sfd.Filter = "Text files (*.txt)|*.txt";
-            sfd.FilterIndex = 1;
+            SaveFileDialog.Filter = Resources.TextFileFilter;
+            SaveFileDialog.FilterIndex = 1;
 
             if (sourceConv.File.FileName != string.Empty)
-                sfd.FileName = sourceConv.File.FileName;
+                SaveFileDialog.FileName = sourceConv.File.FileName;
 
-            if(sfd.ShowDialog() == DialogResult.OK)
+            if (SaveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if(sourceConv.File.SaveToFile(sfd.FileName))
+                    if (sourceConv.File.SaveToFile(SaveFileDialog.FileName))
                     {
-                        sourceConv.File.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                        sourceConv.File.FileName = Path.GetFileNameWithoutExtension(SaveFileDialog.FileName);
                         SetViewName();
                         return true;
                     }
@@ -107,7 +109,7 @@ namespace FEITS.Controller
                         return false;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "File Not Saved", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
@@ -119,9 +121,9 @@ namespace FEITS.Controller
 
         public bool ImportSourceMessageScript()
         {
-            using (ScriptImport messageImporter = new ScriptImport())
+            using (var messageImporter = new ScriptImport())
             {
-                ImportExportController importCont = new ImportExportController(messageImporter, "");
+                var importCont = new ImportExportController(messageImporter, "");
 
                 if (messageImporter.ShowDialog() == DialogResult.OK)
                 {
@@ -132,7 +134,9 @@ namespace FEITS.Controller
                     }
                     else
                     {
-                        MessageBox.Show("There was a problem parsing the message. Please double-check the text and try again.", "Failed to Import Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(
+                            "There was a problem parsing the message. Please double-check the text and try again.",
+                            "Failed to Import Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return false;
                     }
                 }
@@ -143,10 +147,13 @@ namespace FEITS.Controller
 
         public void ExportSourceMessageScript(bool allMessages)
         {
-            ScriptExport messageExporter = new ScriptExport();
+            var messageExporter = new ScriptExport();
             try
             {
-                ImportExportController exportCont = new ImportExportController(messageExporter, allMessages ? sourceConv.File.CompileFileText() : sourceConv.File.MessageList[sourceConv.MessageIndex].CompileMessage(false));
+                var exportCont = new ImportExportController(messageExporter,
+                    allMessages
+                        ? sourceConv.File.CompileFileText()
+                        : sourceConv.File.MessageList[sourceConv.MessageIndex].CompileMessage(false));
                 messageExporter.ShowDialog();
             }
             catch
@@ -155,8 +162,7 @@ namespace FEITS.Controller
             }
             finally
             {
-                if (messageExporter != null)
-                    messageExporter.Dispose();
+                messageExporter.Dispose();
             }
         }
 
@@ -164,30 +170,37 @@ namespace FEITS.Controller
         {
             if (sourceConv.File.MessageList.Count < 1)
             {
-                MessageBox.Show("There is nothing to edit.", "Cannot Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("There is nothing to edit.", "Cannot Edit", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
-            string rawLine = string.Empty;
-            if(currentLineOnly)
+            var rawLine = string.Empty;
+            if (currentLineOnly)
             {
-                sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].UpdateRawWithNewDialogue();
-                rawLine = sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].RawLine;
+                sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex]
+                    .UpdateRawWithNewDialogue();
+                rawLine =
+                    sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].RawLine;
                 rawLine = rawLine.Replace(Environment.NewLine, "\\n").Replace("\n", "\\n");
             }
 
-            using (DirectEdit messageEdit = new DirectEdit())
+            using (var messageEdit = new DirectEdit())
             {
-                ImportExportController editCont = new ImportExportController(messageEdit, currentLineOnly ? rawLine : sourceConv.File.MessageList[sourceConv.MessageIndex].CompileMessage(false));
+                var editCont = new ImportExportController(messageEdit,
+                    currentLineOnly
+                        ? rawLine
+                        : sourceConv.File.MessageList[sourceConv.MessageIndex].CompileMessage(false));
 
-                if(messageEdit.ShowDialog() == DialogResult.OK)
+                if (messageEdit.ShowDialog() == DialogResult.OK)
                 {
-                    string newMessage = string.Empty;
+                    var newMessage = string.Empty;
                     if (currentLineOnly)
                     {
-                        sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].RawLine = editCont.MessageScript;
+                        sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].RawLine
+                            = editCont.MessageScript;
 
-                        foreach(MessageLine msg in sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines)
+                        foreach (var msg in sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines)
                         {
                             newMessage += msg.RawLine;
                         }
@@ -199,7 +212,7 @@ namespace FEITS.Controller
 
                     sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines.Clear();
                     sourceConv.File.MessageList[sourceConv.MessageIndex].ParseMessage(newMessage);
-                    
+
                     if (currentLineOnly)
                         SetCurrentSourceLine();
                     else
@@ -207,6 +220,7 @@ namespace FEITS.Controller
                 }
             }
         }
+
         #endregion
 
         public void SetNormalFormRefs(CompactMainForm form)
@@ -224,12 +238,12 @@ namespace FEITS.Controller
             sourceConv.MessageIndex = sourceView.SourceMsgListIndex;
             SetCurrentSourceLine();
 
-            sourceView.SourcePlayerGender = sourceConv.File.MessageList[sourceConv.MessageIndex].Prefix.Contains("PCF") ? 1 : 0;
+            sourceView.SourcePlayerGender = sourceConv.GetPlayerGenderFromMessageList();
         }
 
         public void NextSourcePage()
         {
-            if(sourceConv.File.MessageList.Count > 0)
+            if (sourceConv.File.MessageList.Count > 0)
             {
                 sourceConv.LineIndex++;
                 SetCurrentSourceLine();
@@ -262,27 +276,36 @@ namespace FEITS.Controller
             }
         }
 
+        //TODO(Robin): Parameterize
         public void SetCurrentSourceLine()
         {
             sourceView.SourceCurrentPage = sourceConv.LineIndex;
-            sourceView.SourcePageCount = sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines.Count.ToString();
-            sourceView.SourceCurrentLine = sourceConv.GetParsedCommands(sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex]);
+            sourceView.SourcePageCount =
+                sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines.Count.ToString();
+            sourceView.SourceCurrentLine =
+                sourceConv.GetParsedCommands(
+                    sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex]);
             sourceView.SourcePrevLine = (sourceConv.LineIndex > 0) ? true : false;
-            sourceView.SourceNextLine = (sourceConv.LineIndex < sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines.Count - 1) ? true : false;
+            sourceView.SourceNextLine = (sourceConv.LineIndex <
+                                         sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines.Count - 1)
+                ? true
+                : false;
         }
 
+        //TODO(Robin): Parameterize
         public void OnSourceMsgLineChanged()
         {
             try
             {
-                sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].SpokenText = sourceView.SourceCurrentLine;
+                sourceConv.File.MessageList[sourceConv.MessageIndex].MessageLines[sourceConv.LineIndex].SpokenText =
+                    sourceView.SourceCurrentLine;
 
                 if (sourceConv.File.MessageList.Count > 0)
                     sourceView.SourcePreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
             }
             catch
             {
-
+                //TODO(Robin): ???
             }
         }
 
@@ -292,6 +315,11 @@ namespace FEITS.Controller
 
             sourceConv.PlayerName = sourceView.ProtagonistName;
 
+            ResyncSourceViewPreview();
+        }
+
+        private void ResyncSourceViewPreview()
+        {
             if (sourceConv.File.MessageList.Count > 0)
                 sourceView.SourcePreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
         }
@@ -302,44 +330,42 @@ namespace FEITS.Controller
 
             sourceConv.TextboxIndex = sourceView.CurrentTextbox;
 
-            if (sourceConv.File.MessageList.Count > 0)
-                sourceView.SourcePreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
+            ResyncSourceViewPreview();
         }
 
         public void OnSourcePlayerGenderChanged()
         {
             sourceConv.PlayerGender = sourceView.SourcePlayerGender;
 
-            if (sourceConv.File.MessageList.Count > 0)
-                sourceView.SourcePreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
+            ResyncSourceViewPreview();
         }
 
         public override void OnBackgroundEnabledChanged()
         {
             sourceConv.EnableBackgrounds = sourceView.EnableBackgrounds;
-            if (sourceConv.File.MessageList.Count > 0)
-                sourceView.SourcePreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
+            ResyncSourceViewPreview();
 
             base.OnBackgroundEnabledChanged();
         }
 
         public override bool HandleNewBackgroundImage(DragEventArgs e)
         {
-            bool value = base.HandleNewBackgroundImage(e);
+            var value = base.HandleNewBackgroundImage(e);
 
-            if(value)
+            if (value)
             {
                 try
                 {
-                    string file = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+                    var file = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
                     sourceConv.BackgroundImage = Image.FromFile(file);
 
                     if (sourceConv.File.MessageList.Count > 0)
                         sourceView.PreviewImage = sourceConv.RenderPreviewBox(sourceView.SourceCurrentLine);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Background Could Not Be Changed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(ex.Message, "Background Could Not Be Changed", MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                 }
             }
 
@@ -348,29 +374,29 @@ namespace FEITS.Controller
 
         public void SaveSourcePreview(bool fullConversation)
         {
-            sfd.Filter = "PNG Files (*.png)|*.png";
+            SaveFileDialog.Filter = "PNG Files (*.png)|*.png";
 
-            if(fullConversation)
+            if (fullConversation)
             {
-                sfd.FileName = sourceConv.File.FileName + "_Conversation";
+                SaveFileDialog.FileName = sourceConv.File.FileName + "_Conversation";
 
-                if(sfd.ShowDialog() == DialogResult.OK)
+                if (SaveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Image imageFile = sourceConv.RenderConversation();
+                    var imageFile = sourceConv.RenderConversation();
                     sourceConv.GetCommandsUpUntilIndex();
                     SetCurrentSourceLine();
 
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
+                    imageFile.Save(SaveFileDialog.FileName, ImageFormat.Png);
                 }
             }
             else
             {
-                sfd.FileName = sourceConv.File.FileName + "_Page" + sourceView.SourceCurrentPage.ToString();
+                SaveFileDialog.FileName = sourceConv.File.FileName + "_Page" + sourceView.SourceCurrentPage.ToString();
 
-                if(sfd.ShowDialog() == DialogResult.OK)
+                if (SaveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Image imageFile = sourceView.SourcePreviewImage;
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
+                    var imageFile = sourceView.SourcePreviewImage;
+                    imageFile.Save(SaveFileDialog.FileName, ImageFormat.Png);
                 }
             }
         }
@@ -380,7 +406,7 @@ namespace FEITS.Controller
             hiddenForm.SetMessageList(GetConversationFile().MessageList);
             hiddenForm.Show();
 
-            TwoFileForm form = (TwoFileForm)sourceView;
+            var form = (TwoFileForm) sourceView;
             form.Dispose();
         }
     }

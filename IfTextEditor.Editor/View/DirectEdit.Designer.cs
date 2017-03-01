@@ -84,6 +84,7 @@
             // 
             // B_SwapGenders
             // 
+            this.B_SwapGenders.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.B_SwapGenders.Location = new System.Drawing.Point(236, 135);
             this.B_SwapGenders.Name = "B_SwapGenders";
             this.B_SwapGenders.Size = new System.Drawing.Size(166, 23);
