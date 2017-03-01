@@ -1,47 +1,98 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FEITS.Model
+namespace IfTextEditor.Editor.Model
 {
-    /// <summary>
-    /// Contains a single line of dialogue and its commands.
-    /// </summary>
-    //TODO(Robin): Immutable type?
-    public class MessageLine
+    public partial class FileContainer
     {
-        public string RawLine { get; set; } = string.Empty;
-        public string SpokenText { get; set; } = string.Empty;
-        public int SpeechIndex { private get; set; } = -1;
-
-        public ConversationTypes ConversationType = ConversationTypes.Type1;
-
-        public void UpdateRawWithNewDialogue()
+        public partial class Message
         {
-            if (SpokenText != string.Empty)
+            public class Page
             {
-                SpokenText = SpokenText.Replace('’', '\'').Replace('~', '～').Replace("  ", " ");
+                //Page fields
+                public List<Command> Commands { get; }
+                public Dictionary<int, string> ExtraComment { get; set; }
+                public Dictionary<int, string> SpokenText { get; set; }
 
-                //Find where the end of the old dialogue text should be
-                int lineIndex;
-                if (RawLine.Contains("$Nu"))
+                public Page()
                 {
-                    lineIndex = RawLine.IndexOf("$",
-                        RawLine.IndexOf("$Nu", StringComparison.Ordinal) + 2,
-                        StringComparison.Ordinal);
-                }
-                else
-                {
-                    lineIndex = RawLine.IndexOf("$", SpeechIndex, StringComparison.Ordinal);
+                    
                 }
 
-                var oldDialogue = lineIndex > SpeechIndex
-                    ? RawLine.Substring(SpeechIndex, lineIndex - SpeechIndex)
-                    : RawLine.Substring(SpeechIndex);
+                public Page(string speech)
+                {
+                    Commands = new List<Command>();
+                    ExtraComment = new Dictionary<int, string>();
+                    SpokenText = new Dictionary<int, string>();
+                    string newText = speech;
 
-                RawLine = RawLine.Substring(0, SpeechIndex) + SpokenText +
-                          RawLine.Substring(SpeechIndex + oldDialogue.Length);
+                    //Parse for commands until text begins
+                    for (int i = 0; i < newText.Length; i++)
+                    {
+                        bool commandPresent = newText[i] == '$';
+
+                        //If $Nu is next, we've found all the commands.
+                        //Loop once more for line ending
+                        if (commandPresent && (newText.Substring(i).StartsWith("$Nu") || newText.Substring(i).StartsWith("$a0")))
+                            continue;
+
+                        //Find a command and strip it from the text
+                        string parsedText;
+                        var newCmd = new Command(newText.Substring(i), out parsedText);
+                        newText = parsedText;
+
+                        //If nothing was found, don't keep it
+                        if (newCmd.Type != CommandType.Empty)
+                            Commands.Add(newCmd);
+
+                        //One more time for the line ender
+                        if (!commandPresent)
+                            break;
+
+                        i--;
+                    }
+
+                    string[] text = newText.Split(new[] {"\\n"}, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < text.Length; i++)
+                    {
+                        SpokenText.Add(i, text[i]);
+                    }
+
+                    if (SpokenText.Count < 1 && ExtraComment.Count < 1)
+                    {
+                        ExtraComment.Add(0, "//This page was imported without speech.");
+                        ExtraComment.Add(1, "//There may be code attached to it.");
+                    }
+                }
+
+                public string GetCompiledPage()
+                {
+                    //This will be our compiled string
+                    string comp = string.Empty;
+                    
+                    //Commands
+                    comp += Commands.Aggregate(string.Empty, (current, c) => current + c.CompileCommand());
+
+                    //Lines
+                    List<string> lines = SpokenText.Select(entry => entry.Value).ToList();
+                    return comp + string.Join("\\n", lines) + GetLineEnd();
+                }
+
+                private string GetLineEnd()
+                {
+                    foreach (Command c in Commands)
+                    {
+                        if (c.Type == CommandType.PageEnd)
+                            return c.Symbol;
+                    }
+
+                    return string.Empty;
+                }
             }
-
-            RawLine = RawLine.Replace(Environment.NewLine, "\\n");
         }
     }
 }

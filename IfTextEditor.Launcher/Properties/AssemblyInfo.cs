@@ -1,17 +1,16 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("If Text Editor")]
-[assembly: AssemblyDescription("Provides the interface and logic for editing Fire Emblem If text files")]
+[assembly: AssemblyTitle("IfTextEditor.Launcher")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ShadySheikah")]
-[assembly: AssemblyProduct("If Text Editor")]
-[assembly: AssemblyCopyright("Copyright © ShadySheikah 2017")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("IfTextEditor.Launcher")]
+[assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5ccef663-61dd-4deb-94fe-7396c2a150e7")]
+[assembly: Guid("14fc9341-6d18-4b02-9191-a4e140af8469")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -35,5 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: NeutralResourcesLanguage("en-US")]
-

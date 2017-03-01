@@ -1,423 +1,450 @@
-﻿using FEITS.Model;
-using FEITS.View;
-using System;
-using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Windows.Forms;
+using IfTextEditor.Editor.Model;
+using System.IO;
+using System.Linq;
 
-namespace FEITS.Controller
+namespace IfTextEditor.Editor.Controller
 {
     public class MainController
     {
-        private IMainView mainView;
-        private ConversationModel conv;
+        private readonly Interface.IMainView mainView;
+        private readonly ConversationModel sourceModel, targetModel;
 
-        protected OpenFileDialog ofd = new OpenFileDialog();
-        protected SaveFileDialog sfd = new SaveFileDialog();
-
-        private bool reminderOpen;
-        public bool ReminderOpen { set { reminderOpen = value; } }
-
-        public MainController(IMainView view, ConversationModel model)
+        public MainController(Interface.IMainView view, ConversationModel model)
         {
             mainView = view;
-            conv = model;
+            targetModel = model;
+            sourceModel = new ConversationModel();
             mainView.SetController(this);
-            //mainView.SetMessageList(conv.File.MessageList);
         }
 
-        #region Menu Bar
-        public virtual bool OpenFile()
+        private DataTable MessageListToTable(IEnumerable<FileContainer.Message> messages)
         {
-            ofd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            ofd.FileName = string.Empty;
+            var table = new DataTable();
+            table.Columns.Add();
 
-            if(ofd.ShowDialog() == DialogResult.OK)
+            foreach (FileContainer.Message msg in messages)
             {
-                try
+                table.Rows.Add(msg.MessageName);
+            }
+
+            return table;
+        }
+
+        #region Opening
+
+        public bool OpenFile(ModelType type)
+        {
+            //SKSurface surface = SKSurface.Create(400, 240, SKColorType.Rgba8888, SKAlphaType.Premul);
+            //SKCanvas canvas = surface.Canvas;
+
+            var ofd = new OpenFileDialog
+            {
+                Filter = "Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe|All files (*.*)|*.*",
+                FilterIndex = 1,
+                FileName = string.Empty
+            };
+
+            if (ofd.ShowDialog() != DialogResult.OK)
+                return false;
+
+            try
+            {
+                switch (type)
                 {
-                    if (conv.File.LoadFromFile(ofd.FileName))
-                    {
-                        mainView.FormName = conv.File.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
-                        mainView.SetMessageList(conv.File.MessageList);
+                    case ModelType.Source:
+                        if (sourceModel.LoadFromFile(ofd.FileName))
+                        {
+                            if (sourceModel.FileCont.FileName == null)
+                                sourceModel.FileCont.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
+
+                            mainView.FormName = sourceModel.FileCont.FileName;
+                            mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
+                        }
                         return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Could Not Read File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return false;
+                    case ModelType.Target:
+                        if (targetModel.LoadFromFile(ofd.FileName))
+                        {
+                            if (targetModel.FileCont.FileName == null)
+                                targetModel.FileCont.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
+
+                            mainView.FormName = targetModel.FileCont.FileName;
+                            mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
+                        }
+                        return true;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
             }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Tries to save to a previous filepath.
-        /// Returns true if successful, false if not.
-        /// </summary>
-        public bool SaveFile()
-        {
-            if(conv.File.FilePath != string.Empty)
+            catch (Exception ex)
             {
-                conv.File.SaveToFile(conv.File.FilePath);
-                return true;
-            }
-            else
-            {
+                MessageBox.Show(ex.Message, "Error opening file", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public virtual bool SaveFileAs()
+        public void OpenFromString(ModelType type)
         {
-            sfd.Filter = "Text files (*.txt)|*.txt";
-            sfd.FilterIndex = 1;
+            //TODO: New Form open stuff here
+            string tempString = "";
 
-            if (conv.File.FileName != string.Empty)
-                sfd.FileName = conv.File.FileName;
-
-            if(sfd.ShowDialog() == DialogResult.OK)
+            switch (type)
             {
-                try
-                {
-                    if (conv.File.SaveToFile(sfd.FileName))
+                case ModelType.Source:
+                    if (sourceModel.LoadFromString(tempString))
                     {
-                        mainView.FormName = conv.File.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
-                        return true;
+                        mainView.FormName = string.Empty;
+                        mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
                     }
-                    else
+                    break;
+                case ModelType.Target:
+                    if (targetModel.LoadFromString(tempString))
                     {
-                        return false;
+                        mainView.FormName = string.Empty;
+                        mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "File Not Saved", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return false;
-                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-
-            return false;
-        }
-
-        public bool ImportMessageScript()
-        {
-            ScriptImport messageImporter = new ScriptImport();
-            try
-            {
-                ImportExportController importCont = new ImportExportController(messageImporter, "");
-                DialogResult dialogResult = messageImporter.ShowDialog();
-
-                if (dialogResult == DialogResult.OK)
-                {
-                    if (conv.File.LoadFromString(importCont.MessageScript))
-                    {
-                        mainView.SetMessageList(conv.File.MessageList);
-                    }
-                    else
-                    {
-                        MessageBox.Show("There was a problem parsing the message. Please double-check the text and try again.", "Failed to Import Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return false;
-                    }
-                }
-            }
-            finally
-            {
-                if (messageImporter != null)
-                    messageImporter.Dispose();
-            }
-            return true;
-        }
-
-        public void ExportMessageScript(bool allMessages)
-        {
-            ScriptExport messageExporter = new ScriptExport();
-            try
-            {
-                ImportExportController exportCont = new ImportExportController(messageExporter, allMessages ? conv.File.CompileFileText() : conv.File.MessageList[conv.MessageIndex].CompileMessage(false));
-                messageExporter.ShowDialog();
-            }
-            catch
-            {
-                MessageBox.Show("Nothing to export.", "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            finally
-            {
-                if(messageExporter != null)
-                    messageExporter.Dispose();
-            }
-        }
-
-        public void EditMessageScript(bool currentLineOnly)
-        {
-            if(conv.File.MessageList.Count < 1)
-            {
-                MessageBox.Show("There is nothing to edit.", "Cannot Edit", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            string rawLine = string.Empty;
-            if (currentLineOnly)
-            {
-                conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].UpdateRawWithNewDialogue();
-                rawLine = conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].RawLine;
-                rawLine = rawLine.Replace(Environment.NewLine, "\\n").Replace("\n", "\\n");
-            }
-
-            using (DirectEdit messageEdit = new DirectEdit())
-            {
-                ImportExportController editCont = new ImportExportController(messageEdit, currentLineOnly ? rawLine : conv.File.MessageList[conv.MessageIndex].CompileMessage(false));
-
-                if (messageEdit.ShowDialog() == DialogResult.OK)
-                {
-                    string newMessage = string.Empty;
-                    if (currentLineOnly)
-                    {
-                        conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].RawLine = editCont.MessageScript;
-
-                        foreach (MessageLine msg in conv.File.MessageList[conv.MessageIndex].MessageLines)
-                        {
-                            newMessage += msg.RawLine;
-                        }
-                    }
-                    else
-                    {
-                        newMessage = editCont.MessageScript;
-                    }
-
-                    conv.File.MessageList[conv.MessageIndex].MessageLines.Clear();
-                    conv.File.MessageList[conv.MessageIndex].ParseMessage(newMessage);
-
-                    if (currentLineOnly)
-                        SetCurrentLine();
-                    else
-                        SetCurrentMessage();
-                }
-            }
-        }
-
-        public void OpenHalfBoxEditor()
-        {
-            using (HalfBoxTester halfBox = new HalfBoxTester())
-            {
-                HalfBoxController hbCont = new HalfBoxController(halfBox);
-                halfBox.ShowDialog();
-            }
-        }
-
-        public void ShowFriendlyReminder()
-        {
-            if(!reminderOpen)
-            {
-                reminderOpen = true;
-                FriendlyReminder reminder = new FriendlyReminder();
-                reminder.SetController(this);
-                reminder.Show();
-            }
-        }
-
-        public void ExitApplication()
-        {
-            Application.Exit();
         }
         #endregion
 
-        protected ParsedFileContainer GetConversationFile()
-        {
-            return conv.File;
-        }
+        #region Saving
 
-        public void SetOptions()
+        public bool SaveFile(ModelType type)
         {
-            mainView.ProtagonistName = conv.PlayerName;
-            mainView.CurrentTextbox = conv.TextboxIndex;
-            mainView.EnableBackgrounds = conv.EnableBackgrounds;
-        }
-
-        public void LoadAssets()
-        {
-            LoadingPopup loader = new LoadingPopup();
-            loader.BeginLoading();
-            loader.ShowDialog();
-        }
-
-        public void SetCurrentMessage()
-        {
-            conv.MessageIndex = mainView.MsgListIndex;
-            Console.WriteLine(conv.MessageIndex);
-            SetCurrentLine();
-
-            mainView.PlayerGender = conv.File.MessageList[conv.MessageIndex].Prefix.Contains("PCF") ? 1 : 0;
-        }
-
-        public void NextPage()
-        {
-            if(conv.File.MessageList.Count > 0)
+            switch (type)
             {
-                conv.LineIndex++;
-                SetCurrentLine();
+                case ModelType.Source:
+                    if (sourceModel.FileCont.FilePath == string.Empty)
+                        return SaveFileAs(type);
+
+                    return sourceModel.SaveToFile(sourceModel.FileCont.FilePath);
+                case ModelType.Target:
+                    if (targetModel.FileCont.FilePath == string.Empty)
+                        return SaveFileAs(type);
+
+                    return targetModel.SaveToFile(targetModel.FileCont.FilePath);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        public void PreviousPage()
+        public bool SaveFileAs(ModelType type)
         {
-            if (conv.File.MessageList.Count > 0)
+            var sfd = new SaveFileDialog
             {
-                conv.LineIndex--;
-                conv.GetCommandsUpUntilIndex();
-                SetCurrentLine();
+                Filter = "Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe",
+                FilterIndex = 1
+            };
+
+            switch (type)
+            {
+                case ModelType.Source:
+                    sfd.FileName = sourceModel.FileCont.FileName;
+
+                    if (sfd.ShowDialog() != DialogResult.OK)
+                        return false;
+
+                    if (sourceModel.SaveToFile(sfd.FileName))
+                    {
+                        //TODO: Name
+                        mainView.FormName = sourceModel.FileCont.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                        return true;
+                    }
+
+                    return false;
+                case ModelType.Target:
+                    sfd.FileName = targetModel.FileCont.FileName;
+
+                    if (sfd.ShowDialog() != DialogResult.OK)
+                        return false;
+
+                    if (targetModel.SaveToFile(sfd.FileName))
+                    {
+                        mainView.FormName = targetModel.FileCont.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                        return true;
+                    }
+
+                    return false;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        #endregion
+
+        public void SetMessage(int index, ModelType type)
+        {
+            if (index < 0)
+                index = 0;
+
+            switch (type)
+            {
+                case ModelType.Source:
+                    mainView.SourceMsgIndex = sourceModel.MessageIndex = index;
+                    SetPage(0, type);
+                    break;
+                case ModelType.Target:
+                    mainView.TargetMsgIndex = targetModel.MessageIndex = index;
+                    SetPage(0, type);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        public void GoToPage(int page)
+        public void SetPage(int index, ModelType type)
         {
-            if (conv.File.MessageList.Count > 0)
+            if (index < 0)
+                index = 0;
+
+            switch (type)
             {
-                if (page >= conv.File.MessageList[conv.MessageIndex].MessageLines.Count)
-                    page = conv.File.MessageList[conv.MessageIndex].MessageLines.Count - 1;
+                case ModelType.Source:
+                    if (index >= sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count)
+                        index = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count - 1;
 
-                if (page < 0)
-                    page = 0;
+                    mainView.SourcePageIndex = sourceModel.PageIndex = index;
+                    mainView.SourcePageCount = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count;
 
-                conv.LineIndex = page;
-                conv.GetCommandsUpUntilIndex();
-                SetCurrentLine();
+                    mainView.SourcePrevLine = sourceModel.PageIndex > 0;
+                    mainView.SourceNextLine = sourceModel.PageIndex < sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count;
+                    SetCurrentLine(type);
+                    break;
+                case ModelType.Target:
+                    if (index >= targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count)
+                        index = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count - 1;
+
+                    mainView.TargetPageIndex = targetModel.PageIndex = index;
+                    mainView.TargetPageCount = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count;
+
+                    mainView.TargetPrevLine = targetModel.PageIndex > 0;
+                    mainView.TargetNextLine = targetModel.PageIndex < targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count - 1;
+                    SetCurrentLine(type);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        private void SetCurrentLine()
+        private void SetCurrentLine(ModelType type)
         {
-            mainView.CurrentPage = conv.LineIndex;
-            mainView.PageCount = conv.File.MessageList[conv.MessageIndex].MessageLines.Count.ToString();
-            mainView.CurrentLine = conv.GetParsedCommands(conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex]);
-            mainView.PrevLine = (conv.LineIndex > 0) ? true : false;
-            mainView.NextLine = (conv.LineIndex < conv.File.MessageList[conv.MessageIndex].MessageLines.Count - 1) ? true : false;
-        }
-
-        public void OnMsgLineChanged()
-        {
-            try
+            switch (type)
             {
-                conv.File.MessageList[conv.MessageIndex].MessageLines[conv.LineIndex].SpokenText = mainView.CurrentLine;
+                case ModelType.Source:
+                    sourceModel.UpdatePageCommands(sourceModel.PageIndex);
 
-                if (conv.File.MessageList[conv.MessageIndex] != null)
-                    mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+                    var srcLines = new string[sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText.Keys.Count + sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment.Keys.Count];
+                    for (int i = 0; i < srcLines.Length; i++)
+                    {
+                        if (sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText.ContainsKey(i))
+                            srcLines[i] = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText[i];
+                        else if (sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment.ContainsKey(i))
+                            srcLines[i] = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment[i];
+                    }
+
+                    mainView.SourceText = string.Join(Environment.NewLine, srcLines);
+                    break;
+                case ModelType.Target:
+                    targetModel.UpdatePageCommands(targetModel.PageIndex);
+
+                    var tarLines = new string[targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText.Keys.Count + targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment.Keys.Count];
+                    for (int i = 0; i < tarLines.Length; i++)
+                    {
+                        if (targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText.ContainsKey(i))
+                            tarLines[i] = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText[i];
+                        else if (targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment.ContainsKey(i))
+                            tarLines[i] = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment[i];
+                    }
+
+                    mainView.TargetText = string.Join(Environment.NewLine, tarLines);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-            catch
+        }
+
+        public void NextPage(ModelType type)
+        {
+            switch (type)
             {
-                
+                case ModelType.Source:
+                    if (sourceModel.FileCont.Messages.Count > 0)
+                        SetPage(sourceModel.PageIndex + 1, type);
+                    break;
+                case ModelType.Target:
+                    if(targetModel.FileCont.Messages.Count > 0)
+                        SetPage(targetModel.PageIndex + 1, type);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        public virtual void OnNameChanged()
+        public void PrevPage(ModelType type)
         {
-            conv.PlayerName = mainView.ProtagonistName;
+            switch (type)
+            {
+                case ModelType.Source:
+                    if (sourceModel.FileCont.Messages.Count <= 0)
+                        return;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+                    sourceModel.IterateCommandsToIndex(sourceModel.PageIndex);
+                    SetPage(sourceModel.PageIndex - 1, type);
+                    break;
+                case ModelType.Target:
+                    if (targetModel.FileCont.Messages.Count <= 0)
+                        return;
+
+                    targetModel.IterateCommandsToIndex(targetModel.PageIndex - 1);
+                    SetPage(targetModel.PageIndex - 1, type);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
 
-        public virtual void OnTextboxChanged()
+        public void GoToPage(int page, ModelType type)
         {
-            conv.TextboxIndex = mainView.CurrentTextbox;
+            switch (type)
+            {
+                case ModelType.Source:
+                    if (sourceModel.FileCont.Messages.Count <= 0)
+                        return;
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+                    if (page >= sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count)
+                        page = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages.Count - 1;
+                    else if (page < 0)
+                        page = 0;
+
+                    sourceModel.IterateCommandsToIndex(page);
+                    SetPage(page, type);
+                    break;
+                case ModelType.Target:
+                    if (targetModel.FileCont.Messages.Count <= 0)
+                        return;
+
+                    if (page >= targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count)
+                        page = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages.Count - 1;
+                    else if (page < 0)
+                        page = 0;
+
+                    targetModel.IterateCommandsToIndex(page);
+                    SetPage(page, type);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public void OnTextChanged(ModelType type)
+        {
+            switch (type)
+            {
+                case ModelType.Source:
+                    if (sourceModel.FileCont.Messages.Count < 1)
+                        return;
+
+                    string[] newSrcText = mainView.SourceText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    var srcComments = new Dictionary<int, string>();
+                    var srcText = new Dictionary<int, string>();
+                    for (int i = 0; i < newSrcText.Length; i++)
+                    {
+                        if (newSrcText[i].StartsWith("//"))
+                            srcComments.Add(i, newSrcText[i]);
+                        else
+                            srcText.Add(i, newSrcText[i]);
+                    }
+
+                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment = srcComments;
+                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText = srcText;
+                    mainView.SourcePreviewImage = sourceModel.RenderPreview(sourceModel.PageIndex, PreviewFormat.Normal);
+                    break;
+                case ModelType.Target:
+                    if (targetModel.FileCont.Messages.Count < 1)
+                        return;
+
+                    string[] newTarText = mainView.TargetText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    var tarComments = new Dictionary<int, string>();
+                    var tarText = new Dictionary<int, string>();
+                    for (int i = 0; i < newTarText.Length; i++)
+                    {
+                        if (newTarText[i].StartsWith("//"))
+                            tarComments.Add(i, newTarText[i]);
+                        else
+                            tarText.Add(i, newTarText[i]);
+                    }
+
+                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment = tarComments;
+                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText = tarText;
+                    mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public void OnNameChanged()
+        {
+            sourceModel.PlayerName = targetModel.PlayerName = mainView.ProtagonistName;
+            UpdateCurrentPage();
+        }
+
+        public void OnTextboxChanged()
+        {
+            sourceModel.TextboxIndex = targetModel.TextboxIndex = mainView.CurrentTextboxTheme;
+            UpdateCurrentPage();
         }
 
         public void OnPlayerGenderChanged()
         {
-            conv.PlayerGender = mainView.PlayerGender;
-
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+            throw new NotImplementedException();
         }
 
-        public virtual void OnBackgroundEnabledChanged()
+        public void OnBackgroundEnabledChanged()
         {
-            conv.EnableBackgrounds = mainView.EnableBackgrounds;
+            sourceModel.BackgroundEnabled = targetModel.BackgroundEnabled = mainView.BackgroundEnabled;
+            UpdateCurrentPage();
+        }
 
-            if (conv.File.MessageList.Count > 0)
-                mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
+        public void OnBackgroundImageChanged(DragEventArgs e)
+        {
+            string filePath = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
 
-            if (mainView.EnableBackgrounds)
+            if (!File.Exists(filePath))
+                return;
+
+            try
             {
-                MessageBox.Show("Backgrounds enabled." + Environment.NewLine + "Drag/drop an image onto the Picture Box to change the background." + Environment.NewLine + "Disable and then re-enable to reset the background image.", "Alert", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Image background = Image.FromFile(filePath);
+
+                if (background.Width < 1 || background.Height < 1)
+                    return;
+
+                sourceModel.BackgroundImage = targetModel.BackgroundImage = background;
+                UpdateCurrentPage();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error updating background", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        public virtual bool HandleNewBackgroundImage(DragEventArgs e)
+        private void UpdateCurrentPage()
         {
-            string file = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
-
-            if(File.Exists(file))
-            {
-                try
-                {
-                    Image img = Image.FromFile(file);
-                    if(img.Width > 1 && img.Height > 1)
-                    {
-                        conv.BackgroundImage = img;
-
-                        if (conv.File.MessageList.Count > 0)
-                            mainView.PreviewImage = conv.RenderPreviewBox(mainView.CurrentLine);
-
-                        return true;
-                    }
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Background Could Not Be Changed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        public void SavePreview(bool fullConversation)
-        {
-            sfd.Filter = "PNG Files (*.png)|*.png";
-            
-            if(fullConversation)
-            {
-                sfd.FileName = conv.File.FileName + "_Conversation";
-
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    Image imageFile = conv.RenderConversation();
-                    conv.GetCommandsUpUntilIndex();
-                    SetCurrentLine();
-
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
-                }
-            }
-            else
-            {
-                sfd.FileName = conv.File.FileName + "_Page" + mainView.CurrentPage.ToString();
-                
-                if(sfd.ShowDialog() == DialogResult.OK)
-                {
-                    Image imageFile = mainView.PreviewImage;
-                    imageFile.Save(sfd.FileName, ImageFormat.Png);
-                }
-            }
-        }
-
-        public void SetupCompareMode()
-        {
-            TwoFileForm compareForm = new TwoFileForm();
-            TwoFileController controller = new TwoFileController(compareForm, conv);
-            CompactMainForm form = (CompactMainForm)mainView;
-            controller.SetNormalFormRefs(form);
-            form.Hide();
-
-            compareForm.Show();
+            mainView.SourcePreviewImage = sourceModel.RenderPreview(sourceModel.PageIndex, PreviewFormat.Normal);
+            mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
         }
     }
+}
+
+public enum ModelType
+{
+    Source,
+    Target
 }

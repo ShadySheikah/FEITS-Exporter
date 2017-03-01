@@ -1,121 +1,54 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace FEITS.Model
+namespace IfTextEditor.Editor.Model
 {
-    /// <summary>
-    /// Stores a line of dialogue with
-    /// its prefix separated from the messages.
-    /// </summary>
-    public class MessageBlock
+    public partial class FileContainer
     {
-        public string Prefix { get; set; } = string.Empty;
-        public List<MessageLine> MessageLines { get; } = new List<MessageLine>();
-
-        #region Parsing
-        /// <summary>
-        /// Returns a list of parsed message lines.
-        /// </summary>
-        /// <param name="message">The message to parse</param>
-        public void ParseMessage(string message)
+        public partial class Message : IEnumerable<Message.Page>
         {
-            message = message.Replace("\\n", "\n").Replace("$k\n", "$k\\n");
+            public string MessageName { get; set; }
+            public List<Page> Pages { get; } = new List<Page>();
 
-            //Split the lines based on the line-end markers
-            var delimiters = new List<string> { "$k$p", "$k\\n" };
-            var pattern = "(?<=" + string.Join("|", delimiters.Select(Regex.Escape).ToArray()) + ")";
-            var splits = Regex.Split(message, pattern);
-
-            foreach(var str in splits)
+            public void ParseMessage(string message)
             {
-                var newLine = new MessageLine {RawLine = str};
-                MessageLines.Add(newLine);
-            }
-        }
+                //Split messages by line-end markers
+                var delimiters = new List<string> { "$k$p", "$k\\n" };
+                string pattern = "(?<=" + string.Join("|", delimiters.Select(Regex.Escape).ToArray()) + ")";
+                string[] splits = Regex.Split(message, pattern);
 
-        public static Tuple<string, Command> ParseCommand(string line, int offset)
-        {
-            var trunc = line.Substring(offset);
-            string[] NoParams = { "$Wa", "$Wc", "$a", "$Nu", "$N0", "$N1", "$k\\n", "$k", "$t0", "$t1", "$p", "$Wd", "$Wv" };
-            string[] SingleParams = { "$E", "$Sbs", "$Svp", "$Sre", "$Fw", "$Ws", "$VF", "$Ssp", "$Fo", "$VNMPID", "$Fi", "$b", "$w", "$l" };
-            string[] DoubleParams = { "$Wm", "$Sbv", "$Sbp", "$Sls", "$Slp", "$Srp" };
-            var newCmd = new Command();
-
-            foreach(var delim in NoParams)
-            {
-                if (!trunc.StartsWith(delim)) continue;
-
-                newCmd.CommandWithPrefix = delim;
-                newCmd.numParams = 0;
-                newCmd.Params = new string[newCmd.numParams];
-                line = line.Substring(0, offset) + line.Substring(offset + delim.Length);
-                break;
-            }
-
-            foreach(var delim in SingleParams)
-            {
-                if (!trunc.StartsWith(delim)) continue;
-
-                newCmd.CommandWithPrefix = delim;
-                newCmd.numParams = 1;
-                newCmd.Params = new string[newCmd.numParams];
-                var index = line.IndexOf("|", offset, StringComparison.Ordinal);
-                newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                line = line.Substring(0, offset) + line.Substring(index + 1);
-            }
-
-            foreach(var delim in DoubleParams)
-            {
-                if (!trunc.StartsWith(delim)) continue;
-
-                newCmd.CommandWithPrefix = delim;
-                newCmd.numParams = 2;
-                newCmd.Params = new string[newCmd.numParams];
-                var index = line.IndexOf("|", offset, StringComparison.Ordinal);
-                var index2 = line.IndexOf("|", index + 1, StringComparison.Ordinal);
-
-                if(delim == "$Srp")
+                foreach (string str in splits)
                 {
-                    Debug.WriteLine(@"$Srp processed!");
-                }
-
-                if(delim == "$Wm")
-                {
-                    newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                    newCmd.Params[1] = line.Substring(index + 1, 1);
-                    line = line.Substring(0, offset) + line.Substring(index + 2);
-                }
-                else
-                {
-                    newCmd.Params[0] = line.Substring(offset + delim.Length, index - (offset + delim.Length));
-                    newCmd.Params[1] = line.Substring(index + 1, index2 - (index + 1));
-                    line = line.Substring(0, offset) + line.Substring(index2 + 1);
+                    Pages.Add(new Page(str));
                 }
             }
 
-            return new Tuple<string, Command>(line, newCmd);
-        }
-        #endregion
-
-        public string CompileMessage(bool includePrefix = true)
-        {
-            //Recompile the message with the prefix and all lines
-            var combinedLines = string.Empty;
-
-            if (includePrefix)
-                combinedLines = (Prefix != string.Empty ? Prefix + ": " : string.Empty);
-
-            foreach (var line in MessageLines)
+            public string Compile(bool includeName = true)
             {
-                line.UpdateRawWithNewDialogue();
-                combinedLines += line.RawLine;
+                string compMess = string.Empty;
+
+                if (includeName)
+                    compMess = (MessageName != string.Empty ? MessageName + ": " : string.Empty);
+
+                return Pages.Aggregate(compMess, (current, p) => current + p.GetCompiledPage());
             }
 
-            combinedLines = combinedLines.Replace("\n", "\\n");
-            return combinedLines;
+            #region Enumerable
+            public IEnumerator<Page> GetEnumerator()
+            {
+                return Pages.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return Pages.GetEnumerator();
+            }
+            #endregion
         }
     }
 }

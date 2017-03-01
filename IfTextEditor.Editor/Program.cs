@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using FEITS.Model;
-using FEITS.View;
-using FEITS.Controller;
+using IfTextEditor.Editor.View;
+using IfTextEditor.Editor.Controller;
+using IfTextEditor.Editor.Model;
 
-namespace FEITS
+namespace IfTextEditor.Editor
 {
     static class Program
     {
@@ -17,11 +21,18 @@ namespace FEITS
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var mainView = new CompactMainForm();
+            var sw = new Stopwatch();
+            sw.Start();
+            PreviewFont.Initialize();
+            CharacterData.Initialize();
+            sw.Stop();
+            Debug.WriteLine("Init time: " + sw.Elapsed);
+
             var model = new ConversationModel();
-            var controller = new MainController(mainView, model);
-            controller.LoadAssets();
-            Application.Run(mainView);
+            var view = new MainView();
+            var controller = new MainController(view, model);
+
+            Application.Run(view);
         }
     }
 }

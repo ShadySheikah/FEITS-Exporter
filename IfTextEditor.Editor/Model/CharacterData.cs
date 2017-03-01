@@ -1,353 +1,241 @@
-﻿using FEITS.Properties;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
-namespace FEITS.Model
+namespace IfTextEditor.Editor.Model
 {
-    public class AssetGeneration
+    public class CharacterData
     {
-        private static bool isInitialized = false;
+        private static bool isInitialized;
 
-        //Font
-        private static bool[] validCharacters;
-        public static bool[] ValidCharacters { get { return validCharacters; } }
-        private static FontCharacter[] characters;
-        private static Image[] Images = { Resources.Awakening_0, Resources.Awakening_1 };
-
-        //Resources
-        private static Dictionary<string, byte[]> faceData;
-        private static List<string> resourceList = new List<string>();
-
-        //Kamui
-        private static string[] EyeStyles = { "a", "b", "c", "d", "e", "f", "g" };
-        private static string[] Kamuis = { "マイユニ男1", "マイユニ女2" };
-
-        static AssetGeneration()
+        public static Dictionary<Emote, string> EmoteLookup = new Dictionary<Emote, string>
         {
-            
-        }
+            {Emote.Normal, "通常"},
+            {Emote.Smile, "笑"},
+            {Emote.Pained, "苦"},
+            {Emote.Angry, "怒"},
+            {Emote.Signature, "キメ"},
+            {Emote.Sweat, "汗"},
+            {Emote.Blush, "照"}
+        };
 
-        public static void Initialize(BackgroundWorker worker, DoWorkEventArgs e)
+        //Kamui Defaults
+        private static int playerFaceType = 1;
+        private static char playerEyeType = 'a';
+
+        private static Dictionary<string, Character> characters;
+
+        public static void Initialize()
         {
-            if(isInitialized)
+            if (isInitialized)
+                return;
+            isInitialized = true;
+
+            characters = new Dictionary<string, Character>();
+
+            //Names
+            string[] localNames = Resources.Properties.Resources.CharacterNames.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string names in localNames)
             {
-                Console.WriteLine("Assets already initialized!");
+                string[] vals = names.Split('\t');
+
+                var newCharacter = new Character
+                {
+                    Name = vals[0],
+                    LocalizedName = vals[1]
+                };
+
+                if (vals[1] == "Kamui")
+                {
+                    newCharacter.IsPlayer = true;
+                    newCharacter.PlayerFace = playerFaceType;
+                    newCharacter.PlayerEyes = playerEyeType;
+                    vals[0] = "username";
+                }
+
+                characters.Add(vals[0], newCharacter);
             }
-            else
+
+            //Hair color
+            string[] hairLines = Resources.Properties.Resources.HairColors.Split(new[] { Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string line in hairLines)
             {
-                Console.WriteLine("Initializing assets...");
+                string[] vals = line.Split('\t');
+                
+                if(characters.ContainsKey(vals[0]))
+                    characters[vals[0]].HairColor = ColorTranslator.FromHtml("#" + vals[1]);
+            }
 
-                //Set up font, generate list of valid chars
-                validCharacters = new bool[0x10000];
-                characters = new FontCharacter[0x10000];
-                var charWidths = new Dictionary<char, int>();
-                for (int i = 0; i < Resources.chars.Length / 0x10; i++)
+            //Point data
+            string[] sweatLines = Resources.Properties.Resources.FaceSweat.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] blushLines = Resources.Properties.Resources.FaceBlush.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] cropLines = Resources.Properties.Resources.CroppedPositions.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < sweatLines.Length; i++)
+            {
+                string[] sweatVals = sweatLines[i].Split('\t');
+                string[] blushVals = blushLines[i].Split('\t');
+                string[] cropVals = cropLines[i].Split('\t');
+
+                if (sweatVals[0].StartsWith("マイユニ"))
                 {
-                    var fc = new FontCharacter(Resources.chars, i * 0x10);
-                    validCharacters[fc.Value] = true;
-                    fc.SetGlyph(Images[fc.IMG]);
-                    characters[fc.Value] = fc;
-                    if (!charWidths.ContainsKey(fc.Character))
-                        charWidths.Add(fc.Character, fc.CropWidth);
-                }
-
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FontData");
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-
-                List<string> lines = charWidths.Select(entry => entry.Key + "\t" + entry.Value).ToList();
-                File.WriteAllLines(Path.Combine(path, "charWidths.txt"), lines, Encoding.UTF8);
-
-                worker.ReportProgress(33);
-
-                //Grab face data and assign to dictionary
-                faceData = new Dictionary<string, byte[]>();
-                string[] fids = Resources.FID.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < fids.Length; i++)
-                {
-                    byte[] dat = new byte[0x48];
-                    Array.Copy(Resources.faces, i * 0x48, dat, 0, 0x48);
-                    faceData[fids[i]] = dat;
-                }
-
-                var stageBlush = new List<string>();
-                var stageSweat = new List<string>();
-                var BuCropDimensions = new List<string>();
-                var BuCropPos = new List<string>();
-                foreach (KeyValuePair<string, byte[]> entry in faceData)
-                {
-                    if (entry.Key.Contains("_ST_"))
+                    Character kamui = characters["username"];
+                    if (sweatVals[0].Contains("男" + kamui.PlayerFace) && sweatVals[0].EndsWith(kamui.PlayerEyes.ToString().ToUpper()))
                     {
-                        stageBlush.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x38) + "," + BitConverter.ToUInt16(entry.Value, 0x3A));
-                        stageSweat.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x40) + "," + BitConverter.ToUInt16(entry.Value, 0x42));
+                        string[] kSweatPoints = sweatVals[1].Split(',');
+                        string[] kBlushPoints = blushVals[1].Split(',');
+                        string[] kCropPoints = cropVals[1].Split(',');
+
+                        kamui.SweatPos = new Point(Convert.ToInt32(kSweatPoints[0]), Convert.ToInt32(kSweatPoints[1]));
+                        kamui.BlushPos = new Point(Convert.ToInt32(kBlushPoints[0]), Convert.ToInt32(kBlushPoints[1]));
+                        kamui.CropPos = new Point(Convert.ToInt32(kCropPoints[0]), Convert.ToInt32(kCropPoints[1]));
                         continue;
                     }
-
-                    BuCropDimensions.Add(entry.Key.Substring(8) + '\t' + BitConverter.ToUInt16(entry.Value, 0x34) + "," + BitConverter.ToUInt16(entry.Value, 0x36));
-                    BuCropPos.Add(entry.Key.Substring(8) + '\t' + -BitConverter.ToUInt16(entry.Value, 0x30) + "," + -BitConverter.ToUInt16(entry.Value, 0x32));
                 }
 
-                File.WriteAllLines(Path.Combine(path, "FaceSweat.txt"), stageSweat, Encoding.UTF8);
-                File.WriteAllLines(Path.Combine(path, "FaceBlush.txt"), stageBlush, Encoding.UTF8);
-                File.WriteAllLines(Path.Combine(path, "CroppedDimensions.txt"), BuCropDimensions, Encoding.UTF8);
-                File.WriteAllLines(Path.Combine(path, "CroppedPositions.txt"), BuCropPos, Encoding.UTF8);
-
-                worker.ReportProgress(66);
-
-                ResourceSet set = Resources.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, true, true);
-                foreach (DictionaryEntry o in set)
+                if (characters.ContainsKey(sweatVals[0]))
                 {
-                    resourceList.Add(o.Key as string);
+                    string[] sweatPoints = sweatVals[1].Split(',');
+                    string[] blushPoints = blushVals[1].Split(',');
+                    string[] cropPoints = cropVals[1].Split(',');
+
+                    characters[sweatVals[0]].SweatPos = new Point(Convert.ToInt32(sweatPoints[0]), Convert.ToInt32(sweatPoints[1]));
+                    characters[sweatVals[0]].BlushPos = new Point(Convert.ToInt32(blushPoints[0]), Convert.ToInt32(blushPoints[1]));
+                    characters[sweatVals[0]].CropPos = new Point(Convert.ToInt32(cropPoints[0]), Convert.ToInt32(cropPoints[1]));
                 }
-
-                worker.ReportProgress(100);
-                Resources.ResourceManager.ReleaseAllResources();
-
-                isInitialized = true;
             }
         }
 
-        public static Image DrawString(Image BaseImage, string Message, int StartX, int StartY, Color? TC = null)
+        public static void UpdatePlayerData(Gender gender, int faceType = 1, char eyeType = 'a')
         {
-            Color TextColor = TC.HasValue ? TC.Value : Color.Black;
-            int CurX = StartX;
-            int CurY = StartY;
-            Bitmap NewImage = BaseImage.Clone() as Bitmap;
+            Character player = characters["username"];
+            player.PlayerFace = faceType;
+            player.PlayerEyes = eyeType;
 
-            //var charWidths = new List<string>();
+            string[] sweatLines = Resources.Properties.Resources.FaceSweat.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] blushLines = Resources.Properties.Resources.FaceBlush.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] cropLines = Resources.Properties.Resources.CroppedPositions.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-            using (Graphics g = Graphics.FromImage(NewImage))
+            for (int i = 0; i < sweatLines.Length; i++)
             {
-                g.Clear(Color.DeepSkyBlue);
-
-                foreach (char c in Message)
+                if (sweatLines[i].StartsWith("マイユニ"))
                 {
-                    if (c == '\n')
-                    {
-                        CurY += 20;
-                        CurX = StartX;
-                    }
-                    else
-                    {
-                        FontCharacter cur = characters[GetValue(c)];
-                        g.DrawImage(cur.GetGlyph(TextColor), new Point(CurX, CurY - cur.CropHeight));
-                        CurX += cur.CropWidth;
+                    string[] sweatVals = sweatLines[i].Split('\t');
+                    string[] blushVals = blushLines[i].Split('\t');
+                    string[] cropVals = cropLines[i].Split('\t');
 
-                        //charWidths.Add(string.Format(c + "\t" + cur.CropWidth));
+                    if (sweatVals[0].Contains((gender == Gender.Male ? "男" : "女") + player.PlayerFace) && sweatVals[0].EndsWith(player.PlayerEyes.ToString().ToUpper()))
+                    {
+                        string[] sweatPoints = sweatVals[1].Split(',');
+                        player.SweatPos = new Point(Convert.ToInt32(sweatPoints[0]), Convert.ToInt32(sweatPoints[1]));
+
+                        string[] blushPoints = blushVals[1].Split(',');
+                        player.BlushPos = new Point(Convert.ToInt32(blushPoints[0]), Convert.ToInt32(blushPoints[1]));
+
+                        string[] cropPoints = cropVals[1].Split(',');
+                        player.CropPos = new Point(Convert.ToInt32(cropPoints[0]), Convert.ToInt32(cropPoints[1]));
                     }
                 }
             }
-
-            //foreach (string str in charWidths)
-            //{
-            //    Debug.WriteLine(str);
-            //}
-            return NewImage;
         }
 
-        public static Image GetCharacterStageImage(string CName, string CEmo, Color HairColor, bool Slot1, int PGender)
+        public static Bitmap DrawCharacterImage(string name, Emote[] emotes, bool leftSide, Gender gender)
         {
-            //Names
-            bool USER = CName == "username";
-            string hairname = "_st_髪";
-            string dat_id = "FSID_ST_" + CName;
-            if (USER)
-            {
-                dat_id = "FSID_ST_" + (new[] { "マイユニ_男1", "マイユニ_女2" })[PGender] + "_顔" + EyeStyles[0].ToUpper();
-                CName = EyeStyles[0] + Kamuis[PGender];
-                hairname = CName.Substring(1) + hairname + 0;
-            }
-            else
-                hairname = CName + hairname + "0";
+            //Character
+            Character character = characters[name];
+            Bitmap charImage = character.GetCharacterImage(emotes, gender, false);
 
-            //Emotion parsing
-            var Emos = CEmo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string resname = CName + "_st_" + Emos[0];
-
-            //Grab image
-            Image C;
-            if (resourceList.Contains(resname))
-                C = Resources.ResourceManager.GetObject(resname) as Image;
-            else
-                C = new Bitmap(1, 1);
-
-            //Drawing
-            using (Graphics g = Graphics.FromImage(C))
-            {
-                for (int i = 1; i < Emos.Length; i++)
-                {
-                    //Secondary emotions
-                    string exresname = CName + "_st_" + Emos[i];
-                    if (Emos[i] == "汗" && resourceList.Contains(exresname))
-                    {
-                        g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x40), BitConverter.ToUInt16(faceData[dat_id], 0x42)));
-                    }
-                    else if (Emos[i] == "照" && resourceList.Contains(exresname))
-                    {
-                        g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x38), BitConverter.ToUInt16(faceData[dat_id], 0x3A)));
-                    }
-                }
-
-                //Hair
-                if (resourceList.Contains(hairname))
-                {
-                    Bitmap hair = Resources.ResourceManager.GetObject(hairname) as Bitmap;
-                    g.DrawImage(ColorHair(hair, HairColor), new Point(0, 0));
-                }
-            }
+            //Hair
+            Bitmap hairImage = character.GetHair(gender, false);
+            if (hairImage != null)
+                using (Graphics g = Graphics.FromImage(charImage))
+                    g.DrawImage(hairImage, new Point(0, 0));
 
             //Mirror
-            if (Slot1)
-                C.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            if (leftSide)
+                charImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
-            return C;
+            return charImage;
         }
 
-        public static Image GetCharacterBUImage(string CName, string CEmo, Color HairColor, bool Crop, int PGender)
+        public static Bitmap DrawCharacterCloseUpImage(string name, Emote[] emotes, Gender gender)
         {
-            string hairname = "_bu_髪";
-            string dat_id = "FSID_BU_" + CName;
-            bool USER = CName == "username";
-            if (USER)
-            {
-                dat_id = "FSID_BU_" + (new[] { "マイユニ_男1", "マイユニ_女2" })[PGender] + "_顔" + EyeStyles[0].ToUpper();
-                CName = EyeStyles[0] + Kamuis[PGender];
-                hairname = CName.Substring(1) + hairname + 0;
-            }
-            else
-                hairname = CName + hairname + "0";
-            var Emos = CEmo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string resname = CName + "_bu_" + Emos[0];
-            Image C;
-            if (resourceList.Contains(resname))
-                C = Resources.ResourceManager.GetObject(resname) as Image;
-            else
-                C = new Bitmap(1, 1);
-            using (Graphics g = Graphics.FromImage(C))
-            {
-                for (int i = 1; i < Emos.Length; i++)
-                {
-                    string exresname = CName + "_bu_" + Emos[i];
-                    if (Emos[i] == "汗" && resourceList.Contains(exresname))
-                    {
-                        Debug.WriteLine(dat_id + ": " + BitConverter.ToUInt16(faceData[dat_id], 0x40) + "," + BitConverter.ToUInt16(faceData[dat_id], 0x42));
-                        g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x40), BitConverter.ToUInt16(faceData[dat_id], 0x42)));
-                    }
-                    else if (Emos[i] == "照" && resourceList.Contains(exresname))
-                    {
-                        Debug.WriteLine(dat_id + ": " + BitConverter.ToUInt16(faceData[dat_id], 0x38) + "," + BitConverter.ToUInt16(faceData[dat_id], 0x3A));
-                        g.DrawImage(Resources.ResourceManager.GetObject(exresname) as Image, new Point(BitConverter.ToUInt16(faceData[dat_id], 0x38), BitConverter.ToUInt16(faceData[dat_id], 0x3A)));
-                    }
-                }
-                if (resourceList.Contains(hairname))
-                {
-                    Bitmap hair = Resources.ResourceManager.GetObject(hairname) as Bitmap;
-                    g.DrawImage(ColorHair(hair, HairColor), new Point(0, 0));
-                }
-            }
-            if (Crop)
-            {
-                Bitmap Cropped = new Bitmap(BitConverter.ToUInt16(faceData[dat_id], 0x34), BitConverter.ToUInt16(faceData[dat_id], 0x36));
-                using (Graphics g = Graphics.FromImage(Cropped))
-                {
-                    g.DrawImage(C, new Point(-BitConverter.ToUInt16(faceData[dat_id], 0x30), -BitConverter.ToUInt16(faceData[dat_id], 0x32)));
-                }
-                C = Cropped;
-            }
-            C.RotateFlip(RotateFlipType.RotateNoneFlipX);
-            return C;
+            //Character
+            Character character = characters[name];
+            Bitmap charImage = character.GetCharacterImage(emotes, gender, true);
+
+            //Hair
+            Bitmap hairImage = character.GetHair(gender, true);
+            if (hairImage != null)
+                using (Graphics g = Graphics.FromImage(charImage))
+                    g.DrawImage(hairImage, new Point(0, 0));
+
+            //Crop
+            charImage = character.CropImage(charImage);
+
+            //Mirror
+            charImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
+
+            return charImage;
         }
 
-        public static Image ColorHair(Image Hair, Color C)
+        public static Bitmap ColorizeImage(Bitmap baseImage, Color newColor, SKBlendMode blendMode, byte alpha = 255)
         {
-            Bitmap bmp = Hair as Bitmap;
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
+            BitmapData data = baseImage.LockBits(new Rectangle(0, 0, baseImage.Width, baseImage.Height), ImageLockMode.WriteOnly, baseImage.PixelFormat);
+            var info = new SKImageInfo(baseImage.Width, baseImage.Height);
 
-            IntPtr ptr = bmpData.Scan0;
-
-            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-            byte[] rgbaValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            Marshal.Copy(ptr, rgbaValues, 0, bytes);
-
-            for (int i = 0; i < rgbaValues.Length; i += 4)
+            using (SKSurface surface = SKSurface.Create(info, data.Scan0, baseImage.Width * 4))
+            using (SKImage image = SKImage.FromPixels(info, data.Scan0, baseImage.Width * 4))
+            using (var paint = new SKPaint())
             {
-                if (rgbaValues[i + 3] > 0)
+                SKColor color = newColor.ToSKColor();
+                paint.Color = color;
+                paint.BlendMode = SKBlendMode.SrcIn;
+                surface.Canvas.DrawPaint(paint);
+
+                using (SKImage img2 = surface.Snapshot())
                 {
-                    rgbaValues[i + 2] = BlendOverlay(C.R, rgbaValues[i + 2]);
-                    rgbaValues[i + 1] = BlendOverlay(C.G, rgbaValues[i + 1]);
-                    rgbaValues[i + 0] = BlendOverlay(C.B, rgbaValues[i + 0]);
+                    surface.Canvas.Clear();
+                    paint.BlendMode = blendMode;
+                    paint.Color = new SKColor(color.Red, color.Green, color.Blue, alpha);
+
+                    surface.Canvas.DrawImage(image, SKRect.Create(image.Width, image.Height));
+                    surface.Canvas.DrawImage(img2, SKRect.Create(img2.Width, img2.Height), paint);
                 }
             }
-            // Copy the RGB values back to the bitmap
-            Marshal.Copy(rgbaValues, 0, ptr, bytes);
 
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            return bmp;
+            baseImage.UnlockBits(data);
+            return baseImage;
         }
 
-        public static byte BlendOverlay(byte Src, byte Dst)
+        public static string GetLocalizedName(string name)
         {
-            return ((Dst < 128) ? (byte)Math.Max(Math.Min((Src / 255.0f * Dst / 255.0f) * 255.0f * 2, 255), 0) : (byte)Math.Max(Math.Min(255 - ((255 - Src) / 255.0f * (255 - Dst) / 255.0f) * 255.0f * 2, 255), 0));
+            return characters.ContainsKey(name) ? characters[name].LocalizedName : null;
         }
+    }
 
-        public static Image Fade(Image BaseImage)
-        {
+    public enum Emote
+    {
+        Normal,
+        Smile,
+        Pained,
+        Angry,
+        Signature,
+        Sweat,
+        Blush
+    }
 
-            Bitmap bmp = BaseImage as Bitmap;
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
-
-            IntPtr ptr = bmpData.Scan0;
-
-            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-            byte[] rgbaValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            Marshal.Copy(ptr, rgbaValues, 0, bytes);
-
-            const double BLACK_A = 113.0 / 255.0;
-
-            for (int i = 0; i < rgbaValues.Length; i += 4)
-            {
-                if (rgbaValues[i + 3] <= 0) continue;
-                double DST_A = rgbaValues[i + 3] / 255.0;
-                // double FINAL_A = BLACK_A + (DST_A) * (1.0 - BLACK_A);
-                // rgbaValues[i + 3] = (byte)Math.Round((FINAL_A) * 255.0);
-                rgbaValues[i + 2] = (byte)Math.Round((((rgbaValues[i + 2] / 255.0)) * (DST_A) * (1.0 - BLACK_A)) * 255.0);
-                rgbaValues[i + 1] = (byte)Math.Round((((rgbaValues[i + 1] / 255.0)) * (DST_A) * (1.0 - BLACK_A)) * 255.0);
-                rgbaValues[i + 0] = (byte)Math.Round((((rgbaValues[i + 0] / 255.0)) * (DST_A) * (1.0 - BLACK_A)) * 255.0);
-            }
-            // Copy the RGB values back to the bitmap
-            Marshal.Copy(rgbaValues, 0, ptr, bytes);
-
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            return bmp;
-        }
-
-        public static ushort GetValue(char c)
-        {
-            return BitConverter.ToUInt16(Encoding.Unicode.GetBytes(string.Empty + c), 0);
-        }
-
-        public static int GetLength(string s)
-        {
-            return s.Select(GetValue).Select(val => Math.Max(characters[val].Width, characters[val].CropWidth)).Sum();
-        }
+    public enum Gender
+    {
+        Male,
+        Female
     }
 }

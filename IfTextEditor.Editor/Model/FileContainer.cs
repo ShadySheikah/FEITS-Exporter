@@ -1,233 +1,108 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
+using System.Linq;
 
-namespace FEITS.Model
+namespace IfTextEditor.Editor.Model
 {
-    /// <summary>
-    /// Container for the contents of a parsed script file.
-    /// </summary>
-    public class ParsedFileContainer
+    public partial class FileContainer : IEnumerable<FileContainer.Message>
     {
-        public string FileName;
-        public string FilePath;
-        public string[] Header;
-        public List<MessageBlock> MessageList;
+        //Fields
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public List<Message> Messages { get; private set; }
 
-        public ParsedFileContainer()
-        {
-            EmptyFileData();
-        }
-
-        /// <summary>
-        /// Removes any previous message data
-        /// and returns the file to an empty state.
-        /// </summary>
-        public void EmptyFileData()
+        public FileContainer()
         {
             FileName = FilePath = string.Empty;
-            Header = null;
-            MessageList = new List<MessageBlock>();
+            Messages = new List<Message>();
         }
 
-        #region Loading
-        /// <summary>
-        /// Reads lines from specified file
-        /// and parses the information
-        /// </summary>
-        /// <param name="filePath">Specified file name</param>
-        public bool LoadFromFile(string filePath)
+        public bool PopulateContainer(string[] fileLines)
         {
-            if(filePath != string.Empty)
+            //Find and skip the header
+            if (!fileLines[0].StartsWith("MESS_ARCHIVE_"))
             {
-                EmptyFileData();
-
-                //Store the file path
-                FilePath = filePath;
-
-                string[] fileSplitByLinebreak = File.ReadAllLines(filePath, System.Text.Encoding.UTF8);
-
-                if (LoadConversationFromString(fileSplitByLinebreak))
-                    return true;
-                else
-                    return false;
-            }
-            else
-            {
-                EmptyFileData();
-                Console.WriteLine("Opened file was empty; treating as a new object and keeping the file path.");
-                return true;
-            }
-        }
-
-        public bool LoadFromString(string messageString)
-        {
-            EmptyFileData();
-
-            try
-            {
-                if(messageString.StartsWith("MESS_"))
-                {
-                    string[] fileSplitByLinebreak = messageString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-
-                    if (LoadConversationFromString(fileSplitByLinebreak))
-                        return true;
-                    else
-                        return false;
-                }
-                else
-                {
-                    MessageBlock newMessage = new MessageBlock();
-                    newMessage.Prefix = "Imported Message";
-                    newMessage.ParseMessage(messageString);
-                    MessageList.Add(newMessage);
-                }
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool LoadConversationFromString(string[] fileLines)
-        {
-            //Parse for header and message blocks
-            if (fileLines[0].StartsWith("MESS_"))
-            {
-                //Find where the header ends
-                //Should be after "Message Name: Message"
-                int headerEndIndex = 0;
                 for (int i = 0; i < fileLines.Length; i++)
                 {
-                    if (fileLines[i].Contains(":"))
-                    {
-                        if (headerEndIndex != 0)
-                        {
-                            headerEndIndex = i;
-                            break;
-                        }
-                        else
-                        {
-                            headerEndIndex = i;
-                            continue;
-                        }
-                    }
+                    var newMessage = new Message {MessageName = "Imported Message" + (i > 0 ? i.ToString() : "")};
+                    newMessage.ParseMessage(fileLines[i]);
+                    Messages.Add(newMessage);
                 }
+                return true;
+            }
 
-                //If we found the header, add it to Header
-                if (headerEndIndex != 0)
+            FileName = fileLines[0].Substring(13);
+
+            int offset = -1;
+            for (int i = 0; i < fileLines.Length; i++)
+            {
+                //Contents begin after "Message Name: Message"
+                if (fileLines[i].Contains(':'))
                 {
-                    Header = new string[headerEndIndex];
-                    for (int i = 0; i < headerEndIndex; i++)
+                    if (offset > -1)
                     {
-                        Header[i] = fileLines[i];
+                        offset = i;
+                        break;
                     }
 
-                    //Create messages from the rest of the lines
-                    for (int i = headerEndIndex; i < fileLines.Length; i++)
-                    {
-                        //Separate the prefix from the message itself
-                        if (fileLines[i].Contains(":"))
-                        {
-                            MessageBlock newMessage = new MessageBlock();
-                            int prefixIndex = fileLines[i].IndexOf(":");
-                            newMessage.Prefix = fileLines[i].Substring(0, prefixIndex);
-
-                            //Get the message by itself
-                            string message = fileLines[i].Substring(prefixIndex + 2);
-
-                            //Make sure we didn't leave any prefix stuff behind
-                            if (message.StartsWith(":"))
-                            {
-                                message = message.Remove(0, 2);
-
-                                return false;
-                            }
-                            else if (char.IsWhiteSpace(message[0]))
-                            {
-                                message = message.Remove(0, 1);
-                            }
-
-                            //Have the message parse the rest
-                            newMessage.ParseMessage(message);
-
-                            //Add it to our list
-                            MessageList.Add(newMessage);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Message lines don't appear to be formatted correctly. Please make sure each message is preceeded with a Message Name.", "Error");
-                            return false;
-                        }
-                        //messageProgress = (int)((float)i / fileLines.Length * 100);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("File header doesn't appear to be formatted correctly. Please make sure the formatting is correct.", "Error");
-                    return false;
+                    offset = i;
                 }
             }
-            else
+
+            for (int i = offset; i < fileLines.Length; i++)
             {
-                MessageBox.Show("File contents don't appear to be formatted correctly. Please make sure the formatting is correct and the file is compatible with FEITS.", "Error");
+                //Set the message name/prefix
+                if (fileLines[i].Contains(':'))
+                {
+                    var newMessage = new Message();
+                    int prefixIndex = fileLines[i].IndexOf(':');
+                    newMessage.MessageName = fileLines[i].Substring(0, prefixIndex);
+
+                    //Message will take it from here
+                    newMessage.ParseMessage(fileLines[i].Substring(prefixIndex + 2));
+
+                    //Add new Message to the list
+                    Messages.Add(newMessage);
+                    continue;
+                }
+
                 return false;
             }
 
             return true;
-        }
-        #endregion
-
-        #region Saving
-        /// <summary>
-        /// Compiles the message list and
-        /// writes contents with header to file.
-        /// </summary>
-        /// <param name="filePath">File to save as</param>
-        public bool SaveToFile(string filePath)
-        {
-            if(filePath != string.Empty)
-            {
-                //Update file path in case different
-                FilePath = filePath;
-
-                string compiledFileText = CompileFileText();
-
-                if (compiledFileText != string.Empty)
-                {
-                    File.WriteAllText(filePath, compiledFileText);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
         }
 
         public string CompileFileText()
         {
-            //Start compiling a string to make up the new file
-            string newFileText = string.Empty;
-            foreach (string str in Header)
-            {
-                newFileText += str + Environment.NewLine;
-            }
+            var newFileText = string.Empty;
 
-            foreach (MessageBlock msg in MessageList)
+            //Generate and add header
+            string h1 = "MESS_ARCHIVE_" + FileName + Environment.NewLine;
+            string h2 = "Message Name: Message" + Environment.NewLine;
+            newFileText += h1 + Environment.NewLine + h2 + Environment.NewLine;
+
+            //Compile and add all messages
+            for (int i = 0; i < Messages.Count; i++)
             {
-                string compiledMsg = msg.CompileMessage();
-                newFileText += (compiledMsg + Environment.NewLine);
+                string compiledMsg = Messages[i].Compile();
+                newFileText += compiledMsg + (i < Messages.Count - 1 ? Environment.NewLine : string.Empty);
             }
 
             return newFileText;
+        }
+
+        #region Enumerable
+        public IEnumerator<Message> GetEnumerator()
+        {
+            return Messages.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Messages.GetEnumerator();
         }
         #endregion
     }

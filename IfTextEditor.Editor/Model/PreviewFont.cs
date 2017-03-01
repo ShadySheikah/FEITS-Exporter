@@ -1,122 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Windows;
+using System.Threading.Tasks;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
-namespace FEITS.Model
+namespace IfTextEditor.Editor.Model
 {
-    public class FontCharacter
+    public class PreviewFont
     {
-        public ushort Value;
-        public ushort IMG;
-        public ushort XOfs;
-        public ushort YOfs;
-        public byte Width;
-        public byte Height;
-        public byte Padding1;
-        public int CropHeight;
-        public int CropWidth;
-        public byte[] Padding2; // Size = 3;
+        private static SKTypeface typeface;
+        private static Dictionary<char, int> charWidths;
 
-        public char Character;
-
-        public Image Glyph;
-
-        public FontCharacter() { }
-
-        public FontCharacter(byte[] Data) : this(Data, 0) { }
-
-        public FontCharacter(byte[] Data, int ofs)
+        public static void Initialize()
         {
-            Value = BitConverter.ToUInt16(Data, ofs + 0);
-            IMG = BitConverter.ToUInt16(Data, ofs + 2);
-            XOfs = BitConverter.ToUInt16(Data, ofs + 4);
-            YOfs = BitConverter.ToUInt16(Data, ofs + 6);
-            Width = Data[ofs + 8];
-            Height = Data[ofs + 9];
-            Padding1 = Data[ofs + 0xA];
-            CropHeight = Data[ofs + 0xB];
-            if (CropHeight > 0x7F)
-                CropHeight -= 256;
-            CropWidth = Data[ofs + 0xC];
-            if (CropWidth > 0x7F)
-                CropWidth -= 256;
-            Padding2 = new byte[0x3];
-            Array.Copy(Data, ofs + 0xD, Padding2, 0, 3);
-
-            Character = Encoding.Unicode.GetString(Data, ofs + 0, 2)[0];
+            ObtainFont();
+            EstablishCharWidths();
         }
 
-        public void PrintToFile(int index)
+        private static void ObtainFont()
         {
-            var lines = new List<string>
-            {
-                "Character\t" + Character,
-                "Value\t" + Value,
-                "IMG\t" + IMG,
-                "XOfs\t" + XOfs,
-                "YOfs\t" + YOfs,
-                "Width\t" + Width,
-                "Height\t" + Height,
-                "Padding1\t" + Padding1,
-                "CropHeight\t" + CropHeight,
-                "CropWidth\t" + CropWidth
-            };
-            lines.AddRange(Padding2.Select(b => "Padding2\t" + b));
+            byte[] font = Resources.Properties.Resources.Chiaro;
+            var stream = new SKManagedStream(new MemoryStream(font));
+            typeface = SKTypeface.FromStream(stream);
 
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Font");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            File.WriteAllLines(Path.Combine(path, "FONT_CHARACTER_" + index + ".txt"), lines, Encoding.UTF8);
         }
 
-        public void SetGlyph(Image img)
+        private static void EstablishCharWidths()
         {
-            Bitmap crop = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(crop))
+            charWidths = new Dictionary<char, int>();
+            string[] lines = Resources.Properties.Resources.CharWidths.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string str in lines)
             {
-                g.DrawImage(img as Bitmap, new Rectangle(0, 0, Width, Height), new Rectangle(XOfs, YOfs, Width, Height), GraphicsUnit.Pixel);
+                string[] vals = str.Split('\t');
+                char key = Convert.ToChar(vals[0]);
+                int value = Convert.ToInt32(vals[1]);
+
+                if (!charWidths.ContainsKey(key))
+                    charWidths.Add(key, value);
             }
-            Glyph = crop;
         }
 
-        public Image GetGlyph(Color NewColor)
+        public static int GetStringWidth(string line)
         {
-            Bitmap ColoredGlyph = Glyph as Bitmap;
+            string[] lines = line.Replace(Environment.NewLine, "\n").Split('\n');
+            var widths = new int[lines.Length];
 
-            Rectangle rect = new Rectangle(0, 0, ColoredGlyph.Width, ColoredGlyph.Height);
-            BitmapData bmpData = ColoredGlyph.LockBits(rect, ImageLockMode.ReadWrite, ColoredGlyph.PixelFormat);
-
-            IntPtr ptr = bmpData.Scan0;
-
-            int bytes = Math.Abs(bmpData.Stride) * ColoredGlyph.Height;
-            byte[] rgbaValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            Marshal.Copy(ptr, rgbaValues, 0, bytes);
-
-            for (int i = 0; i < rgbaValues.Length; i += 4)
+            for (int i = 0; i < lines.Length; i++)
             {
-                if (rgbaValues[i + 3] > 0) // If CurrentColor.A > 0
+                foreach (char c in lines[i])
+                    widths[i] += charWidths[c];
+            }
+
+            return widths.Max();
+        }
+
+        public static Image DrawString(Bitmap baseImage, string line, Color textColor, int posX, int posY)
+        {
+            string newLine = line.Replace(Environment.NewLine, "\n");
+            int curX = posX, curY = posY;
+
+            BitmapData data = baseImage.LockBits(new Rectangle(0, 0, baseImage.Width, baseImage.Height), ImageLockMode.WriteOnly, baseImage.PixelFormat);
+            var info = new SKImageInfo(baseImage.Width, baseImage.Height);
+
+            using (SKSurface surface = SKSurface.Create(info, data.Scan0, baseImage.Width * 4))
+            {
+                //Debug
+                //surface.Canvas.Clear(SKColors.AliceBlue);
+
+                using (var paint = new SKPaint())
                 {
-                    rgbaValues[i + 2] = NewColor.R;
-                    rgbaValues[i + 1] = NewColor.G;
-                    rgbaValues[i + 0] = NewColor.B;
+                    paint.Typeface = typeface;
+                    paint.TextSize = 15f;
+                    paint.IsAntialias = true;
+                    paint.Color = textColor.ToSKColor();
+
+                    foreach (char c in newLine)
+                    {
+                        if (c == '\n')
+                        {
+                            curY += 20;
+                            curX = posX;
+                            continue;
+                        }
+
+                        surface.Canvas.DrawPositionedText(c.ToString(), new[] {new SKPoint(curX, curY + 15)}, paint);
+                        curX += charWidths[c];
+                    }
                 }
             }
 
-            // Copy the RGB values back to the bitmap
-            Marshal.Copy(rgbaValues, 0, ptr, bytes);
-
-            // Unlock the bits.
-            ColoredGlyph.UnlockBits(bmpData);
-            return ColoredGlyph;
+            baseImage.UnlockBits(data);
+            return baseImage;
         }
     }
 }
