@@ -12,7 +12,6 @@ namespace IfTextEditor.Update.Controller
     {
         private readonly Interface.ILaunchView view;
         private readonly Updater updateModel;
-        private BackgroundWorker bw;
 
         internal LauncherController()
         {
@@ -25,20 +24,6 @@ namespace IfTextEditor.Update.Controller
             updateModel = m;
             view.SetController(this);
             updateModel.SetController(this);
-
-            InitializeBackgroundWorker();
-        }
-
-        private void InitializeBackgroundWorker()
-        {
-            bw = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            bw.DoWork += Bw_DoWork;
-            bw.ProgressChanged += Bw_ProgressChanged;
-            bw.RunWorkerCompleted += Bw_RunWorkerCompleted;
         }
 
         internal void SetAutoUpdatePreferences()
@@ -81,40 +66,10 @@ namespace IfTextEditor.Update.Controller
             return Settings.Default.UpdatePreference != 1 || updateModel.ImportantUpdatePending();
         }
 
-        internal void StartUpdating()
+        internal async void StartUpdating()
         {
-            if (!bw.IsBusy)
-            {
-                bw.RunWorkerAsync();
-            }
-        }
-
-        public void CancelUpdate()
-        {
-            bw.CancelAsync();
-        }
-
-        private void Bw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var worker = (BackgroundWorker)sender;
-            e.Result = updateModel.UpdateAssemblies(worker, e);
-        }
-
-        private void Bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            view.Progress = e.ProgressPercentage;
-        }
-
-        private void Bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //Make sure update succeeded
-            if (e.Error != null)
-                MessageBox.Show(e.Error.Message, Resources.UpdateDownloadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            else if (e.Cancelled)
-                return;
-            else if ((bool)e.Result == false)
-                MessageBox.Show(Resources.UpdateFailed, Resources.UpdateDownloadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            else
+            bool result = await updateModel.UpdateAssemblies();
+            if (result)
             {
                 //First arg is either blank or the application path, remove it
                 List<string> args = Environment.GetCommandLineArgs().ToList();
@@ -126,12 +81,23 @@ namespace IfTextEditor.Update.Controller
                 Application.Exit();
             }
 
-            ((Form) view).DialogResult = DialogResult.OK;
+            MessageBox.Show(Resources.UpdateFailed, Resources.UpdateDownloadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            ((Form)view).DialogResult = DialogResult.OK;
+        }
+
+        public void CancelUpdate()
+        {
+            updateModel.CancelDownload();
         }
 
         internal void UpdateLabel(string text)
         {
             view.StatusDesc = text;
+        }
+
+        internal void UpdateProgress(int percentage)
+        {
+            view.Progress = percentage;
         }
     }
 }

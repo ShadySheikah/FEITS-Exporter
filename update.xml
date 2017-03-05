@@ -2,7 +2,7 @@
 <IfTextEditor>
   <assembly name="If Text Editor.exe">
     <version>1.0.0.0</version>
-    <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/If Text Editor.exe</url>
+    <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/If%20Text%20Editor.exe</url>
     <md5>E1324B130450F8E4F770C1536B6F5E3E</md5>
   </assembly>
   <assembly name="Editor.Resources.dll">

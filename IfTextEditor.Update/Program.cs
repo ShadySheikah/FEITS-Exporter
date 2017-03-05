@@ -18,7 +18,7 @@ namespace IfTextEditor.Update
             if (!controller.StartAutoUpdate())
                 return;
 
-            if (Settings.Default.UpdatePreference == 2)
+            if (Settings.Default.UpdatePreference == 1)
                 if(MessageBox.Show(Resources.UpdateAvailableInform, Resources.UpdateAvailableTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.No)
                     return;
 

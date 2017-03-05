@@ -16,6 +16,7 @@ namespace IfTextEditor.Update.Model
     internal class Updater
     {
         private LauncherController controller;
+        private WebClient client;
 
         private readonly Uri xmlLocation;
         private readonly UpdateContainer updates = new UpdateContainer();
@@ -25,7 +26,7 @@ namespace IfTextEditor.Update.Model
         internal Updater()
         {
 #if DEBUG
-            xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/Rewrite/update.xml");
+            xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/update.xml");
 #endif
 #if RELEASE
             xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/update.xml");
@@ -76,7 +77,7 @@ namespace IfTextEditor.Update.Model
 
             foreach (UpdateContainer.UpdateInfo update in updates)
             {
-                Debug.WriteLine("HERE: " + update.AssemblyName);
+                Debug.WriteLine("HERE: " + update.AssemblyVer + ", " + assemblies[update.AssemblyName].ToString());
 
                 //Check if current assemblies exist
                 if (!assemblies.ContainsKey(update.AssemblyName))
@@ -103,7 +104,7 @@ namespace IfTextEditor.Update.Model
             return updates.Any(update => update.ImportantUpdate);
         }
 
-        internal async Task<bool> UpdateAssemblies(BackgroundWorker worker, DoWorkEventArgs e)
+        internal async Task<bool> UpdateAssemblies()
         {
             //Set up temp folder
             tempPath = Path.Combine(Path.GetTempPath(), "IfTextEditor");
@@ -117,18 +118,12 @@ namespace IfTextEditor.Update.Model
             //For each new update, download to tmp folder
             foreach (UpdateContainer.UpdateInfo update in updates)
             {
-                if (worker.CancellationPending)
-                {
-                    e.Cancel = true;
-                    return false;
-                }
-
                 if (!update.UpdateAvailable)
                     continue;
 
                 controller.UpdateLabel("Updating " + update.AssemblyName);
                 string filePath = Path.Combine(tempPath, update.AssemblyName);
-                await DownloadFile(update.DownloadUri, Path.Combine(tempPath, filePath), worker);
+                await DownloadFile(update.DownloadUri, Path.Combine(tempPath, filePath));
 
                 controller.UpdateLabel("Verifying " + update.AssemblyName);
                 if (!VerifyDownloadIntegrity(filePath, update))
@@ -138,17 +133,28 @@ namespace IfTextEditor.Update.Model
             return true;
         }
 
-        private async Task DownloadFile(Uri fileLocation, string filePath, BackgroundWorker worker)
+        private async Task DownloadFile(Uri fileLocation, string filePath)
         {
-            using (var client = new WebClient())
+            using (client = new WebClient())
             {
                 client.DownloadProgressChanged += (o, e) =>
                 {
-                    worker.ReportProgress(e.ProgressPercentage);
+                    controller.UpdateProgress(e.ProgressPercentage);
+                };
+                client.DownloadFileCompleted += (o, e) =>
+                {
+                    if (e.Cancelled)
+                        Debug.WriteLine("DOWNLOAD CANCELED");
                 };
 
                 await client.DownloadFileTaskAsync(fileLocation, filePath);
             }
+        }
+
+        internal void CancelDownload()
+        {
+            if (client.IsBusy)
+                client.CancelAsync();
         }
 
         private bool VerifyDownloadIntegrity(string path, UpdateContainer.UpdateInfo info)
