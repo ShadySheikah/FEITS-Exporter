@@ -202,7 +202,8 @@ namespace IfTextEditor.Update.Model
 
                 //If entry assembly (this), check for possible name diff
                 FileVersionInfo fileInfo = FileVersionInfo.GetVersionInfo(newFiles[i]);
-                if (fileInfo.FileDescription == Assembly.GetEntryAssembly().GetName().ToString())
+
+                if (fileInfo.FileDescription == "If Text Editor")
                 {
                     fileName = Path.GetFileName(Assembly.GetEntryAssembly().Location);
                     movePath = Path.Combine(destPath, fileName);

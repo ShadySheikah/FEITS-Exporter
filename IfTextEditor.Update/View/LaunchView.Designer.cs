@@ -157,7 +157,7 @@
             this.Name = "LaunchView";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Launcher";
+            this.Text = "Updater";
             this.Shown += new System.EventHandler(this.LaunchView_Shown);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);

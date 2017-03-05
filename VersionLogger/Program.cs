@@ -43,7 +43,7 @@ namespace VersionLogger
 
                     //If it's the executable, keep outside the lib folder
                     string newUrl = assName.EndsWith(".exe") ?
-                        path + assName : path + "lib/" + assName;
+                        path + assName.Replace(" ", "%20") : path + "lib/" + assName.Replace(" ", "%20");
 
                     var ua = new UpdateableAssembly
                     {
