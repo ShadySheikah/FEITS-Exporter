@@ -221,11 +221,14 @@ namespace IfTextEditor.Update.Model
             string compArg = cmdStart + moveArgs.Where(s => s != null).Aggregate(string.Empty, (current, s) => current + s) + cmdEnd;
 
             //Start the command process
-            var info = new ProcessStartInfo();
-            info.FileName = "cmd.exe";
-            info.WindowStyle = ProcessWindowStyle.Hidden;
-            info.CreateNoWindow = true;
-            info.Arguments = compArg;
+            var info = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                Arguments = compArg
+            };
+
             Process.Start(info);
         }
     }

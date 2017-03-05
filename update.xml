@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <IfTextEditor>
   <assembly name="If Text Editor.exe">
-    <version>1.0.0.0</version>
+    <version>1.1.0.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/If%20Text%20Editor.exe</url>
     <md5>E1324B130450F8E4F770C1536B6F5E3E</md5>
   </assembly>
   <assembly name="Editor.Resources.dll">
-    <version>1.0.0.0</version>
+    <version>1.0.1.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/lib/Editor.Resources.dll</url>
     <md5>8DCE3625457EDAEC2696BD83574E17F9</md5>
   </assembly>
