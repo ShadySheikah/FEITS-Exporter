@@ -25,7 +25,7 @@ namespace IfTextEditor.Update.Model
         internal Updater()
         {
 #if DEBUG
-            xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/update.xml");
+            xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/Rewrite/update.xml");
 #endif
 #if RELEASE
             xmlLocation = new Uri("https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/update.xml");
@@ -64,7 +64,7 @@ namespace IfTextEditor.Update.Model
 
             //Get assemblies from lib folder
             libraries = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib"), "*.dll");
-            Dictionary<string, Version> assemblies = libraries.Select(FileVersionInfo.GetVersionInfo).ToDictionary(info => Path.GetFileName(info.FileName), info => Version.Parse(info.FileVersion));
+            Dictionary<string, Version> assemblies = libraries.Select(FileVersionInfo.GetVersionInfo).Where(info => info.FileVersion != null).ToDictionary(info => Path.GetFileName(info.FileName), info => new Version(info.FileVersion));
 
             //Add the executable assembly to the dictionary
             string fileName = Assembly.GetEntryAssembly().Location;
@@ -76,6 +76,8 @@ namespace IfTextEditor.Update.Model
 
             foreach (UpdateContainer.UpdateInfo update in updates)
             {
+                Debug.WriteLine("HERE: " + update.AssemblyName);
+
                 //Check if current assemblies exist
                 if (!assemblies.ContainsKey(update.AssemblyName))
                     update.UpdateAvailable = true;

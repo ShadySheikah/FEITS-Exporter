@@ -8,6 +8,9 @@ namespace IfTextEditor.Update.View
         public Preferences()
         {
             InitializeComponent();
+
+            RB_Auto_Auto.Checked = true;
+            RB_Priority_All.Checked = true;
         }
 
         public int UpdatePreference { get; set; } = 0;

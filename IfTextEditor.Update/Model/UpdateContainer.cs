@@ -38,7 +38,7 @@ namespace IfTextEditor.Update.Model
                 {
                     var newUpdate = new UpdateInfo
                     {
-                        AssemblyName = node.Name,
+                        AssemblyName = node.Attributes["name"].Value,
                         AssemblyVer = Version.Parse(node["version"].InnerText),
                         DownloadUri = new Uri(node["url"].InnerText),
                         Md5 = node["md5"].InnerText

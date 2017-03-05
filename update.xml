@@ -16,12 +16,12 @@
     <md5>F8B24F057E7FB7C8A938EB8678DCC9FC</md5>
   </assembly>
   <assembly name="SkiaSharp.dll">
-    <version>1.56.1.0</version>
+    <version>1.57.1.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/lib/SkiaSharp.dll</url>
     <md5>58E8AD3DF30298F0D092D512A6A03909</md5>
   </assembly>
   <assembly name="SkiaSharp.Views.Desktop.dll">
-    <version>1.56.1.0</version>
+    <version>1.56.2.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/dev/IfTextEditor.Editor/dist/lib/SkiaSharp.Views.Desktop.dll</url>
     <md5>5E115B8C217EB7E2E1BF871F56CDA5DB</md5>
   </assembly>

@@ -56,6 +56,8 @@ namespace IfTextEditor.Update.Controller
 
         internal bool StartAutoUpdate()
         {
+            Settings.Default.Reset();
+
             //If first time, set auto-update preference
             if (Settings.Default.FirstTime)
             {

@@ -107,12 +107,10 @@
             // 
             this.RB_Auto_Auto.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Auto_Auto.AutoSize = true;
-            this.RB_Auto_Auto.Checked = true;
             this.RB_Auto_Auto.Location = new System.Drawing.Point(3, 6);
             this.RB_Auto_Auto.Name = "RB_Auto_Auto";
             this.RB_Auto_Auto.Size = new System.Drawing.Size(137, 17);
             this.RB_Auto_Auto.TabIndex = 0;
-            this.RB_Auto_Auto.TabStop = true;
             this.RB_Auto_Auto.Text = "Download automatically";
             this.RB_Auto_Auto.UseVisualStyleBackColor = true;
             this.RB_Auto_Auto.CheckedChanged += new System.EventHandler(this.RB_Auto_Auto_CheckedChanged);
@@ -172,12 +170,10 @@
             // 
             this.RB_Priority_All.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Priority_All.AutoSize = true;
-            this.RB_Priority_All.Checked = true;
             this.RB_Priority_All.Location = new System.Drawing.Point(3, 14);
             this.RB_Priority_All.Name = "RB_Priority_All";
             this.RB_Priority_All.Size = new System.Drawing.Size(77, 17);
             this.RB_Priority_All.TabIndex = 0;
-            this.RB_Priority_All.TabStop = true;
             this.RB_Priority_All.Text = "All updates";
             this.RB_Priority_All.UseVisualStyleBackColor = true;
             this.RB_Priority_All.CheckedChanged += new System.EventHandler(this.RB_Priority_All_CheckedChanged);
