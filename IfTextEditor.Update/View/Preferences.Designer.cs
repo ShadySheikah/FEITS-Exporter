@@ -70,7 +70,7 @@
             this.TL_Base.RowCount = 3;
             this.TL_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TL_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TL_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.TL_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.TL_Base.Size = new System.Drawing.Size(344, 261);
             this.TL_Base.TabIndex = 0;
             // 
@@ -78,9 +78,9 @@
             // 
             this.GB_AutoUpdate.Controls.Add(this.tableLayoutPanel2);
             this.GB_AutoUpdate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GB_AutoUpdate.Location = new System.Drawing.Point(3, 118);
+            this.GB_AutoUpdate.Location = new System.Drawing.Point(3, 116);
             this.GB_AutoUpdate.Name = "GB_AutoUpdate";
-            this.GB_AutoUpdate.Size = new System.Drawing.Size(166, 109);
+            this.GB_AutoUpdate.Size = new System.Drawing.Size(166, 107);
             this.GB_AutoUpdate.TabIndex = 9;
             this.GB_AutoUpdate.TabStop = false;
             this.GB_AutoUpdate.Text = "Auto Update";
@@ -100,7 +100,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(160, 90);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(160, 88);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // RB_Auto_Auto
@@ -119,7 +119,7 @@
             // 
             this.RB_Auto_Notify.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Auto_Notify.AutoSize = true;
-            this.RB_Auto_Notify.Location = new System.Drawing.Point(3, 36);
+            this.RB_Auto_Notify.Location = new System.Drawing.Point(3, 35);
             this.RB_Auto_Notify.Name = "RB_Auto_Notify";
             this.RB_Auto_Notify.Size = new System.Drawing.Size(134, 17);
             this.RB_Auto_Notify.TabIndex = 1;
@@ -131,7 +131,7 @@
             // 
             this.RB_Auto_No.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Auto_No.AutoSize = true;
-            this.RB_Auto_No.Location = new System.Drawing.Point(3, 66);
+            this.RB_Auto_No.Location = new System.Drawing.Point(3, 64);
             this.RB_Auto_No.Name = "RB_Auto_No";
             this.RB_Auto_No.Size = new System.Drawing.Size(93, 17);
             this.RB_Auto_No.TabIndex = 2;
@@ -143,9 +143,9 @@
             // 
             this.GB_Priority.Controls.Add(this.tableLayoutPanel3);
             this.GB_Priority.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GB_Priority.Location = new System.Drawing.Point(175, 118);
+            this.GB_Priority.Location = new System.Drawing.Point(175, 116);
             this.GB_Priority.Name = "GB_Priority";
-            this.GB_Priority.Size = new System.Drawing.Size(166, 109);
+            this.GB_Priority.Size = new System.Drawing.Size(166, 107);
             this.GB_Priority.TabIndex = 8;
             this.GB_Priority.TabStop = false;
             this.GB_Priority.Text = "Priority";
@@ -163,14 +163,14 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(160, 90);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(160, 88);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // RB_Priority_All
             // 
             this.RB_Priority_All.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Priority_All.AutoSize = true;
-            this.RB_Priority_All.Location = new System.Drawing.Point(3, 14);
+            this.RB_Priority_All.Location = new System.Drawing.Point(3, 13);
             this.RB_Priority_All.Name = "RB_Priority_All";
             this.RB_Priority_All.Size = new System.Drawing.Size(77, 17);
             this.RB_Priority_All.TabIndex = 0;
@@ -182,7 +182,7 @@
             // 
             this.RB_Priority_Important.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.RB_Priority_Important.AutoSize = true;
-            this.RB_Priority_Important.Location = new System.Drawing.Point(3, 59);
+            this.RB_Priority_Important.Location = new System.Drawing.Point(3, 57);
             this.RB_Priority_Important.Name = "RB_Priority_Important";
             this.RB_Priority_Important.Size = new System.Drawing.Size(132, 17);
             this.RB_Priority_Important.TabIndex = 1;
@@ -196,9 +196,9 @@
             this.flowLayoutPanel1.Controls.Add(this.B_SaveChanges);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(175, 233);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(175, 229);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(166, 25);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(166, 29);
             this.flowLayoutPanel1.TabIndex = 10;
             // 
             // B_Cancel
@@ -234,7 +234,7 @@
             this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(338, 109);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(338, 107);
             this.flowLayoutPanel2.TabIndex = 11;
             // 
             // label1

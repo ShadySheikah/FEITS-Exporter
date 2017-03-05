@@ -9,12 +9,27 @@ namespace IfTextEditor.Update.View
         {
             InitializeComponent();
 
-            RB_Auto_Auto.Checked = true;
-            RB_Priority_All.Checked = true;
+            switch (Properties.Settings.Default.UpdatePreference)
+            {
+                case 0:
+                    RB_Auto_No.Checked = true;
+                    break;
+                case 1:
+                    RB_Auto_Notify.Checked = true;
+                    break;
+                case 2:
+                    RB_Auto_Auto.Checked = true;
+                    break;
+            }
+
+            if (Properties.Settings.Default.ImportantUpdatesOnly)
+                RB_Priority_Important.Checked = true;
+            else
+                RB_Priority_All.Checked = true;
         }
 
-        public int UpdatePreference { get; set; } = 0;
-        public bool ImportantUpdatesOnly { get; set; } = false;
+        public int UpdatePreference { get; set; }
+        public bool ImportantUpdatesOnly { get; set; }
 
         private void RB_Auto_Auto_CheckedChanged(object sender, EventArgs e)
         {
