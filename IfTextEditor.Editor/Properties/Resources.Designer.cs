@@ -59,5 +59,15 @@ namespace IfTextEditor.Editor.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon ITE {
+            get {
+                object obj = ResourceManager.GetObject("ITE", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

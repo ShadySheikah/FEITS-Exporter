@@ -31,9 +31,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>dist\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -43,7 +43,7 @@
     <StartupObject>IfTextEditor.Editor.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>ITE.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\ITE.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SkiaSharp, Version=1.56.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
@@ -116,7 +116,6 @@
     <EmbeddedResource Include="View\MainView.resx">
       <DependentUpon>MainView.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -131,13 +130,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IfTextEditor.Update\IfTextEditor.Update.csproj">
+      <Project>{14fc9341-6d18-4b02-9191-a4e140af8469}</Project>
+      <Name>IfTextEditor.Update</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IfTextEditor.Resources\IfTextEditor.Resources.csproj">
       <Project>{3e1683cd-0f25-4dc8-a2a7-986022329852}</Project>
       <Name>IfTextEditor.Resources</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ITE.ico" />
+    <None Include="Resources\ITE.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.1.56.1\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.56.1\build\net45\SkiaSharp.targets')" />
@@ -154,4 +157,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <MoveToLibFolder Include="$(OutputPath)*.dll ; $(OutputPath)*.pdb ; $(OutputPath)*.xml" />
+    </ItemGroup>
+    <Move SourceFiles="@(MoveToLibFolder)" DestinationFolder="$(OutputPath)lib" OverwriteReadOnlyFiles="true" />
+  </Target>
 </Project>

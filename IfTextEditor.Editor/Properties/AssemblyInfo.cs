@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("If Text Editor")]
-[assembly: AssemblyDescription("Provides the interface and logic for editing Fire Emblem If text files")]
+[assembly: AssemblyDescription("Open, edit, and save text files from Fire Emblem If.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ShadySheikah")]
 [assembly: AssemblyProduct("If Text Editor")]

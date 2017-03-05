@@ -335,5 +335,20 @@ namespace IfTextEditor.Editor.View
         {
             cont.OnBackgroundEnabledChanged();
         }
+
+        private void MainView_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void MI_UpdateCheck_Click(object sender, EventArgs e)
+        {
+            cont.UpdateProgram();
+        }
+
+        private void MI_UpdateSettings_Click(object sender, EventArgs e)
+        {
+            cont.UpdateSettings();
+        }
     }
 }

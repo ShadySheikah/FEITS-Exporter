@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using IfTextEditor.Editor.Model;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 
 namespace IfTextEditor.Editor.Controller
 {
@@ -439,6 +439,16 @@ namespace IfTextEditor.Editor.Controller
         {
             mainView.SourcePreviewImage = sourceModel.RenderPreview(sourceModel.PageIndex, PreviewFormat.Normal);
             mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
+        }
+
+        public void UpdateProgram()
+        {
+            Update.Program.CheckUpdatesAtRuntime();
+        }
+
+        public void UpdateSettings()
+        {
+            Update.Program.SetUpdatePreferences();
         }
     }
 }

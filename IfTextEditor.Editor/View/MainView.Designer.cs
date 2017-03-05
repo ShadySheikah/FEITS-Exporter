@@ -363,7 +363,6 @@
             this.MI_UpdateSettings,
             this.toolStripSeparator2,
             this.aboutToolStripMenuItem});
-            this.helpToolStripMenuItem.Enabled = false;
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
@@ -373,12 +372,14 @@
             this.MI_UpdateCheck.Name = "MI_UpdateCheck";
             this.MI_UpdateCheck.Size = new System.Drawing.Size(182, 22);
             this.MI_UpdateCheck.Text = "Check For Updates...";
+            this.MI_UpdateCheck.Click += new System.EventHandler(this.MI_UpdateCheck_Click);
             // 
             // MI_UpdateSettings
             // 
             this.MI_UpdateSettings.Name = "MI_UpdateSettings";
             this.MI_UpdateSettings.Size = new System.Drawing.Size(182, 22);
             this.MI_UpdateSettings.Text = "Update Settings";
+            this.MI_UpdateSettings.Click += new System.EventHandler(this.MI_UpdateSettings_Click);
             // 
             // toolStripSeparator2
             // 
@@ -387,6 +388,7 @@
             // 
             // aboutToolStripMenuItem
             // 
+            this.aboutToolStripMenuItem.Enabled = false;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
@@ -1090,6 +1092,7 @@
             this.MinimumSize = new System.Drawing.Size(640, 540);
             this.Name = "MainView";
             this.Text = "If Text Editor";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainView_FormClosed);
             this.MS_Top.ResumeLayout(false);
             this.MS_Top.PerformLayout();
             this.SS_Status.ResumeLayout(false);
