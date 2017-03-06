@@ -40,9 +40,6 @@ namespace IfTextEditor.Update.Model
 
         internal bool CheckIfUpdateAvailable()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-
             try
             {
                 //Check if manifest is available
@@ -91,9 +88,6 @@ namespace IfTextEditor.Update.Model
                         update.ImportantUpdate = true;
                 }
             }
-
-            sw.Stop();
-            Debug.WriteLine("UPDATE CHECK TIME: " + sw.Elapsed);
 
             //Return results, prompt if update needed
             return updates.Any(update => update.UpdateAvailable);
@@ -195,10 +189,7 @@ namespace IfTextEditor.Update.Model
                 string fileName = Path.GetFileName(newFiles[i]);
                 string movePath = Path.Combine(destPath, "lib", fileName);
 
-                //If entry assembly (this), check for possible name diff
-                FileVersionInfo fileInfo = FileVersionInfo.GetVersionInfo(newFiles[i]);
-
-                if (fileInfo.FileDescription == "If Text Editor")
+                if (Path.GetFileNameWithoutExtension(newFiles[i]) == Assembly.GetEntryAssembly().GetName().Name)
                 {
                     fileName = Path.GetFileName(Assembly.GetEntryAssembly().Location);
                     movePath = Path.Combine(destPath, fileName);
