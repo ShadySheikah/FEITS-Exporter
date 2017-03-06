@@ -159,21 +159,16 @@ namespace IfTextEditor.Update.Model
 
         private bool VerifyDownloadIntegrity(string path, UpdateContainer.UpdateInfo info)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             //Get the downloaded file's hash
             byte[] fileHash = MD5.Create().ComputeHash(new FileStream(path, FileMode.Open));
+            Trace.WriteLine(fileHash.Length);
 
             //Convert to string
             var builder = new StringBuilder();
             foreach (byte b in fileHash)
-                builder.Append(b.ToString("x2").ToLower());
+                builder.Append(b.ToString("x2"));
 
-            Debug.WriteLine("BEFORE: " + builder);
-            Debug.WriteLine("AFTER: " + builder.ToString().ToUpper());
-            sw.Stop();
-            Debug.WriteLine("TIME TO VERIFY: " + sw.Elapsed);
-
+            Trace.WriteLine(builder.ToString().ToUpper() + ", " + info.Md5);
             return string.Equals(builder.ToString().ToUpper(), info.Md5, StringComparison.CurrentCultureIgnoreCase);
         }
 
