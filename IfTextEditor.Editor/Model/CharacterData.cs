@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -75,41 +76,38 @@ namespace IfTextEditor.Editor.Model
             }
 
             //Point data
-            string[] sweatLines = Resources.Properties.Resources.FaceSweat.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            string[] blushLines = Resources.Properties.Resources.FaceBlush.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            string[] cropLines = Resources.Properties.Resources.CroppedPositions.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+            string[] dataLines = Resources.Properties.Resources.CharacterData.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 0; i < sweatLines.Length; i++)
+            foreach (string line in dataLines)
             {
-                string[] sweatVals = sweatLines[i].Split('\t');
-                string[] blushVals = blushLines[i].Split('\t');
-                string[] cropVals = cropLines[i].Split('\t');
+                if (line.StartsWith("//"))
+                    continue;
 
-                if (sweatVals[0].StartsWith("マイユニ"))
+                string[] charData = line.Split('\t');
+
+                if (charData[0].StartsWith("マイユニ"))
                 {
                     Character kamui = characters["username"];
-                    if (sweatVals[0].Contains("男" + kamui.PlayerFace) && sweatVals[0].EndsWith(kamui.PlayerEyes.ToString().ToUpper()))
-                    {
-                        string[] kSweatPoints = sweatVals[1].Split(',');
-                        string[] kBlushPoints = blushVals[1].Split(',');
-                        string[] kCropPoints = cropVals[1].Split(',');
-
-                        kamui.SweatPos = new Point(Convert.ToInt32(kSweatPoints[0]), Convert.ToInt32(kSweatPoints[1]));
-                        kamui.BlushPos = new Point(Convert.ToInt32(kBlushPoints[0]), Convert.ToInt32(kBlushPoints[1]));
-                        kamui.CropPos = new Point(Convert.ToInt32(kCropPoints[0]), Convert.ToInt32(kCropPoints[1]));
+                    if (!charData[0].Contains("男" + kamui.PlayerFace) || !charData[0].EndsWith(kamui.PlayerEyes.ToString().ToUpper()))
                         continue;
-                    }
+
+                    string[] kSweatPoints = charData[1].Split(',');
+                    string[] kBlushPoints = charData[2].Split(',');
+                    string[] kCropPoints = charData[3].Split(',');
+
+                    kamui.SweatPos = new Point(Convert.ToInt32(kSweatPoints[0]), Convert.ToInt32(kSweatPoints[1]));
+                    kamui.BlushPos = new Point(Convert.ToInt32(kBlushPoints[0]), Convert.ToInt32(kBlushPoints[1]));
+                    kamui.CropPos = new Point(Convert.ToInt32(kCropPoints[0]), Convert.ToInt32(kCropPoints[1]));
                 }
-
-                if (characters.ContainsKey(sweatVals[0]))
+                else if (characters.ContainsKey(charData[0]))
                 {
-                    string[] sweatPoints = sweatVals[1].Split(',');
-                    string[] blushPoints = blushVals[1].Split(',');
-                    string[] cropPoints = cropVals[1].Split(',');
+                    string[] sweatPoints = charData[1].Split(',');
+                    string[] blushPoints = charData[2].Split(',');
+                    string[] cropPoints = charData[3].Split(',');
 
-                    characters[sweatVals[0]].SweatPos = new Point(Convert.ToInt32(sweatPoints[0]), Convert.ToInt32(sweatPoints[1]));
-                    characters[sweatVals[0]].BlushPos = new Point(Convert.ToInt32(blushPoints[0]), Convert.ToInt32(blushPoints[1]));
-                    characters[sweatVals[0]].CropPos = new Point(Convert.ToInt32(cropPoints[0]), Convert.ToInt32(cropPoints[1]));
+                    characters[charData[0]].SweatPos = new Point(Convert.ToInt32(sweatPoints[0]), Convert.ToInt32(sweatPoints[1]));
+                    characters[charData[0]].BlushPos = new Point(Convert.ToInt32(blushPoints[0]), Convert.ToInt32(blushPoints[1]));
+                    characters[charData[0]].CropPos = new Point(Convert.ToInt32(cropPoints[0]), Convert.ToInt32(cropPoints[1]));
                 }
             }
         }
@@ -120,27 +118,23 @@ namespace IfTextEditor.Editor.Model
             player.PlayerFace = faceType;
             player.PlayerEyes = eyeType;
 
-            string[] sweatLines = Resources.Properties.Resources.FaceSweat.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            string[] blushLines = Resources.Properties.Resources.FaceBlush.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            string[] cropLines = Resources.Properties.Resources.CroppedPositions.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] dataLines = Resources.Properties.Resources.CharacterData.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 0; i < sweatLines.Length; i++)
+            for (int i = 0; i < dataLines.Length; i++)
             {
-                if (sweatLines[i].StartsWith("マイユニ"))
+                if (dataLines[i].StartsWith("マイユニ"))
                 {
-                    string[] sweatVals = sweatLines[i].Split('\t');
-                    string[] blushVals = blushLines[i].Split('\t');
-                    string[] cropVals = cropLines[i].Split('\t');
+                    string[] charData = dataLines[i].Split('\t');
 
-                    if (sweatVals[0].Contains((gender == Gender.Male ? "男" : "女") + player.PlayerFace) && sweatVals[0].EndsWith(player.PlayerEyes.ToString().ToUpper()))
+                    if (charData[0].Contains((gender == Gender.Male ? "男" : "女") + player.PlayerFace) && charData[0].EndsWith(player.PlayerEyes.ToString().ToUpper()))
                     {
-                        string[] sweatPoints = sweatVals[1].Split(',');
+                        string[] sweatPoints = charData[1].Split(',');
                         player.SweatPos = new Point(Convert.ToInt32(sweatPoints[0]), Convert.ToInt32(sweatPoints[1]));
 
-                        string[] blushPoints = blushVals[1].Split(',');
+                        string[] blushPoints = charData[2].Split(',');
                         player.BlushPos = new Point(Convert.ToInt32(blushPoints[0]), Convert.ToInt32(blushPoints[1]));
 
-                        string[] cropPoints = cropVals[1].Split(',');
+                        string[] cropPoints = charData[3].Split(',');
                         player.CropPos = new Point(Convert.ToInt32(cropPoints[0]), Convert.ToInt32(cropPoints[1]));
                     }
                 }
@@ -150,6 +144,9 @@ namespace IfTextEditor.Editor.Model
         public static Bitmap DrawCharacterImage(string name, Emote[] emotes, bool leftSide, Gender gender)
         {
             //Character
+            if (!characters.ContainsKey(name))
+                return new Bitmap(1, 1);
+
             Character character = characters[name];
             Bitmap charImage = character.GetCharacterImage(emotes, gender, false);
 
@@ -169,6 +166,9 @@ namespace IfTextEditor.Editor.Model
         public static Bitmap DrawCharacterCloseUpImage(string name, Emote[] emotes, Gender gender)
         {
             //Character
+            if (!characters.ContainsKey(name))
+                return new Bitmap(1, 1);
+
             Character character = characters[name];
             Bitmap charImage = character.GetCharacterImage(emotes, gender, true);
 

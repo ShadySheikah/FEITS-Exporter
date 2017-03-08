@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Resources;
 using System.Text;
 
 namespace IfTextEditor.Editor.Model
@@ -242,7 +240,10 @@ namespace IfTextEditor.Editor.Model
             if (format == ConversationFormat.Type0)
                 pFormat = PreviewFormat.TopBottom;
 
-            return RenderSpecifiedPreview(page, pFormat);
+            if(FileCont.Messages.Count > 0 && page < FileCont.Messages[messageIndex].Pages.Count)
+                return RenderSpecifiedPreview(page, pFormat);
+
+            return null;
         }
 
         private Bitmap RenderSpecifiedPreview(int index, PreviewFormat pFormat)
@@ -340,11 +341,11 @@ namespace IfTextEditor.Editor.Model
                             {
                                 //Character and text
                                 gr.DrawImage(CharacterData.DrawCharacterCloseUpImage(charA, charAEmotions, playerGender), new Point(2, 3));
-                                gr.DrawImage(PreviewFont.DrawString(new Bitmap(260, 50), topLine, Color.FromArgb(68, 8, 0), 0, 7), new Point(76, 2));
+                                gr.DrawImage(PreviewFont.DrawString(new Bitmap(282, 50), topLine, Color.FromArgb(68, 8, 0), 0, 7), new Point(76, 2));
 
                                 //Arrow
                                 if (index < FileCont.Messages[messageIndex].Pages.Count - 1 && activeChar == charA)
-                                    gr.DrawImage(Resources.Properties.Resources.KeyPress, new Point(topTextbox.Width - 30, 32));
+                                    gr.DrawImage(Resources.Properties.Resources.KeyPress, new Point(topTextbox.Width - 22, 32));
                             }
 
                             //Add to base
@@ -363,11 +364,11 @@ namespace IfTextEditor.Editor.Model
                             {
                                 //Character and text
                                 gr.DrawImage(CharacterData.DrawCharacterCloseUpImage(charB, charBEmotions, playerGender), new Point(2,3));
-                                gr.DrawImage(PreviewFont.DrawString(new Bitmap(260, 50), bottomLine, Color.FromArgb(68, 8, 0), 0, 7), new Point(76, 2));
+                                gr.DrawImage(PreviewFont.DrawString(new Bitmap(282, 50), bottomLine, Color.FromArgb(68, 8, 0), 0, 7), new Point(76, 2));
 
                                 //Arrow
                                 if (index < FileCont.Messages[messageIndex].Pages.Count - 1 && activeChar == charB)
-                                    gr.DrawImage(Resources.Properties.Resources.KeyPress, new Point(botTextbox.Width - 30, 32));
+                                    gr.DrawImage(Resources.Properties.Resources.KeyPress, new Point(botTextbox.Width - 22, 32));
                             }
 
                             //Add to base

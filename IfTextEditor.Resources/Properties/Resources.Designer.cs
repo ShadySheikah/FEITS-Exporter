@@ -1201,6 +1201,30 @@ namespace IfTextEditor.Resources.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //Name	Sweat	Blush	Cropped-Position
+        ///カゲマン	132,63	107,49	-21,-42
+        ///マイユニ_男1_顔A	133,73	91,45	-21,-46
+        ///マイユニ_男1_顔B	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔C	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔D	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔E	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔F	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔G	133,78	86,40	-21,-46
+        ///マイユニ_男1_顔H	32,32	32,32	-21,-46
+        ///マイユニ_男1_顔I	32,32	32,32	-21,-46
+        ///マイユニ_男1_顔J	32,32	32,32	-21,-46
+        ///マイユニ_男2_顔A	135,67	88,42	-21,-40
+        ///マイユニ_男2_顔B	135,67	88,42	-21,-40
+        ///マイユニ_男2_顔C	135,67	88,42	-21,-40
+        ///マイユニ_男2_顔D	135,67	88, [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CharacterData {
+            get {
+                return ResourceManager.GetString("CharacterData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 不明	Unknown
         ///マイユニ	Kamui
         ///ギュンター	Gunther
@@ -1363,43 +1387,6 @@ namespace IfTextEditor.Resources.Properties {
             get {
                 object obj = ResourceManager.GetObject("Chiaro", resourceCulture);
                 return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to カゲマン	42,42
-        ///マイユニ_男1_顔A	46,46
-        ///マイユニ_男1_顔B	46,46
-        ///マイユニ_男1_顔C	46,46
-        ///マイユニ_男1_顔D	46,46
-        ///マイユニ_男1_顔E	46,46
-        ///マイユニ_男1_顔F	46,46
-        ///マイユニ_男1_顔G	46,46
-        ///マイユニ_男1_顔H	46,46
-        ///マイユニ_男1_顔I	46,46
-        ///マイユニ_男1_顔J	46,46
-        ///マイユニ_男2_顔A	40,40
-        ///マイユニ_男2_顔B	40,40
-        ///マイユニ_男2_顔C	40,40
-        ///マイユニ_男2_顔D	40,40
-        ///マイユニ_男2_顔E	40,40
-        ///マイユニ_男2_顔F	40,40
-        ///マイユニ_男2_顔G	40,40
-        ///マイユニ_男2_顔H	46,46
-        ///マイユニ_男2_顔I	46,46
-        ///マイユニ_男2_顔J	46,46
-        ///マイユニ_女1_顔A	51,51
-        ///マイユニ_女1_顔B	51,51
-        ///マイユニ_女1_顔C	51,51
-        ///マイユニ_女1_顔D	51,51
-        ///マイユニ_女1_顔E	51,51
-        ///マイユニ_女1_顔F	51,51
-        ///マイユニ_女1_顔G	51,51
-        ///マイユニ_女1_顔H	46, [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string CroppedPositions {
-            get {
-                return ResourceManager.GetString("CroppedPositions", resourceCulture);
             }
         }
         
@@ -3080,79 +3067,6 @@ namespace IfTextEditor.Resources.Properties {
             get {
                 object obj = ResourceManager.GetObject("eマイユニ男2_st_通常", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to カゲマン	107,49
-        ///マイユニ_男1_顔A	91,45
-        ///マイユニ_男1_顔B	86,40
-        ///マイユニ_男1_顔C	86,40
-        ///マイユニ_男1_顔D	86,40
-        ///マイユニ_男1_顔E	86,40
-        ///マイユニ_男1_顔F	86,40
-        ///マイユニ_男1_顔G	86,40
-        ///マイユニ_男1_顔H	32,32
-        ///マイユニ_男1_顔I	32,32
-        ///マイユニ_男1_顔J	32,32
-        ///マイユニ_男2_顔A	88,42
-        ///マイユニ_男2_顔B	88,42
-        ///マイユニ_男2_顔C	88,42
-        ///マイユニ_男2_顔D	88,42
-        ///マイユニ_男2_顔E	88,42
-        ///マイユニ_男2_顔F	88,42
-        ///マイユニ_男2_顔G	88,42
-        ///マイユニ_男2_顔H	32,32
-        ///マイユニ_男2_顔I	32,32
-        ///マイユニ_男2_顔J	32,32
-        ///マイユニ_女1_顔A	96,76
-        ///マイユニ_女1_顔B	96,76
-        ///マイユニ_女1_顔C	96,76
-        ///マイユニ_女1_顔D	96,76
-        ///マイユニ_女1_顔E	96,76
-        ///マイユニ_女1_顔F	96,76
-        ///マイユニ_女1_顔G	96,76
-        ///マイユニ_女1_顔H	32 [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string FaceBlush {
-            get {
-                return ResourceManager.GetString("FaceBlush", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to カゲマン	132,63
-        ///マイユニ_男1_顔A	133,73
-        ///マイユニ_男1_顔B	133,78
-        ///マイユニ_男1_顔C	133,78
-        ///マイユニ_男1_顔D	133,78
-        ///マイユニ_男1_顔E	133,78
-        ///マイユニ_男1_顔F	133,78
-        ///マイユニ_男1_顔G	133,78
-        ///マイユニ_男1_顔H	32,32
-        ///マイユニ_男1_顔I	32,32
-        ///マイユニ_男1_顔J	32,32
-        ///マイユニ_男2_顔A	135,67
-        ///マイユニ_男2_顔B	135,67
-        ///マイユニ_男2_顔C	135,67
-        ///マイユニ_男2_顔D	135,67
-        ///マイユニ_男2_顔E	135,67
-        ///マイユニ_男2_顔F	135,67
-        ///マイユニ_男2_顔G	135,67
-        ///マイユニ_男2_顔H	32,32
-        ///マイユニ_男2_顔I	32,32
-        ///マイユニ_男2_顔J	32,32
-        ///マイユニ_女1_顔A	134,98
-        ///マイユニ_女1_顔B	134,98
-        ///マイユニ_女1_顔C	134,98
-        ///マイユニ_女1_顔D	134,98
-        ///マイユニ_女1_顔E	134,98
-        ///マイユニ_女1_顔F	134,98
-        ///マイユニ_女1_顔G	 [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string FaceSweat {
-            get {
-                return ResourceManager.GetString("FaceSweat", resourceCulture);
             }
         }
         
@@ -33440,9 +33354,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_キメ {
+        public static System.Drawing.Bitmap 陰陽師_bu_キメ {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_キメ", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_キメ", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33450,9 +33364,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_囚 {
+        public static System.Drawing.Bitmap 陰陽師_bu_囚 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_囚", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_囚", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33460,9 +33374,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_怒 {
+        public static System.Drawing.Bitmap 陰陽師_bu_怒 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_怒", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_怒", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33470,9 +33384,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_汗 {
+        public static System.Drawing.Bitmap 陰陽師_bu_汗 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_汗", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_汗", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33480,9 +33394,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_照 {
+        public static System.Drawing.Bitmap 陰陽師_bu_照 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_照", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_照", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33490,9 +33404,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_笑 {
+        public static System.Drawing.Bitmap 陰陽師_bu_笑 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_笑", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_笑", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33500,9 +33414,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_苦 {
+        public static System.Drawing.Bitmap 陰陽師_bu_苦 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_苦", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_苦", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33510,9 +33424,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_bu_通常 {
+        public static System.Drawing.Bitmap 陰陽師_bu_通常 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_bu_通常", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_bu_通常", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33520,9 +33434,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_キメ {
+        public static System.Drawing.Bitmap 陰陽師_st_キメ {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_キメ", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_キメ", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33530,9 +33444,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_囚 {
+        public static System.Drawing.Bitmap 陰陽師_st_囚 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_囚", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_囚", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33540,9 +33454,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_怒 {
+        public static System.Drawing.Bitmap 陰陽師_st_怒 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_怒", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_怒", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33550,9 +33464,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_汗 {
+        public static System.Drawing.Bitmap 陰陽師_st_汗 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_汗", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_汗", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33560,9 +33474,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_照 {
+        public static System.Drawing.Bitmap 陰陽師_st_照 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_照", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_照", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33570,9 +33484,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_笑 {
+        public static System.Drawing.Bitmap 陰陽師_st_笑 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_笑", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_笑", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33580,9 +33494,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_苦 {
+        public static System.Drawing.Bitmap 陰陽師_st_苦 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_苦", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_苦", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -33590,9 +33504,9 @@ namespace IfTextEditor.Resources.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap 陰陽師男_st_通常 {
+        public static System.Drawing.Bitmap 陰陽師_st_通常 {
             get {
-                object obj = ResourceManager.GetObject("陰陽師男_st_通常", resourceCulture);
+                object obj = ResourceManager.GetObject("陰陽師_st_通常", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

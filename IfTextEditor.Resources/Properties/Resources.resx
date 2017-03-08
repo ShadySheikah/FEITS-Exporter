@@ -469,9 +469,6 @@
   <data name="Chiaro" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Chiaro.otf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="CroppedPositions" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\txt\CroppedPositions.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="cマイユニ女1_bu_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\cマイユニ女1_bu_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -975,12 +972,6 @@
   </data>
   <data name="eマイユニ男2_st_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\eマイユニ男2_st_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="FaceBlush" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\txt\FaceBlush.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="FaceSweat" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\txt\FaceSweat.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="fマイユニ女1_bu_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\fマイユニ女1_bu_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -10060,54 +10051,6 @@
   <data name="鍛冶男_st_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\鍛冶男_st_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="陰陽師男_bu_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_囚" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_囚.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_怒" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_怒.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_汗" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_汗.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_照" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_照.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_笑" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_笑.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_苦" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_苦.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_bu_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_bu_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_囚" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_囚.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_怒" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_怒.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_汗" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_汗.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_照" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_照.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_笑" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_笑.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_苦" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_苦.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="陰陽師男_st_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\img\face\陰陽師男_st_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="面をつけた透魔竜_bu_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\面をつけた透魔竜_bu_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -10203,5 +10146,56 @@
   </data>
   <data name="鬼人男_st_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\img\face\鬼人男_st_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_囚" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_囚.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_怒" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_怒.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_汗" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_汗.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_照" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_照.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_笑" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_笑.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_苦" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_苦.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_bu_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_bu_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_キメ" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_キメ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_囚" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_囚.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_怒" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_怒.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_汗" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_汗.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_照" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_照.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_笑" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_笑.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_苦" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_苦.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="陰陽師_st_通常" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\img\face\陰陽師_st_通常.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CharacterData" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\txt\CharacterData.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

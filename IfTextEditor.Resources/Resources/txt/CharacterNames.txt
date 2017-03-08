@@ -116,6 +116,7 @@ CASTLE_黒村人女	Nohrian Woman
 魔物	Monster
 傭兵団	Mercenary
 花売り	Flower Vendor
+陰陽師	Onmyouji
 絆_白白_01	Ainezu
 絆_白白_02	Azuki
 絆_白白_03	Usubeni

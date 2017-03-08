@@ -3205,22 +3205,6 @@
     <None Include="Resources\img\face\鍛冶男_st_笑.png" />
     <None Include="Resources\img\face\鍛冶男_st_苦.png" />
     <None Include="Resources\img\face\鍛冶男_st_通常.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_キメ.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_囚.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_怒.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_汗.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_照.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_笑.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_苦.png" />
-    <None Include="Resources\img\face\陰陽師男_bu_通常.png" />
-    <None Include="Resources\img\face\陰陽師男_st_キメ.png" />
-    <None Include="Resources\img\face\陰陽師男_st_囚.png" />
-    <None Include="Resources\img\face\陰陽師男_st_怒.png" />
-    <None Include="Resources\img\face\陰陽師男_st_汗.png" />
-    <None Include="Resources\img\face\陰陽師男_st_照.png" />
-    <None Include="Resources\img\face\陰陽師男_st_笑.png" />
-    <None Include="Resources\img\face\陰陽師男_st_苦.png" />
-    <None Include="Resources\img\face\陰陽師男_st_通常.png" />
     <None Include="Resources\img\face\面をつけた透魔竜_bu_キメ.png" />
     <None Include="Resources\img\face\面をつけた透魔竜_bu_囚.png" />
     <None Include="Resources\img\face\面をつけた透魔竜_bu_怒.png" />
@@ -3399,9 +3383,6 @@
     <None Include="Resources\img\TextBox_Hoshido.png" />
     <None Include="Resources\img\TextBox_Nohr.png" />
     <None Include="Resources\txt\charWidths.txt" />
-    <None Include="Resources\txt\CroppedPositions.txt" />
-    <None Include="Resources\txt\FaceBlush.txt" />
-    <None Include="Resources\txt\FaceSweat.txt" />
     <None Include="Resources\txt\HairColors.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -3454,6 +3435,57 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\txt\CharacterNames.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_笑.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_苦.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_通常.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_キメ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_囚.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_怒.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_汗.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_照.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_笑.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_苦.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_st_通常.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_キメ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_囚.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_怒.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_汗.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\img\face\陰陽師_bu_照.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\txt\CharacterData.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
