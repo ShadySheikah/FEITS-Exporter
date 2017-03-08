@@ -63,7 +63,7 @@ namespace IfTextEditor.Update.Controller
                 return false;
 
             //If we only want important updates and there are none, stop
-            return Settings.Default.UpdatePreference != 1 || updateModel.ImportantUpdatePending();
+            return !Settings.Default.ImportantUpdatesOnly || updateModel.ImportantUpdatePending();
         }
 
         internal async void StartUpdating()
