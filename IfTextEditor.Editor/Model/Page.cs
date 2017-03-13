@@ -37,7 +37,7 @@ namespace IfTextEditor.Editor.Model
 
                         //If $Nu is next, we've found all the commands.
                         //Loop once more for line ending
-                        if (commandPresent && (newText.Substring(i).StartsWith("$Nu") || newText.Substring(i).StartsWith("$a0")))
+                        if (commandPresent && (newText.Substring(i).StartsWith("$Nu") || newText.Substring(i).StartsWith("$a0") || newText.Substring(i).StartsWith("$G")))
                             continue;
 
                         //Find a command and strip it from the text

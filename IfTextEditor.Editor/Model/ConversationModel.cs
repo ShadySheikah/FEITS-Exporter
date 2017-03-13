@@ -221,11 +221,30 @@ namespace IfTextEditor.Editor.Model
             {
                 int index = newSpeech.IndexOf("$", StringComparison.Ordinal);
 
+                //Handle gender-specific phrases
+                if (newSpeech.Substring(index).StartsWith("$G"))
+                {
+                    int end = newSpeech.Substring(index).IndexOf('|');
+                    if (end > 0)
+                    {
+                        string[] parameters = newSpeech.Substring(index + 2, end - 2).Split(',');
+
+                        foreach (string str in parameters)
+                            Debug.WriteLine(str);
+
+                        newSpeech = newSpeech.Substring(0, index) + (playerGender == Gender.Male ? parameters[0] : parameters[1]) + newSpeech.Substring(index + end + 1);
+
+                        continue;
+                    }
+                }
+
                 string substring;
                 var cmd = new Command(newSpeech.Substring(index), out substring);
+                if (cmd.Type == CommandType.UNKNOWN_TYPE && newSpeech.Count(f => f == '$') <= 1)
+                    break;
+
                 newSpeech = newSpeech.Substring(0, index) + substring;
                 cmds.Add(cmd);
-                Debug.WriteLine(newSpeech);
             }
 
             UpdateCommands(cmds);

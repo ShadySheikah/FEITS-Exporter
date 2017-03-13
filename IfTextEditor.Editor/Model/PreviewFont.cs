@@ -66,7 +66,9 @@ namespace IfTextEditor.Editor.Model
 
         public static Image DrawString(Bitmap baseImage, string line, Color textColor, int posX, int posY)
         {
+            Debug.WriteLine(line);
             string newLine = line.Replace(Environment.NewLine, "\n");
+            Debug.WriteLine(newLine);
             int curX = posX, curY = posY;
 
             BitmapData data = baseImage.LockBits(new Rectangle(0, 0, baseImage.Width, baseImage.Height), ImageLockMode.WriteOnly, baseImage.PixelFormat);
@@ -95,6 +97,7 @@ namespace IfTextEditor.Editor.Model
 
                         surface.Canvas.DrawPositionedText(c.ToString(), new[] {new SKPoint(curX, curY + 15)}, paint);
                         curX += charWidths[c];
+
                     }
                 }
             }

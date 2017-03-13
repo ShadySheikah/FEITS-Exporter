@@ -9,7 +9,7 @@ namespace IfTextEditor.Editor.Model
 {
     public class Command
     {
-        public string Symbol { get; }
+        public string Symbol { get; } = string.Empty;
         public string[] Parameters { get; }
         public CommandType Type { get; }
 
@@ -32,13 +32,17 @@ namespace IfTextEditor.Editor.Model
                 //Iterate through dictionary to find symbol and param count
                 foreach (string key in knownCommands.Keys)
                 {
-                    if (content.StartsWith(key, StringComparison.Ordinal))
-                    {
-                        Symbol = key;
-                        Parameters = new string[knownCommands[key]];
-                        break;
-                    }
+                    if (!content.StartsWith(key, StringComparison.Ordinal))
+                        continue;
+
+                    Symbol = key;
+                    Parameters = new string[knownCommands[key]];
+                    break;
                 }
+
+                //If no key matched, set empty params to avoid errors
+                if (Symbol == string.Empty)
+                    Parameters = new string[0];
 
                 #region Set parameters
 
@@ -158,6 +162,7 @@ namespace IfTextEditor.Editor.Model
         Portrait,
         Speaker,
         Emotion,
+        GenderConditional,
         CharExit,
         NamePerms,
         PageEnd,
