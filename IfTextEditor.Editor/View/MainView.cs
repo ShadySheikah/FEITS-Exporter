@@ -4,7 +4,6 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using IfTextEditor.Editor.Model;
 
 namespace IfTextEditor.Editor.View
 {
@@ -27,7 +26,14 @@ namespace IfTextEditor.Editor.View
                     Text = "If Text Editor";
             }
         }
+
         public string AppStatus { set { SL_AppStatus.Text = value; } }
+
+        private bool IsTwoPane
+        {
+            get { return MI_TwoPanes.Checked; }
+            set { MI_TwoPanes.Checked = value; }
+        }
         #endregion
 
         #region Source
@@ -51,7 +57,7 @@ namespace IfTextEditor.Editor.View
 
         public int SourcePageCount
         {
-            set { SL_Source.Text = $"Source: {SourcePageIndex}/{value}"; }
+            set { SL_Source.Text = $"Source: {SourcePageIndex + 1}/{value}"; }
         }
 
         public string SourceText
@@ -100,7 +106,7 @@ namespace IfTextEditor.Editor.View
 
         public int TargetPageCount
         {
-            set { SL_Target.Text = $"Target: {TargetPageIndex}/{value}"; }
+            set { SL_Target.Text = $"Target: {TargetPageIndex + 1}/{value}"; }
         }
 
         public string TargetText
@@ -176,6 +182,7 @@ namespace IfTextEditor.Editor.View
         public MainView()
         {
             InitializeComponent();
+            IsTwoPane = false;
         }
 
         public void SetController(MainController controller)
@@ -207,12 +214,12 @@ namespace IfTextEditor.Editor.View
 
         private void MI_SourceImport_Click(object sender, EventArgs e)
         {
-
+            cont.OpenFromString(ModelType.Source);
         }
 
         private void MI_TargetImport_Click(object sender, EventArgs e)
         {
-
+            cont.OpenFromString(ModelType.Target);
         }
         #endregion
 
@@ -349,6 +356,28 @@ namespace IfTextEditor.Editor.View
         private void MI_UpdateSettings_Click(object sender, EventArgs e)
         {
             cont.UpdateSettings();
+        }
+
+        private void MI_TwoPanes_CheckedChanged(object sender, EventArgs e)
+        {
+            var btn = (ToolStripMenuItem) sender;
+            if (btn == null)
+                throw new Exception("Button not found!");
+
+            if (btn.Checked)
+            {
+                Size = new Size(1280, 540);
+                SC_PreviewMain.Panel1Collapsed = false;
+                MI_Source.Visible = true;
+                SL_Source.Visible = true;
+            }
+            else
+            {
+                Size = new Size(640, 540);
+                SC_PreviewMain.Panel1Collapsed = true;
+                MI_Source.Visible = false;
+                SL_Source.Visible = false;
+            }
         }
     }
 }

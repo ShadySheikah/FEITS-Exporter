@@ -196,7 +196,6 @@
             // 
             // MI_SourceImport
             // 
-            this.MI_SourceImport.Enabled = false;
             this.MI_SourceImport.Name = "MI_SourceImport";
             this.MI_SourceImport.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.I)));
@@ -259,7 +258,6 @@
             // 
             // MI_TargetImport
             // 
-            this.MI_TargetImport.Enabled = false;
             this.MI_TargetImport.Name = "MI_TargetImport";
             this.MI_TargetImport.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
             this.MI_TargetImport.Size = new System.Drawing.Size(147, 22);
@@ -310,10 +308,10 @@
             this.MI_TwoPanes.Checked = true;
             this.MI_TwoPanes.CheckOnClick = true;
             this.MI_TwoPanes.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.MI_TwoPanes.Enabled = false;
             this.MI_TwoPanes.Name = "MI_TwoPanes";
             this.MI_TwoPanes.Size = new System.Drawing.Size(181, 22);
             this.MI_TwoPanes.Text = "Two-Pane View";
+            this.MI_TwoPanes.CheckedChanged += new System.EventHandler(this.MI_TwoPanes_CheckedChanged);
             // 
             // MI_EnableBackgrounds
             // 
@@ -430,7 +428,6 @@
             // 
             // SC_PreviewMain
             // 
-            this.SC_PreviewMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.SC_PreviewMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SC_PreviewMain.Location = new System.Drawing.Point(0, 24);
             this.SC_PreviewMain.Name = "SC_PreviewMain";
@@ -448,7 +445,6 @@
             // 
             // tabControl2
             // 
-            this.tabControl2.Alignment = System.Windows.Forms.TabAlignment.Right;
             this.tabControl2.Controls.Add(this.TP_SourcePreview);
             this.tabControl2.Controls.Add(this.TP_SourceRaw);
             this.tabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -456,16 +452,16 @@
             this.tabControl2.Multiline = true;
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(630, 451);
+            this.tabControl2.Size = new System.Drawing.Size(632, 453);
             this.tabControl2.TabIndex = 1;
             // 
             // TP_SourcePreview
             // 
             this.TP_SourcePreview.Controls.Add(this.SC_PreviewSource);
-            this.TP_SourcePreview.Location = new System.Drawing.Point(4, 4);
+            this.TP_SourcePreview.Location = new System.Drawing.Point(4, 22);
             this.TP_SourcePreview.Name = "TP_SourcePreview";
             this.TP_SourcePreview.Padding = new System.Windows.Forms.Padding(3);
-            this.TP_SourcePreview.Size = new System.Drawing.Size(603, 443);
+            this.TP_SourcePreview.Size = new System.Drawing.Size(624, 427);
             this.TP_SourcePreview.TabIndex = 0;
             this.TP_SourcePreview.Text = "Preview";
             this.TP_SourcePreview.UseVisualStyleBackColor = true;
@@ -486,7 +482,7 @@
             // SC_PreviewSource.Panel2
             // 
             this.SC_PreviewSource.Panel2.Controls.Add(this.DG_SourceMessageList);
-            this.SC_PreviewSource.Size = new System.Drawing.Size(597, 437);
+            this.SC_PreviewSource.Size = new System.Drawing.Size(618, 421);
             this.SC_PreviewSource.SplitterDistance = 410;
             this.SC_PreviewSource.TabIndex = 2;
             // 
@@ -508,7 +504,7 @@
             this.splitContainer5.Panel2.Controls.Add(this.toolStrip3);
             this.splitContainer5.Panel2.Controls.Add(this.TB_SourceText);
             this.splitContainer5.Panel2.Controls.Add(this.TS_SourceTools);
-            this.splitContainer5.Size = new System.Drawing.Size(408, 435);
+            this.splitContainer5.Size = new System.Drawing.Size(408, 419);
             this.splitContainer5.SplitterDistance = 248;
             this.splitContainer5.TabIndex = 1;
             // 
@@ -544,7 +540,7 @@
             // 
             // TS_SourceTools
             // 
-            this.TS_SourceTools.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.TS_SourceTools.BackColor = System.Drawing.SystemColors.Control;
             this.TS_SourceTools.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.TS_SourceTools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TS_SourceTools.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -552,7 +548,7 @@
             this.TB_SourcePage,
             this.B_SourcePrev,
             this.B_SyncNavigation});
-            this.TS_SourceTools.Location = new System.Drawing.Point(0, 158);
+            this.TS_SourceTools.Location = new System.Drawing.Point(0, 142);
             this.TS_SourceTools.Name = "TS_SourceTools";
             this.TS_SourceTools.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.TS_SourceTools.Size = new System.Drawing.Size(408, 25);
@@ -624,7 +620,7 @@
             this.DG_SourceMessageList.Name = "DG_SourceMessageList";
             this.DG_SourceMessageList.ReadOnly = true;
             this.DG_SourceMessageList.RowHeadersVisible = false;
-            this.DG_SourceMessageList.Size = new System.Drawing.Size(181, 435);
+            this.DG_SourceMessageList.Size = new System.Drawing.Size(202, 419);
             this.DG_SourceMessageList.TabIndex = 1;
             this.DG_SourceMessageList.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DG_SourceMessageList_DataBindingComplete);
             this.DG_SourceMessageList.SelectionChanged += new System.EventHandler(this.DG_SourceMessageList_SelectionChanged);
@@ -632,10 +628,10 @@
             // TP_SourceRaw
             // 
             this.TP_SourceRaw.Controls.Add(this.tableLayoutPanel1);
-            this.TP_SourceRaw.Location = new System.Drawing.Point(4, 4);
+            this.TP_SourceRaw.Location = new System.Drawing.Point(4, 22);
             this.TP_SourceRaw.Name = "TP_SourceRaw";
             this.TP_SourceRaw.Padding = new System.Windows.Forms.Padding(3);
-            this.TP_SourceRaw.Size = new System.Drawing.Size(603, 443);
+            this.TP_SourceRaw.Size = new System.Drawing.Size(624, 427);
             this.TP_SourceRaw.TabIndex = 1;
             this.TP_SourceRaw.Text = "Raw";
             this.TP_SourceRaw.UseVisualStyleBackColor = true;
@@ -652,7 +648,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(597, 437);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(618, 421);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // TB_RawText
@@ -661,12 +657,12 @@
             this.TB_RawText.Location = new System.Drawing.Point(3, 28);
             this.TB_RawText.Multiline = true;
             this.TB_RawText.Name = "TB_RawText";
-            this.TB_RawText.Size = new System.Drawing.Size(591, 406);
+            this.TB_RawText.Size = new System.Drawing.Size(612, 390);
             this.TB_RawText.TabIndex = 1;
             // 
             // TS_Raw
             // 
-            this.TS_Raw.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.TS_Raw.BackColor = System.Drawing.SystemColors.Control;
             this.TS_Raw.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TS_Raw.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TS_Raw.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -682,7 +678,7 @@
             this.B_RawReload});
             this.TS_Raw.Location = new System.Drawing.Point(0, 0);
             this.TS_Raw.Name = "TS_Raw";
-            this.TS_Raw.Size = new System.Drawing.Size(597, 25);
+            this.TS_Raw.Size = new System.Drawing.Size(618, 25);
             this.TS_Raw.Stretch = true;
             this.TS_Raw.TabIndex = 0;
             this.TS_Raw.Text = "toolStrip2";
@@ -763,7 +759,6 @@
             // 
             // tabControl3
             // 
-            this.tabControl3.Alignment = System.Windows.Forms.TabAlignment.Left;
             this.tabControl3.Controls.Add(this.TP_TargetPreview);
             this.tabControl3.Controls.Add(this.TP_TargetRaw);
             this.tabControl3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -771,16 +766,16 @@
             this.tabControl3.Multiline = true;
             this.tabControl3.Name = "tabControl3";
             this.tabControl3.SelectedIndex = 0;
-            this.tabControl3.Size = new System.Drawing.Size(626, 451);
+            this.tabControl3.Size = new System.Drawing.Size(628, 453);
             this.tabControl3.TabIndex = 0;
             // 
             // TP_TargetPreview
             // 
             this.TP_TargetPreview.Controls.Add(this.SC_PreviewTarget);
-            this.TP_TargetPreview.Location = new System.Drawing.Point(23, 4);
+            this.TP_TargetPreview.Location = new System.Drawing.Point(4, 22);
             this.TP_TargetPreview.Name = "TP_TargetPreview";
             this.TP_TargetPreview.Padding = new System.Windows.Forms.Padding(3);
-            this.TP_TargetPreview.Size = new System.Drawing.Size(599, 443);
+            this.TP_TargetPreview.Size = new System.Drawing.Size(620, 427);
             this.TP_TargetPreview.TabIndex = 0;
             this.TP_TargetPreview.Text = "Preview";
             this.TP_TargetPreview.UseVisualStyleBackColor = true;
@@ -800,8 +795,8 @@
             // 
             this.SC_PreviewTarget.Panel2.Controls.Add(this.splitContainer3);
             this.SC_PreviewTarget.Panel2MinSize = 410;
-            this.SC_PreviewTarget.Size = new System.Drawing.Size(593, 437);
-            this.SC_PreviewTarget.SplitterDistance = 175;
+            this.SC_PreviewTarget.Size = new System.Drawing.Size(614, 421);
+            this.SC_PreviewTarget.SplitterDistance = 181;
             this.SC_PreviewTarget.TabIndex = 2;
             // 
             // DG_TargetMessageList
@@ -819,7 +814,7 @@
             this.DG_TargetMessageList.Name = "DG_TargetMessageList";
             this.DG_TargetMessageList.ReadOnly = true;
             this.DG_TargetMessageList.RowHeadersVisible = false;
-            this.DG_TargetMessageList.Size = new System.Drawing.Size(173, 435);
+            this.DG_TargetMessageList.Size = new System.Drawing.Size(179, 419);
             this.DG_TargetMessageList.TabIndex = 0;
             this.DG_TargetMessageList.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DG_TargetMessageList_DataBindingComplete);
             this.DG_TargetMessageList.SelectionChanged += new System.EventHandler(this.DG_TargetMessageList_SelectionChanged);
@@ -842,7 +837,7 @@
             this.splitContainer3.Panel2.Controls.Add(this.toolStrip2);
             this.splitContainer3.Panel2.Controls.Add(this.TB_TargetText);
             this.splitContainer3.Panel2.Controls.Add(this.TS_TargetTools);
-            this.splitContainer3.Size = new System.Drawing.Size(412, 435);
+            this.splitContainer3.Size = new System.Drawing.Size(427, 419);
             this.splitContainer3.SplitterDistance = 248;
             this.splitContainer3.TabIndex = 0;
             // 
@@ -850,7 +845,7 @@
             // 
             this.PB_TargetPreview.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.PB_TargetPreview.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.PB_TargetPreview.Location = new System.Drawing.Point(5, 5);
+            this.PB_TargetPreview.Location = new System.Drawing.Point(12, 5);
             this.PB_TargetPreview.Name = "PB_TargetPreview";
             this.PB_TargetPreview.Size = new System.Drawing.Size(400, 240);
             this.PB_TargetPreview.TabIndex = 0;
@@ -861,7 +856,7 @@
             this.toolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(412, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(427, 25);
             this.toolStrip2.TabIndex = 2;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -874,13 +869,13 @@
             this.TB_TargetText.Location = new System.Drawing.Point(3, 28);
             this.TB_TargetText.Multiline = true;
             this.TB_TargetText.Name = "TB_TargetText";
-            this.TB_TargetText.Size = new System.Drawing.Size(400, 127);
+            this.TB_TargetText.Size = new System.Drawing.Size(415, 111);
             this.TB_TargetText.TabIndex = 1;
             this.TB_TargetText.TextChanged += new System.EventHandler(this.TB_TargetText_TextChanged);
             // 
             // TS_TargetTools
             // 
-            this.TS_TargetTools.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.TS_TargetTools.BackColor = System.Drawing.SystemColors.Control;
             this.TS_TargetTools.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.TS_TargetTools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TS_TargetTools.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -889,10 +884,10 @@
             this.B_TargetNext,
             this.TB_PlayerName,
             this.L_PlayerName});
-            this.TS_TargetTools.Location = new System.Drawing.Point(0, 158);
+            this.TS_TargetTools.Location = new System.Drawing.Point(0, 142);
             this.TS_TargetTools.Name = "TS_TargetTools";
             this.TS_TargetTools.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.TS_TargetTools.Size = new System.Drawing.Size(412, 25);
+            this.TS_TargetTools.Size = new System.Drawing.Size(427, 25);
             this.TS_TargetTools.TabIndex = 0;
             this.TS_TargetTools.Text = "toolStrip1";
             // 
@@ -951,10 +946,10 @@
             // TP_TargetRaw
             // 
             this.TP_TargetRaw.Controls.Add(this.tableLayoutPanel2);
-            this.TP_TargetRaw.Location = new System.Drawing.Point(23, 4);
+            this.TP_TargetRaw.Location = new System.Drawing.Point(4, 22);
             this.TP_TargetRaw.Name = "TP_TargetRaw";
             this.TP_TargetRaw.Padding = new System.Windows.Forms.Padding(3);
-            this.TP_TargetRaw.Size = new System.Drawing.Size(599, 443);
+            this.TP_TargetRaw.Size = new System.Drawing.Size(620, 427);
             this.TP_TargetRaw.TabIndex = 1;
             this.TP_TargetRaw.Text = "Raw";
             this.TP_TargetRaw.UseVisualStyleBackColor = true;
@@ -971,7 +966,7 @@
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(593, 437);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(614, 421);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // textBox1
@@ -980,12 +975,12 @@
             this.textBox1.Location = new System.Drawing.Point(3, 28);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(587, 406);
+            this.textBox1.Size = new System.Drawing.Size(608, 390);
             this.textBox1.TabIndex = 1;
             // 
             // toolStrip1
             // 
-            this.toolStrip1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.toolStrip1.BackColor = System.Drawing.SystemColors.Control;
             this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
@@ -1000,7 +995,7 @@
             this.toolStripButton5});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(593, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(614, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip2";
             // 

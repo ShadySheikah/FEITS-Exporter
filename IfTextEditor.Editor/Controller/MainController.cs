@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using IfTextEditor.Editor.Model;
 using System.IO;
 using System.Reflection;
+using IfTextEditor.Update.View;
 
 namespace IfTextEditor.Editor.Controller
 {
@@ -89,20 +90,30 @@ namespace IfTextEditor.Editor.Controller
 
         public void OpenFromString(ModelType type)
         {
-            //TODO: New Form open stuff here
-            string tempString = "";
+            string incomingString;
+            
+            using (var importer = new Import())
+            {
+                if (importer.ShowDialog() == DialogResult.Cancel)
+                    return;
+
+                incomingString = importer.ImportedText;
+            }
+
+            if (incomingString == string.Empty)
+                return;
 
             switch (type)
             {
                 case ModelType.Source:
-                    if (sourceModel.LoadFromString(tempString))
+                    if (sourceModel.LoadFromString(incomingString))
                     {
                         mainView.FormName = string.Empty;
                         mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
                     }
                     break;
                 case ModelType.Target:
-                    if (targetModel.LoadFromString(tempString))
+                    if (targetModel.LoadFromString(incomingString))
                     {
                         mainView.FormName = string.Empty;
                         mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);

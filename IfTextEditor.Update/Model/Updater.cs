@@ -175,7 +175,7 @@ namespace IfTextEditor.Update.Model
             string startArgs = startupArgs.Aggregate(string.Empty, (current, s) => current + (s + " "));
 
             //Pieces of the command line argument
-            const string cmdStart = "/C choice /C Y /N /D Y /T 4 ";
+            const string cmdStart = "/C choice /C Y /N /D Y /T 2 ";
             const string cmdMove = "& Move /Y \"{0}\" \"{1}\" ";
             var cmdEnd = "& Start \"\" /D \"{0}\" \"{1}\" {2}";
 
