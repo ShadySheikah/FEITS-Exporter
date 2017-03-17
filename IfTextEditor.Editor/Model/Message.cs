@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace IfTextEditor.Editor.Model
 {
-    public partial class FileContainer
+    internal partial class FileContainer
     {
-        public partial class Message : IEnumerable<Message.Page>
+        internal partial class Message : IEnumerable<Message.Page>
         {
-            public string MessageName { get; set; }
-            public List<Page> Pages { get; } = new List<Page>();
+            internal string MessageName { get; set; }
+            internal List<Page> Pages { get; } = new List<Page>();
 
-            public void ParseMessage(string message)
+            internal void ParseMessage(string message)
             {
                 //Split messages by line-end markers
                 var delimiters = new List<string> { "$k$p", "$k\\n" };
@@ -28,7 +25,7 @@ namespace IfTextEditor.Editor.Model
                 }
             }
 
-            public string Compile(bool includeName = true)
+            internal string Compile(bool includeName = true)
             {
                 string compMess = string.Empty;
 
@@ -39,14 +36,15 @@ namespace IfTextEditor.Editor.Model
             }
 
             #region Enumerable
+
             public IEnumerator<Page> GetEnumerator()
             {
-                return Pages.GetEnumerator();
+                return ((IEnumerable<Page>)Pages).GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return Pages.GetEnumerator();
+                return ((IEnumerable<Page>)Pages).GetEnumerator();
             }
             #endregion
         }

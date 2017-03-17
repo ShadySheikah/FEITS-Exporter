@@ -69,5 +69,51 @@ namespace IfTextEditor.Editor.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error opening file.
+        /// </summary>
+        internal static string OpenErrorTitle {
+            get {
+                return ResourceManager.GetString("OpenErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe|All files (*.*)|*.*.
+        /// </summary>
+        internal static string OpenFileDialogFilter {
+            get {
+                return ResourceManager.GetString("OpenFileDialogFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a permanent action and cannot be undone.
+        ///Are you sure you want to remove the currently selected message?.
+        /// </summary>
+        internal static string RemoveMessage {
+            get {
+                return ResourceManager.GetString("RemoveMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Message from {0}.
+        /// </summary>
+        internal static string RemoveMessageTitle {
+            get {
+                return ResourceManager.GetString("RemoveMessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe.
+        /// </summary>
+        internal static string SaveFileDialogFilter {
+            get {
+                return ResourceManager.GetString("SaveFileDialogFilter", resourceCulture);
+            }
+        }
     }
 }

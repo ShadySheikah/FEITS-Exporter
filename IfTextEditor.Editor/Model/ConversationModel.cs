@@ -12,9 +12,10 @@ namespace IfTextEditor.Editor.Model
     {
         #region Variables
         //File Container
-        public FileContainer FileCont { get; set; } = new FileContainer();
+        internal FileContainer FileCont { get; private set; } = new FileContainer();
         private int messageIndex;
-        public int MessageIndex
+
+        internal int MessageIndex
         {
             get { return messageIndex; }
             set
@@ -24,12 +25,14 @@ namespace IfTextEditor.Editor.Model
                 ResetCommands();
             }
         }
-        public int PageIndex { get; set; }
+
+        internal int PageIndex { get; set; }
 
         //Conversation properties
-        public string PlayerName { get; set; } = "Kamui";
+        internal string PlayerName { get; set; } = "Kamui";
         private Gender playerGender;
-        public Gender PlayerGender
+
+        internal Gender PlayerGender
         {
             get { return playerGender; }
             set
@@ -49,9 +52,10 @@ namespace IfTextEditor.Editor.Model
         private enum ConversationFormat { Type1, Type0 }
         private ConversationFormat format;
 
-        public Image BackgroundImage { get; set; } = Resources.Properties.Resources.SupportBG;
+        internal Image BackgroundImage { get; set; } = Resources.Properties.Resources.SupportBG;
         private bool backgroundEnabled = true;
-        public bool BackgroundEnabled
+
+        internal bool BackgroundEnabled
         {
             get { return backgroundEnabled; }
             set
@@ -61,7 +65,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public int TextboxIndex { get; set; }
+        internal int TextboxIndex { get; set; }
         private static readonly Image[] Textboxes =
         {
             Resources.Properties.Resources.TextBox,
@@ -80,7 +84,7 @@ namespace IfTextEditor.Editor.Model
 
         #region Open/Close
 
-        public bool LoadFromFile(string path)
+        internal bool LoadFromFile(string path)
         {
             //if (!Directory.Exists(path))
             //    return false;
@@ -91,25 +95,20 @@ namespace IfTextEditor.Editor.Model
             return FileCont.PopulateContainer(splitFile);
         }
 
-        public bool LoadFromString(string content)
+        internal bool LoadFromString(string content)
         {
             try
             {
-                if (content.StartsWith("MESS_ARCHIVE_"))
-                {
-                    string[] splitContent = content.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
-                    return FileCont.PopulateContainer(splitContent);
-                }
+                string[] splitContent = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                return FileCont.PopulateContainer(splitContent);
             }
             catch
             {
                 return false;
             }
-
-            return false;
         }
 
-        public bool SaveToFile(string path)
+        internal bool SaveToFile(string path)
         {
             if (path == string.Empty)
                 return false;
@@ -125,9 +124,23 @@ namespace IfTextEditor.Editor.Model
         }
         #endregion
 
+        internal bool RemoveMessage(int index)
+        {
+            try
+            {
+                FileCont.Messages.RemoveAt(index);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
         #region Commands
 
-        public void IterateCommandsToIndex(int pageIndex)
+        internal void IterateCommandsToIndex(int pageIndex)
         {
             ResetCommands();
 
@@ -137,7 +150,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public void UpdatePageCommands(int pageIndex)
+        internal void UpdatePageCommands(int pageIndex)
         {
             UpdateCommands(FileCont.Messages[messageIndex].Pages[pageIndex].Commands);
         }
@@ -228,10 +241,6 @@ namespace IfTextEditor.Editor.Model
                     if (end > 0)
                     {
                         string[] parameters = newSpeech.Substring(index + 2, end - 2).Split(',');
-
-                        foreach (string str in parameters)
-                            Debug.WriteLine(str);
-
                         newSpeech = newSpeech.Substring(0, index) + (playerGender == Gender.Male ? parameters[0] : parameters[1]) + newSpeech.Substring(index + end + 1);
 
                         continue;
@@ -254,7 +263,7 @@ namespace IfTextEditor.Editor.Model
 
         #region Rendering
 
-        public Image RenderPreview(int page, PreviewFormat pFormat)
+        internal Image RenderPreview(int page, PreviewFormat pFormat)
         {
             if (format == ConversationFormat.Type0)
                 pFormat = PreviewFormat.TopBottom;
@@ -433,7 +442,7 @@ namespace IfTextEditor.Editor.Model
 #endregion
     }
 
-    public enum PreviewFormat
+    internal enum PreviewFormat
     {
         Normal,
         HalfBox,

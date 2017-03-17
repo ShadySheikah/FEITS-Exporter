@@ -16,5 +16,18 @@ namespace IfTextEditor.Update.View
         {
             ImportedText = TB_Input.Text;
         }
+
+        internal void SetForExport(string exportedText)
+        {
+            Text = "Export";
+            AcceptButton = B_Import;
+
+            TB_Input.Text = exportedText;
+            TB_Input.ReadOnly = true;
+            TB_Input.SelectAll();
+
+            B_Cancel.Visible = false;
+            B_Import.Text = "OK";
+        }
     }
 }

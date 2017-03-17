@@ -61,6 +61,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TB_Input.Location = new System.Drawing.Point(13, 13);
+            this.TB_Input.MaxLength = 250000;
             this.TB_Input.Multiline = true;
             this.TB_Input.Name = "TB_Input";
             this.TB_Input.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;

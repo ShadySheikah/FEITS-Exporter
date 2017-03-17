@@ -1,88 +1,86 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace IfTextEditor.Editor.Model
 {
-    public partial class FileContainer : IEnumerable<FileContainer.Message>
+    internal partial class FileContainer : IEnumerable<FileContainer.Message>
     {
         //Fields
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
-        public List<Message> Messages { get; private set; }
+        internal string FileName { get; set; }
+        internal string FilePath { get; set; }
+        internal List<Message> Messages { get; }
 
-        public FileContainer()
+        internal FileContainer()
         {
             FileName = FilePath = string.Empty;
             Messages = new List<Message>();
         }
 
-        public bool PopulateContainer(string[] fileLines)
+        internal bool PopulateContainer(string[] fileMsgs)
         {
             //Find and skip the header
-            if (!fileLines[0].StartsWith("MESS_ARCHIVE_"))
+            if (!fileMsgs[0].StartsWith("MESS_ARCHIVE_"))
             {
-                for (int i = 0; i < fileLines.Length; i++)
+                for (int i = 0; i < fileMsgs.Length; i++)
                 {
-                    var newMessage = new Message {MessageName = "Imported Message" + (i > 0 ? i.ToString() : "")};
-                    newMessage.ParseMessage(fileLines[i]);
+                    var newMessage = new Message {MessageName = "Imported Message" + (i > 0 ? " " +  i : "")};
+                    newMessage.ParseMessage(fileMsgs[i]);
                     Messages.Add(newMessage);
                 }
                 return true;
             }
 
-            FileName = fileLines[0].Substring(13);
+            FileName = fileMsgs[0].Substring(13);
 
             int offset = -1;
-            for (int i = 0; i < fileLines.Length; i++)
+            for (int i = 0; i < fileMsgs.Length; i++)
             {
                 //Contents begin after "Message Name: Message"
-                if (fileLines[i].Contains(':'))
-                {
-                    if (offset > -1)
-                    {
-                        offset = i;
-                        break;
-                    }
+                if (!fileMsgs[i].Contains(':'))
+                    continue;
 
+                if (offset > -1)
+                {
                     offset = i;
+                    break;
                 }
+
+                offset = i;
             }
 
-            for (int i = offset; i < fileLines.Length; i++)
+            for (int i = offset; i < fileMsgs.Length; i++)
             {
                 //Set the message name/prefix
-                if (fileLines[i].Contains(':'))
+                if (fileMsgs[i].Contains(':'))
                 {
                     var newMessage = new Message();
-                    int prefixIndex = fileLines[i].IndexOf(':');
-                    newMessage.MessageName = fileLines[i].Substring(0, prefixIndex);
+                    int prefixIndex = fileMsgs[i].IndexOf(':');
+                    newMessage.MessageName = fileMsgs[i].Substring(0, prefixIndex);
 
                     //Message will take it from here
-                    newMessage.ParseMessage(fileLines[i].Substring(prefixIndex + 2));
+                    newMessage.ParseMessage(fileMsgs[i].Substring(prefixIndex + 2));
 
                     //Add new Message to the list
                     Messages.Add(newMessage);
-                    continue;
                 }
-
-                return false;
             }
 
             return true;
         }
 
-        public string CompileFileText()
+        internal string CompileFileText()
         {
             var newFileText = string.Empty;
 
-            //Generate and add header
-            string h1 = "MESS_ARCHIVE_" + FileName + Environment.NewLine;
-            string h2 = "Message Name: Message" + Environment.NewLine;
-            newFileText += h1 + Environment.NewLine + h2 + Environment.NewLine;
+            if (FileName != string.Empty)
+            {
+                //Generate and add header
+                string h1 = "MESS_ARCHIVE_" + FileName + Environment.NewLine;
+                string h2 = "Message Name: Message" + Environment.NewLine;
+                newFileText += h1 + Environment.NewLine + h2 + Environment.NewLine;
+            }
 
             //Compile and add all messages
             for (int i = 0; i < Messages.Count; i++)
@@ -94,15 +92,16 @@ namespace IfTextEditor.Editor.Model
             return newFileText;
         }
 
-        #region Enumerable
+        #region Enumerator
+
         public IEnumerator<Message> GetEnumerator()
         {
-            return Messages.GetEnumerator();
+            return ((IEnumerable<Message>)Messages).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return Messages.GetEnumerator();
+            return ((IEnumerable<Message>)Messages).GetEnumerator();
         }
         #endregion
     }

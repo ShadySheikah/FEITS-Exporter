@@ -1,6 +1,6 @@
 ﻿namespace IfTextEditor.Editor.View
 {
-    partial class MainView
+    public partial class MainView
     {
         /// <summary>
         /// Required designer variable.
@@ -36,14 +36,14 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_SourceSave = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_SourceSaveAs = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_SourceExport = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_Target = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_TargetOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_TargetImport = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.MI_TargetSave = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_TargetSaveAs = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_TargetExport = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_TwoPanes = new System.Windows.Forms.ToolStripMenuItem();
             this.MI_EnableBackgrounds = new System.Windows.Forms.ToolStripMenuItem();
@@ -178,7 +178,7 @@
             this.toolStripSeparator1,
             this.MI_SourceSave,
             this.MI_SourceSaveAs,
-            this.toolStripMenuItem10});
+            this.MI_SourceExport});
             this.MI_Source.Name = "MI_Source";
             this.MI_Source.Size = new System.Drawing.Size(55, 20);
             this.MI_Source.Text = "&Source";
@@ -190,7 +190,7 @@
             this.MI_SourceOpen.Name = "MI_SourceOpen";
             this.MI_SourceOpen.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.O)));
-            this.MI_SourceOpen.Size = new System.Drawing.Size(179, 22);
+            this.MI_SourceOpen.Size = new System.Drawing.Size(204, 22);
             this.MI_SourceOpen.Text = "&Open";
             this.MI_SourceOpen.Click += new System.EventHandler(this.MI_SourceOpen_Click);
             // 
@@ -199,14 +199,14 @@
             this.MI_SourceImport.Name = "MI_SourceImport";
             this.MI_SourceImport.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.I)));
-            this.MI_SourceImport.Size = new System.Drawing.Size(179, 22);
-            this.MI_SourceImport.Text = "Import";
+            this.MI_SourceImport.Size = new System.Drawing.Size(204, 22);
+            this.MI_SourceImport.Text = "&Import";
             this.MI_SourceImport.Click += new System.EventHandler(this.MI_SourceImport_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(176, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(201, 6);
             // 
             // MI_SourceSave
             // 
@@ -215,23 +215,25 @@
             this.MI_SourceSave.Name = "MI_SourceSave";
             this.MI_SourceSave.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.MI_SourceSave.Size = new System.Drawing.Size(179, 22);
+            this.MI_SourceSave.Size = new System.Drawing.Size(204, 22);
             this.MI_SourceSave.Text = "&Save";
             this.MI_SourceSave.Click += new System.EventHandler(this.MI_SourceSave_Click);
             // 
             // MI_SourceSaveAs
             // 
             this.MI_SourceSaveAs.Name = "MI_SourceSaveAs";
-            this.MI_SourceSaveAs.Size = new System.Drawing.Size(179, 22);
+            this.MI_SourceSaveAs.Size = new System.Drawing.Size(204, 22);
             this.MI_SourceSaveAs.Text = "Save &As";
             this.MI_SourceSaveAs.Click += new System.EventHandler(this.MI_SourceSaveAs_Click);
             // 
-            // toolStripMenuItem10
+            // MI_SourceExport
             // 
-            this.toolStripMenuItem10.Enabled = false;
-            this.toolStripMenuItem10.Name = "toolStripMenuItem10";
-            this.toolStripMenuItem10.Size = new System.Drawing.Size(179, 22);
-            this.toolStripMenuItem10.Text = "Export YAML";
+            this.MI_SourceExport.Name = "MI_SourceExport";
+            this.MI_SourceExport.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.E)));
+            this.MI_SourceExport.Size = new System.Drawing.Size(204, 22);
+            this.MI_SourceExport.Text = "&Export Text";
+            this.MI_SourceExport.Click += new System.EventHandler(this.MI_SourceExport_Click);
             // 
             // MI_Target
             // 
@@ -241,7 +243,7 @@
             this.toolStripSeparator7,
             this.MI_TargetSave,
             this.MI_TargetSaveAs,
-            this.exportAsToolStripMenuItem});
+            this.MI_TargetExport});
             this.MI_Target.Name = "MI_Target";
             this.MI_Target.Size = new System.Drawing.Size(53, 20);
             this.MI_Target.Text = "&Target";
@@ -252,7 +254,7 @@
             this.MI_TargetOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MI_TargetOpen.Name = "MI_TargetOpen";
             this.MI_TargetOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.MI_TargetOpen.Size = new System.Drawing.Size(147, 22);
+            this.MI_TargetOpen.Size = new System.Drawing.Size(172, 22);
             this.MI_TargetOpen.Text = "&Open";
             this.MI_TargetOpen.Click += new System.EventHandler(this.MI_TargetOpen_Click);
             // 
@@ -260,14 +262,14 @@
             // 
             this.MI_TargetImport.Name = "MI_TargetImport";
             this.MI_TargetImport.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.MI_TargetImport.Size = new System.Drawing.Size(147, 22);
-            this.MI_TargetImport.Text = "Import";
+            this.MI_TargetImport.Size = new System.Drawing.Size(172, 22);
+            this.MI_TargetImport.Text = "&Import";
             this.MI_TargetImport.Click += new System.EventHandler(this.MI_TargetImport_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(144, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(169, 6);
             // 
             // MI_TargetSave
             // 
@@ -275,23 +277,24 @@
             this.MI_TargetSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MI_TargetSave.Name = "MI_TargetSave";
             this.MI_TargetSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.MI_TargetSave.Size = new System.Drawing.Size(147, 22);
+            this.MI_TargetSave.Size = new System.Drawing.Size(172, 22);
             this.MI_TargetSave.Text = "&Save";
             this.MI_TargetSave.Click += new System.EventHandler(this.MI_TargetSave_Click);
             // 
             // MI_TargetSaveAs
             // 
             this.MI_TargetSaveAs.Name = "MI_TargetSaveAs";
-            this.MI_TargetSaveAs.Size = new System.Drawing.Size(147, 22);
+            this.MI_TargetSaveAs.Size = new System.Drawing.Size(172, 22);
             this.MI_TargetSaveAs.Text = "Save &As";
             this.MI_TargetSaveAs.Click += new System.EventHandler(this.MI_TargetSaveAs_Click);
             // 
-            // exportAsToolStripMenuItem
+            // MI_TargetExport
             // 
-            this.exportAsToolStripMenuItem.Enabled = false;
-            this.exportAsToolStripMenuItem.Name = "exportAsToolStripMenuItem";
-            this.exportAsToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            this.exportAsToolStripMenuItem.Text = "Export YAML";
+            this.MI_TargetExport.Name = "MI_TargetExport";
+            this.MI_TargetExport.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.MI_TargetExport.Size = new System.Drawing.Size(172, 22);
+            this.MI_TargetExport.Text = "&Export Text";
+            this.MI_TargetExport.Click += new System.EventHandler(this.MI_TargetExport_Click);
             // 
             // toolsToolStripMenuItem
             // 
@@ -622,8 +625,9 @@
             this.DG_SourceMessageList.RowHeadersVisible = false;
             this.DG_SourceMessageList.Size = new System.Drawing.Size(202, 419);
             this.DG_SourceMessageList.TabIndex = 1;
+            this.DG_SourceMessageList.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DG_SourceMessageList_CellEnter);
             this.DG_SourceMessageList.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DG_SourceMessageList_DataBindingComplete);
-            this.DG_SourceMessageList.SelectionChanged += new System.EventHandler(this.DG_SourceMessageList_SelectionChanged);
+            this.DG_SourceMessageList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DG_SourceMessageList_KeyDown);
             // 
             // TP_SourceRaw
             // 
@@ -816,8 +820,9 @@
             this.DG_TargetMessageList.RowHeadersVisible = false;
             this.DG_TargetMessageList.Size = new System.Drawing.Size(179, 419);
             this.DG_TargetMessageList.TabIndex = 0;
+            this.DG_TargetMessageList.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DG_TargetMessageList_CellEnter);
             this.DG_TargetMessageList.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DG_TargetMessageList_DataBindingComplete);
-            this.DG_TargetMessageList.SelectionChanged += new System.EventHandler(this.DG_TargetMessageList_SelectionChanged);
+            this.DG_TargetMessageList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DG_TargetMessageList_KeyDown);
             // 
             // splitContainer3
             // 
@@ -1153,7 +1158,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem MI_TargetSave;
         private System.Windows.Forms.ToolStripMenuItem MI_TargetSaveAs;
-        private System.Windows.Forms.ToolStripMenuItem exportAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MI_TargetExport;
         private System.Windows.Forms.ToolStripMenuItem MI_TwoPanes;
         private System.Windows.Forms.ToolStripMenuItem MI_Source;
         private System.Windows.Forms.ToolStripMenuItem MI_SourceOpen;
@@ -1161,7 +1166,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem MI_SourceSave;
         private System.Windows.Forms.ToolStripMenuItem MI_SourceSaveAs;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem10;
+        private System.Windows.Forms.ToolStripMenuItem MI_SourceExport;
         private System.Windows.Forms.ToolStripStatusLabel SL_Source;
         private System.Windows.Forms.ToolStripStatusLabel SL_Target;
         private System.Windows.Forms.ToolStripStatusLabel SL_AppStatus;

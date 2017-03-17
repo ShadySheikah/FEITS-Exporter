@@ -121,4 +121,20 @@
   <data name="ITE" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ITE.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RemoveMessage" xml:space="preserve">
+    <value>This is a permanent action and cannot be undone.
+Are you sure you want to remove the currently selected message?</value>
+  </data>
+  <data name="RemoveMessageTitle" xml:space="preserve">
+    <value>Remove Message from {0}</value>
+  </data>
+  <data name="OpenFileDialogFilter" xml:space="preserve">
+    <value>Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe|All files (*.*)|*.*</value>
+  </data>
+  <data name="OpenErrorTitle" xml:space="preserve">
+    <value>Error opening file</value>
+  </data>
+  <data name="SaveFileDialogFilter" xml:space="preserve">
+    <value>Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe</value>
+  </data>
 </root>

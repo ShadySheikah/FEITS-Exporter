@@ -224,7 +224,36 @@ namespace IfTextEditor.Editor.View
         #endregion
 
         #region Saving
-        
+
+        private void MI_SourceSave_Click(object sender, EventArgs e)
+        {
+            cont.SaveFile(ModelType.Source);
+        }
+
+        private void MI_TargetSave_Click(object sender, EventArgs e)
+        {
+            cont.SaveFile(ModelType.Target);
+        }
+
+        private void MI_SourceSaveAs_Click(object sender, EventArgs e)
+        {
+            cont.SaveFileAs(ModelType.Source);
+        }
+
+        private void MI_TargetSaveAs_Click(object sender, EventArgs e)
+        {
+            cont.SaveFileAs(ModelType.Target);
+        }
+
+        private void MI_SourceExport_Click(object sender, EventArgs e)
+        {
+            cont.ExportCompiledText(ModelType.Source);
+        }
+
+        private void MI_TargetExport_Click(object sender, EventArgs e)
+        {
+            cont.ExportCompiledText(ModelType.Target);
+        }
         #endregion
 
         #region Message List
@@ -239,14 +268,66 @@ namespace IfTextEditor.Editor.View
             TargetMsgIndex = 0;
         }
 
-        private void DG_SourceMessageList_SelectionChanged(object sender, EventArgs e)
+        private void DG_SourceMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
             cont.SetMessage(SourceMsgIndex, ModelType.Source);
         }
 
-        private void DG_TargetMessageList_SelectionChanged(object sender, EventArgs e)
+        private void DG_TargetMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
             cont.SetMessage(TargetMsgIndex, ModelType.Target);
+        }
+
+        private void DG_SourceMessageList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Delete || DG_SourceMessageList.CurrentRow == null)
+                return;
+
+            if (cont.RemoveMessage(DG_SourceMessageList.CurrentCell.RowIndex, ModelType.Source))
+            {
+                int curIndex = DG_SourceMessageList.CurrentCell.RowIndex;
+                DG_SourceMessageList.Rows.RemoveAt(curIndex);
+
+                if (curIndex <= DG_SourceMessageList.Rows.Count - 1)
+                    DG_SourceMessageList.CurrentCell = DG_SourceMessageList[0, curIndex];
+                else if (DG_SourceMessageList.Rows.Count > 0)
+                    DG_SourceMessageList.CurrentCell = DG_SourceMessageList[0, DG_SourceMessageList.Rows.Count - 1];
+                else
+                {
+                    PB_SourcePreview.Image = null;
+                    TB_SourceText.Text = string.Empty;
+                }
+            }
+        }
+
+        private void DG_TargetMessageList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Delete || DG_TargetMessageList.CurrentRow == null)
+                return;
+
+            if (cont.RemoveMessage(DG_TargetMessageList.CurrentCell.RowIndex, ModelType.Target))
+            {
+                int curIndex = DG_TargetMessageList.CurrentCell.RowIndex;
+                DG_TargetMessageList.Rows.RemoveAt(curIndex);
+
+                if (curIndex <= DG_TargetMessageList.Rows.Count - 1)
+                    DG_TargetMessageList.CurrentCell = DG_TargetMessageList[0, curIndex];
+                else if (DG_TargetMessageList.Rows.Count > 0)
+                    DG_TargetMessageList.CurrentCell = DG_TargetMessageList[0, DG_TargetMessageList.Rows.Count - 1];
+                else
+                {
+                    PB_TargetPreview.Image = null;
+                    TB_TargetText.Text = string.Empty;
+                }
+            }
+        }
+        #endregion
+
+        #region Editing
+
+        private void TB_PlayerName_TextChanged(object sender, EventArgs e)
+        {
+            cont.OnNameChanged();
         }
         #endregion
 
@@ -311,56 +392,16 @@ namespace IfTextEditor.Editor.View
         }
         #endregion
 
-        #endregion
-
-        private void MI_SourceSave_Click(object sender, EventArgs e)
-        {
-            cont.SaveFile(ModelType.Source);
-        }
-
-        private void MI_TargetSave_Click(object sender, EventArgs e)
-        {
-            cont.SaveFile(ModelType.Target);
-        }
-
-        private void MI_SourceSaveAs_Click(object sender, EventArgs e)
-        {
-            cont.SaveFileAs(ModelType.Source);
-        }
-
-        private void MI_TargetSaveAs_Click(object sender, EventArgs e)
-        {
-            cont.SaveFileAs(ModelType.Target);
-        }
-
-        private void TB_PlayerName_TextChanged(object sender, EventArgs e)
-        {
-            cont.OnNameChanged();
-        }
+        #region View
 
         private void MI_EnableBackgrounds_CheckedChanged(object sender, EventArgs e)
         {
             cont.OnBackgroundEnabledChanged();
         }
 
-        private void MainView_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void MI_UpdateCheck_Click(object sender, EventArgs e)
-        {
-            cont.UpdateProgram();
-        }
-
-        private void MI_UpdateSettings_Click(object sender, EventArgs e)
-        {
-            cont.UpdateSettings();
-        }
-
         private void MI_TwoPanes_CheckedChanged(object sender, EventArgs e)
         {
-            var btn = (ToolStripMenuItem) sender;
+            var btn = (ToolStripMenuItem)sender;
             if (btn == null)
                 throw new Exception("Button not found!");
 
@@ -379,5 +420,25 @@ namespace IfTextEditor.Editor.View
                 SL_Source.Visible = false;
             }
         }
+        #endregion
+
+        #region Update
+
+        private void MI_UpdateCheck_Click(object sender, EventArgs e)
+        {
+            MainController.UpdateProgram();
+        }
+
+        private void MI_UpdateSettings_Click(object sender, EventArgs e)
+        {
+            MainController.UpdateSettings();
+        }
+        #endregion
+
+        private void MainView_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+        #endregion
     }
 }

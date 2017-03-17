@@ -1,26 +1,20 @@
-﻿using System;
+﻿using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 
 namespace IfTextEditor.Editor.Model
 {
-    public class PreviewFont
+    internal static class PreviewFont
     {
         private static SKTypeface typeface;
         private static Dictionary<char, int> charWidths;
 
-        public static void Initialize()
+        internal static void Initialize()
         {
             ObtainFont();
             EstablishCharWidths();
@@ -50,7 +44,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public static int GetStringWidth(string line)
+        internal static int GetStringWidth(string line)
         {
             string[] lines = line.Replace(Environment.NewLine, "\n").Split('\n');
             var widths = new int[lines.Length];
@@ -64,11 +58,9 @@ namespace IfTextEditor.Editor.Model
             return widths.Max();
         }
 
-        public static Image DrawString(Bitmap baseImage, string line, Color textColor, int posX, int posY)
+        internal static Image DrawString(Bitmap baseImage, string line, Color textColor, int posX, int posY)
         {
-            Debug.WriteLine(line);
             string newLine = line.Replace(Environment.NewLine, "\n");
-            Debug.WriteLine(newLine);
             int curX = posX, curY = posY;
 
             BitmapData data = baseImage.LockBits(new Rectangle(0, 0, baseImage.Width, baseImage.Height), ImageLockMode.WriteOnly, baseImage.PixelFormat);

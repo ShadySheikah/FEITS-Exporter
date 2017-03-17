@@ -15,7 +15,7 @@ namespace IfTextEditor.Editor.Controller
         private readonly Interface.IMainView mainView;
         private readonly ConversationModel sourceModel, targetModel;
 
-        public MainController(Interface.IMainView view, ConversationModel model)
+        internal MainController(Interface.IMainView view, ConversationModel model)
         {
             mainView = view;
             targetModel = model;
@@ -40,12 +40,9 @@ namespace IfTextEditor.Editor.Controller
 
         public bool OpenFile(ModelType type)
         {
-            //SKSurface surface = SKSurface.Create(400, 240, SKColorType.Rgba8888, SKAlphaType.Premul);
-            //SKCanvas canvas = surface.Canvas;
-
             var ofd = new OpenFileDialog
             {
-                Filter = "Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe|All files (*.*)|*.*",
+                Filter = Properties.Resources.OpenFileDialogFilter,
                 FilterIndex = 1,
                 FileName = string.Empty
             };
@@ -83,7 +80,7 @@ namespace IfTextEditor.Editor.Controller
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error opening file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, Properties.Resources.OpenErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -150,7 +147,7 @@ namespace IfTextEditor.Editor.Controller
         {
             var sfd = new SaveFileDialog
             {
-                Filter = "Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe",
+                Filter = Properties.Resources.SaveFileDialogFilter,
                 FilterIndex = 1
             };
 
@@ -187,7 +184,24 @@ namespace IfTextEditor.Editor.Controller
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
+
+        public void ExportCompiledText(ModelType type)
+        {
+            using (var exporter = new Import())
+            {
+                exporter.SetForExport(type == ModelType.Source ? sourceModel.FileCont.CompileFileText() : targetModel.FileCont.CompileFileText());
+                exporter.ShowDialog();
+            }
+        }
         #endregion
+
+        public bool RemoveMessage(int index, ModelType type)
+        {
+            if (MessageBox.Show(Properties.Resources.RemoveMessage, string.Format(Properties.Resources.RemoveMessageTitle, type == ModelType.Source ? "Source" : "Target"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                return false;
+
+            return type == ModelType.Source ? sourceModel.RemoveMessage(index) : targetModel.RemoveMessage(index);
+        }
 
         public void SetMessage(int index, ModelType type)
         {
@@ -209,7 +223,7 @@ namespace IfTextEditor.Editor.Controller
             }
         }
 
-        public void SetPage(int index, ModelType type)
+        private void SetPage(int index, ModelType type)
         {
             if (index < 0)
                 index = 0;
@@ -452,12 +466,12 @@ namespace IfTextEditor.Editor.Controller
             mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
         }
 
-        public void UpdateProgram()
+        public static void UpdateProgram()
         {
             Update.Program.CheckUpdatesAtRuntime();
         }
 
-        public void UpdateSettings()
+        public static void UpdateSettings()
         {
             Update.Program.SetUpdatePreferences();
         }

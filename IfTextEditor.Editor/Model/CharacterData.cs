@@ -1,23 +1,17 @@
-﻿using System;
+﻿using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
-using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 
 namespace IfTextEditor.Editor.Model
 {
-    public class CharacterData
+    internal static class CharacterData
     {
         private static bool isInitialized;
 
-        public static Dictionary<Emote, string> EmoteLookup = new Dictionary<Emote, string>
+        internal static readonly Dictionary<Emote, string> EmoteLookup = new Dictionary<Emote, string>
         {
             {Emote.Normal, "通常"},
             {Emote.Smile, "笑"},
@@ -34,7 +28,7 @@ namespace IfTextEditor.Editor.Model
 
         private static Dictionary<string, Character> characters;
 
-        public static void Initialize()
+        internal static void Initialize()
         {
             if (isInitialized)
                 return;
@@ -112,7 +106,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public static void UpdatePlayerData(Gender gender, int faceType = 1, char eyeType = 'a')
+        internal static void UpdatePlayerData(Gender gender, int faceType = 1, char eyeType = 'a')
         {
             Character player = characters["username"];
             player.PlayerFace = faceType;
@@ -141,7 +135,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public static Bitmap DrawCharacterImage(string name, Emote[] emotes, bool leftSide, Gender gender)
+        internal static Bitmap DrawCharacterImage(string name, Emote[] emotes, bool leftSide, Gender gender)
         {
             //Character
             if (!characters.ContainsKey(name))
@@ -163,7 +157,7 @@ namespace IfTextEditor.Editor.Model
             return charImage;
         }
 
-        public static Bitmap DrawCharacterCloseUpImage(string name, Emote[] emotes, Gender gender)
+        internal static Bitmap DrawCharacterCloseUpImage(string name, Emote[] emotes, Gender gender)
         {
             //Character
             if (!characters.ContainsKey(name))
@@ -187,7 +181,7 @@ namespace IfTextEditor.Editor.Model
             return charImage;
         }
 
-        public static Bitmap ColorizeImage(Bitmap baseImage, Color newColor, SKBlendMode blendMode, byte alpha = 255)
+        internal static Bitmap ColorizeImage(Bitmap baseImage, Color newColor, SKBlendMode blendMode, byte alpha = 255)
         {
             BitmapData data = baseImage.LockBits(new Rectangle(0, 0, baseImage.Width, baseImage.Height), ImageLockMode.WriteOnly, baseImage.PixelFormat);
             var info = new SKImageInfo(baseImage.Width, baseImage.Height);
@@ -216,13 +210,13 @@ namespace IfTextEditor.Editor.Model
             return baseImage;
         }
 
-        public static string GetLocalizedName(string name)
+        internal static string GetLocalizedName(string name)
         {
             return characters.ContainsKey(name) ? characters[name].LocalizedName : null;
         }
     }
 
-    public enum Emote
+    internal enum Emote
     {
         Normal,
         Smile,
@@ -233,7 +227,7 @@ namespace IfTextEditor.Editor.Model
         Blush
     }
 
-    public enum Gender
+    internal enum Gender
     {
         Male,
         Female

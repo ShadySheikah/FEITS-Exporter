@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IfTextEditor.Editor.Model
 {
-    public class Command
+    internal class Command
     {
-        public string Symbol { get; } = string.Empty;
-        public string[] Parameters { get; }
-        public CommandType Type { get; }
+        internal string Symbol { get; } = string.Empty;
+        internal string[] Parameters { get; }
+        internal CommandType Type { get; }
 
-        public Command()
+        internal Command()
         {
             
         }
 
-        public Command(string content, out string updatedText)
+        internal Command(string content, out string updatedText)
         {
             if (content.StartsWith("$"))
             {
@@ -131,7 +128,7 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        public string CompileCommand()
+        internal string CompileCommand()
         {
             if (Symbol == string.Empty || Type == CommandType.PageEnd)
                 return string.Empty;
@@ -153,7 +150,7 @@ namespace IfTextEditor.Editor.Model
         }
     }
 
-    public enum CommandType
+    internal enum CommandType
     {
         // ReSharper disable once InconsistentNaming
         UNKNOWN_TYPE,
@@ -162,7 +159,6 @@ namespace IfTextEditor.Editor.Model
         Portrait,
         Speaker,
         Emotion,
-        GenderConditional,
         CharExit,
         NamePerms,
         PageEnd,

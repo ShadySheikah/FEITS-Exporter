@@ -1,38 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IfTextEditor.Editor.Model
 {
-    public class Character
+    internal class Character
     {
         //Info
-        public string Name { get; set; }
-        public string LocalizedName { get; set; }
-        public Color HairColor { get; set; }
+        internal string Name { private get; set; }
+        internal string LocalizedName { get; set; }
+        internal Color HairColor { private get; set; }
 
         //Player-specific
-        public bool IsPlayer { get; set; }
-        public int PlayerFace { get; set; }
-        public char PlayerEyes { get; set; }
+        internal bool IsPlayer { private get; set; }
+        internal int PlayerFace { get; set; }
+        internal char PlayerEyes { get; set; }
 
         //Emote layer positions
-        public Point SweatPos { get; set; }
-        public Point BlushPos { get; set; }
-        public Point CropPos { get; set; }
+        internal Point SweatPos { private get; set; }
+        internal Point BlushPos { private get; set; }
+        internal Point CropPos { private get; set; }
 
         private readonly ResourceManager manager;
 
-        public Character()
+        internal Character()
         {
             manager = Resources.Properties.Resources.ResourceManager;
         }
 
-        public Bitmap GetCharacterImage(Emote[] emotes, Gender gender, bool cropped)
+        internal Bitmap GetCharacterImage(Emote[] emotes, Gender gender, bool cropped)
         {
             //Resource file name
             string baseName = (IsPlayer ? PlayerEyes + Name + (gender == Gender.Male ? "男" : "女") + PlayerFace : Name) + (cropped ? "_bu_" : "_st_");
@@ -63,7 +58,7 @@ namespace IfTextEditor.Editor.Model
             return image;
         }
 
-        public Bitmap GetHair(Gender gender, bool cropped)
+        internal Bitmap GetHair(Gender gender, bool cropped)
         {
             string hair = (IsPlayer ? Name + (gender == Gender.Male ? "男" : "女") + PlayerFace : Name) + (cropped ? "_bu_" : "_st_") + "髪0";
             var hairImg = (Bitmap) manager.GetObject(hair);
@@ -71,7 +66,7 @@ namespace IfTextEditor.Editor.Model
             return hairImg != null ? CharacterData.ColorizeImage(hairImg, HairColor, SkiaSharp.SKBlendMode.Overlay) : null;
         }
 
-        public Bitmap CropImage(Bitmap baseImage)
+        internal Bitmap CropImage(Bitmap baseImage)
         {
             var croppedImg = new Bitmap(70, 49);
 

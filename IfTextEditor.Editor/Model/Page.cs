@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IfTextEditor.Editor.Model
 {
-    public partial class FileContainer
+    internal partial class FileContainer
     {
-        public partial class Message
+        internal partial class Message
         {
-            public class Page
+            internal class Page
             {
                 //Page fields
-                public List<Command> Commands { get; }
-                public Dictionary<int, string> ExtraComment { get; set; }
-                public Dictionary<int, string> SpokenText { get; set; }
+                internal List<Command> Commands { get; }
+                internal Dictionary<int, string> ExtraComment { get; set; }
+                internal Dictionary<int, string> SpokenText { get; set; }
 
-                public Page()
+                internal Page()
                 {
                     
                 }
 
-                public Page(string speech)
+                internal Page(string speech)
                 {
                     Commands = new List<Command>();
                     ExtraComment = new Dictionary<int, string>();
@@ -69,7 +66,7 @@ namespace IfTextEditor.Editor.Model
                     }
                 }
 
-                public string GetCompiledPage()
+                internal string GetCompiledPage()
                 {
                     //This will be our compiled string
                     string comp = string.Empty;
