@@ -91,7 +91,10 @@ namespace IfTextEditor.Editor.Model
 
             FileCont = new FileContainer {FilePath = path};
 
-            string[] splitFile = File.ReadAllLines(path, Encoding.UTF8);
+            byte[] fileBytes = File.ReadAllBytes(path);
+            string convertedString = Encoding.UTF8.GetString(fileBytes);
+
+            string[] splitFile = convertedString.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
             return FileCont.PopulateContainer(splitFile);
         }
 

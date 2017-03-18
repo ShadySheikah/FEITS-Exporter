@@ -42,6 +42,9 @@ namespace IfTextEditor.Editor.Model
                         var newCmd = new Command(newText.Substring(i), out parsedText);
                         newText = parsedText;
 
+                        if (!commandPresent && (newText.StartsWith("Nu") || newText.StartsWith("a0") || newText.StartsWith("G")))
+                            newText = '$' + parsedText;
+
                         //If nothing was found, don't keep it
                         if (newCmd.Type != CommandType.Empty)
                             Commands.Add(newCmd);

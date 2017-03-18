@@ -25,7 +25,16 @@ namespace IfTextEditor.Editor.Model
             {
                 for (int i = 0; i < fileMsgs.Length; i++)
                 {
-                    var newMessage = new Message {MessageName = "Imported Message" + (i > 0 ? " " +  i : "")};
+                    var newMessage = new Message();
+                    if (fileMsgs[i].StartsWith("MID_") || fileMsgs[i].StartsWith("MKID_"))
+                    {
+                        int tOffset = fileMsgs[i].IndexOf(':');
+                        newMessage.MessageName = fileMsgs[i].Substring(0, tOffset);
+                        fileMsgs[i] = fileMsgs[i].Substring(tOffset + 2);   //": "
+                    }
+                    else
+                        newMessage.MessageName = "Imported Message" + (i > 0 ? " " + i : "");
+
                     newMessage.ParseMessage(fileMsgs[i]);
                     Messages.Add(newMessage);
                 }
