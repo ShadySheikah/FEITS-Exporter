@@ -27,6 +27,8 @@ namespace IfTextEditor.Editor.Model
                     SpokenText = new Dictionary<int, string>();
                     string newText = speech;
 
+                    var starterCmdFound = false;
+
                     //Parse for commands until text begins
                     for (int i = 0; i < newText.Length; i++)
                     {
@@ -35,14 +37,17 @@ namespace IfTextEditor.Editor.Model
                         //If $Nu is next, we've found all the commands.
                         //Loop once more for line ending
                         if (commandPresent && (newText.Substring(i).StartsWith("$Nu") || newText.Substring(i).StartsWith("$a0") || newText.Substring(i).StartsWith("$G")))
+                        {
+                            starterCmdFound = true;
                             continue;
+                        }
 
                         //Find a command and strip it from the text
                         string parsedText;
                         var newCmd = new Command(newText.Substring(i), out parsedText);
                         newText = parsedText;
 
-                        if (!commandPresent && (newText.StartsWith("Nu") || newText.StartsWith("a0") || newText.StartsWith("G")))
+                        if (starterCmdFound)
                             newText = '$' + parsedText;
 
                         //If nothing was found, don't keep it

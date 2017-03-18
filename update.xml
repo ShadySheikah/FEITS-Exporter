@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <IfTextEditor>
   <assembly name="If Text Editor.exe">
-    <version>0.2.1.0</version>
+    <version>0.2.2.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/If%20Text%20Editor.exe</url>
-    <md5>75D3466D256A0D40617BA7BC13781026</md5>
+    <md5>46E1A39D74B0AA368C9AAD28953CF1C9</md5>
   </assembly>
   <assembly name="Editor.Resources.dll">
     <version>1.0.1.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/lib/Editor.Resources.dll</url>
-    <md5>68A249A09E4CFE46E46C50CAC9514499</md5>
+    <md5>8B04E78ED63EA273AF9EC0E82F4FA142</md5>
   </assembly>
   <assembly name="Editor.Update.dll">
     <version>1.0.2.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/lib/Editor.Update.dll</url>
-    <md5>1EAF221FB4D16FF89AB47526D23540D2</md5>
+    <md5>1148C1548C4C8BE7E7A70C73FC6FC867</md5>
   </assembly>
   <assembly name="SkiaSharp.dll">
     <version>1.56.1.0</version>
