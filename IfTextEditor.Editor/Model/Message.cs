@@ -5,12 +5,12 @@ using System.Text.RegularExpressions;
 
 namespace IfTextEditor.Editor.Model
 {
-    internal partial class FileContainer
+    public partial class FileContainer
     {
-        internal partial class Message : IEnumerable<Message.Page>
+        public partial class Message : IEnumerable<FileContainer.Message.Page>
         {
-            internal string MessageName { get; set; }
-            internal List<Page> Pages { get; } = new List<Page>();
+            public string MsgName { get; set; }
+            public List<Page> Pages { get; } = new List<Page>();
 
             internal void ParseMessage(string message)
             {
@@ -25,17 +25,15 @@ namespace IfTextEditor.Editor.Model
                 }
             }
 
-            internal string Compile(bool includeName = true)
+            internal string ToString(bool includeName)
             {
                 string compMess = string.Empty;
 
                 if (includeName)
-                    compMess = (MessageName != string.Empty ? MessageName + ": " : string.Empty);
+                    compMess = (MsgName != string.Empty ? MsgName + ": " : string.Empty);
 
-                return Pages.Aggregate(compMess, (current, p) => current + p.GetCompiledPage());
+                return Pages.Aggregate(compMess, (current, p) => current + p.ToString());
             }
-
-            #region Enumerable
 
             public IEnumerator<Page> GetEnumerator()
             {
@@ -46,7 +44,6 @@ namespace IfTextEditor.Editor.Model
             {
                 return ((IEnumerable<Page>)Pages).GetEnumerator();
             }
-            #endregion
         }
     }
 }

@@ -30,7 +30,7 @@ namespace IfTextEditor.Editor.Controller
 
             foreach (FileContainer.Message msg in messages)
             {
-                table.Rows.Add(msg.MessageName);
+                table.Rows.Add(msg.MsgName);
             }
 
             return table;
@@ -50,6 +50,34 @@ namespace IfTextEditor.Editor.Controller
             if (ofd.ShowDialog() != DialogResult.OK)
                 return false;
 
+
+            switch (type)
+            {
+                case ModelType.Source:
+                    if (sourceModel.LoadFromFile(ofd.FileName))
+                    {
+                        if (sourceModel.FileCont.Name == null)
+                            sourceModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
+
+                        mainView.FormName = sourceModel.FileCont.Name;
+                        mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
+                    }
+                    return true;
+                case ModelType.Target:
+                    if (targetModel.LoadFromFile(ofd.FileName))
+                    {
+                        if (targetModel.FileCont.Name == null)
+                            targetModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
+
+                        mainView.FormName = targetModel.FileCont.Name;
+                        mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
+                    }
+                    return true;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+
+
             try
             {
                 switch (type)
@@ -57,20 +85,20 @@ namespace IfTextEditor.Editor.Controller
                     case ModelType.Source:
                         if (sourceModel.LoadFromFile(ofd.FileName))
                         {
-                            if (sourceModel.FileCont.FileName == null)
-                                sourceModel.FileCont.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
+                            if (sourceModel.FileCont.Name == null)
+                                sourceModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
 
-                            mainView.FormName = sourceModel.FileCont.FileName;
+                            mainView.FormName = sourceModel.FileCont.Name;
                             mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
                         }
                         return true;
                     case ModelType.Target:
                         if (targetModel.LoadFromFile(ofd.FileName))
                         {
-                            if (targetModel.FileCont.FileName == null)
-                                targetModel.FileCont.FileName = Path.GetFileNameWithoutExtension(ofd.FileName);
+                            if (targetModel.FileCont.Name == null)
+                                targetModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
 
-                            mainView.FormName = targetModel.FileCont.FileName;
+                            mainView.FormName = targetModel.FileCont.Name;
                             mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
                         }
                         return true;
@@ -129,15 +157,15 @@ namespace IfTextEditor.Editor.Controller
             switch (type)
             {
                 case ModelType.Source:
-                    if (sourceModel.FileCont.FilePath == string.Empty)
+                    if (sourceModel.FileCont.Path == string.Empty)
                         return SaveFileAs(type);
 
-                    return sourceModel.SaveToFile(sourceModel.FileCont.FilePath);
+                    return sourceModel.SaveToFile(sourceModel.FileCont.Path);
                 case ModelType.Target:
-                    if (targetModel.FileCont.FilePath == string.Empty)
+                    if (targetModel.FileCont.Path == string.Empty)
                         return SaveFileAs(type);
 
-                    return targetModel.SaveToFile(targetModel.FileCont.FilePath);
+                    return targetModel.SaveToFile(targetModel.FileCont.Path);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -154,29 +182,53 @@ namespace IfTextEditor.Editor.Controller
             switch (type)
             {
                 case ModelType.Source:
-                    sfd.FileName = sourceModel.FileCont.FileName;
+                    sfd.FileName = sourceModel.FileCont.Name;
 
                     if (sfd.ShowDialog() != DialogResult.OK)
                         return false;
 
-                    if (sourceModel.SaveToFile(sfd.FileName))
+                    switch (Path.GetExtension(sfd.FileName))
                     {
-                        //TODO: Name
-                        mainView.FormName = sourceModel.FileCont.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
-                        return true;
+                        case ".fe":
+                            if (sourceModel.ExportYaml(sfd.FileName))
+                            {
+                                MessageBox.Show("Parsed file saved to file. YAML serialization is still in development, so please be aware that there is a very good chance these files will not be supported in the future.", "Export to YAML", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                return true;
+                            }
+                            break;
+                        default:
+                            if (sourceModel.SaveToFile(sfd.FileName))
+                            {
+                                //TODO: Name
+                                mainView.FormName = sourceModel.FileCont.Name = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                return true;
+                            }
+                            break;
                     }
 
                     return false;
                 case ModelType.Target:
-                    sfd.FileName = targetModel.FileCont.FileName;
+                    sfd.FileName = targetModel.FileCont.Name;
 
                     if (sfd.ShowDialog() != DialogResult.OK)
                         return false;
 
-                    if (targetModel.SaveToFile(sfd.FileName))
+                    switch (Path.GetExtension(sfd.FileName))
                     {
-                        mainView.FormName = targetModel.FileCont.FileName = Path.GetFileNameWithoutExtension(sfd.FileName);
-                        return true;
+                        case ".fe":
+                            if (targetModel.ExportYaml(sfd.FileName))
+                            {
+                                MessageBox.Show("Parsed file saved to file. YAML serialization is still in development, so please be aware that there is a very good chance these files will not be supported in the future.", "Export to YAML", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                return true;
+                            }
+                            break;
+                        default:
+                            if (targetModel.SaveToFile(sfd.FileName))
+                            {
+                                mainView.FormName = targetModel.FileCont.Name = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                return true;
+                            }
+                            break;
                     }
 
                     return false;
@@ -189,9 +241,41 @@ namespace IfTextEditor.Editor.Controller
         {
             using (var exporter = new Import())
             {
-                exporter.SetForExport(type == ModelType.Source ? sourceModel.FileCont.CompileFileText() : targetModel.FileCont.CompileFileText());
+                if (type == ModelType.Source)
+                    exporter.SetForExport(sourceModel.FileCont, sourceModel.MessageIndex);
+                else
+                    exporter.SetForExport(targetModel.FileCont, targetModel.MessageIndex);
+
                 exporter.ShowDialog();
             }
+        }
+        #endregion
+
+        #region Raws
+
+        internal string GetFileRaw(ModelType type)
+        {
+            return type == ModelType.Source ? sourceModel.ExportYaml() : targetModel.ExportYaml();
+        }
+
+        internal bool SetFileRaw(ModelType type)
+        {
+            if (type == ModelType.Source)
+            {
+                if (!sourceModel.LoadFromString(mainView.SourceParsed))
+                    return false;
+
+                mainView.FormName = sourceModel.FileCont.Name;
+                mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
+                return true;
+            }
+
+            if (!targetModel.LoadFromString(mainView.TargetParsed))
+                return false;
+
+            mainView.FormName = targetModel.FileCont.Name;
+            mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
+            return true;
         }
         #endregion
 
@@ -264,13 +348,24 @@ namespace IfTextEditor.Editor.Controller
                 case ModelType.Source:
                     sourceModel.UpdatePageCommands(sourceModel.PageIndex);
 
-                    var srcLines = new string[sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText.Keys.Count + sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment.Keys.Count];
+                    var srcLines = new string[sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenLine.Count
+                        + sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].Comments.Keys.Count];
                     for (int i = 0; i < srcLines.Length; i++)
                     {
-                        if (sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText.ContainsKey(i))
-                            srcLines[i] = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText[i];
-                        else if (sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment.ContainsKey(i))
-                            srcLines[i] = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment[i];
+                        if (sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].Comments.ContainsKey(i))
+                            srcLines[i] = sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].Comments[i];
+                    }
+
+                    foreach (string str in sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenLine)
+                    {
+                        for (int i = 0; i < srcLines.Length; i++)
+                        {
+                            if (srcLines[i] == null)
+                            {
+                                srcLines[i] = str;
+                                break;
+                            }
+                        }
                     }
 
                     mainView.SourceText = string.Join(Environment.NewLine, srcLines);
@@ -278,13 +373,24 @@ namespace IfTextEditor.Editor.Controller
                 case ModelType.Target:
                     targetModel.UpdatePageCommands(targetModel.PageIndex);
 
-                    var tarLines = new string[targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText.Keys.Count + targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment.Keys.Count];
+                    var tarLines = new string[targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenLine.Count
+                        + targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].Comments.Count];
                     for (int i = 0; i < tarLines.Length; i++)
                     {
-                        if (targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText.ContainsKey(i))
-                            tarLines[i] = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText[i];
-                        else if (targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment.ContainsKey(i))
-                            tarLines[i] = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment[i];
+                        if (targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].Comments.ContainsKey(i))
+                            tarLines[i] = targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].Comments[i];
+                    }
+
+                    foreach (string str in targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenLine)
+                    {
+                        for (int i = 0; i < tarLines.Length; i++)
+                        {
+                            if (tarLines[i] == null)
+                            {
+                                tarLines[i] = str;
+                                break;
+                            }
+                        }
                     }
 
                     mainView.TargetText = string.Join(Environment.NewLine, tarLines);
@@ -377,17 +483,17 @@ namespace IfTextEditor.Editor.Controller
 
                     string[] newSrcText = mainView.SourceText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     var srcComments = new Dictionary<int, string>();
-                    var srcText = new Dictionary<int, string>();
+                    var srcText = new List<string>();
                     for (int i = 0; i < newSrcText.Length; i++)
                     {
                         if (newSrcText[i].StartsWith("//"))
                             srcComments.Add(i, newSrcText[i]);
                         else
-                            srcText.Add(i, newSrcText[i]);
+                            srcText.Add(newSrcText[i]);
                     }
 
-                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].ExtraComment = srcComments;
-                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenText = srcText;
+                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].Comments = srcComments;
+                    sourceModel.FileCont.Messages[sourceModel.MessageIndex].Pages[sourceModel.PageIndex].SpokenLine = srcText;
                     mainView.SourcePreviewImage = sourceModel.RenderPreview(sourceModel.PageIndex, PreviewFormat.Normal);
                     break;
                 case ModelType.Target:
@@ -396,17 +502,17 @@ namespace IfTextEditor.Editor.Controller
 
                     string[] newTarText = mainView.TargetText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     var tarComments = new Dictionary<int, string>();
-                    var tarText = new Dictionary<int, string>();
+                    var tarText = new List<string>();
                     for (int i = 0; i < newTarText.Length; i++)
                     {
                         if (newTarText[i].StartsWith("//"))
                             tarComments.Add(i, newTarText[i]);
                         else
-                            tarText.Add(i, newTarText[i]);
+                            tarText.Add(newTarText[i]);
                     }
 
-                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].ExtraComment = tarComments;
-                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenText = tarText;
+                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].Comments = tarComments;
+                    targetModel.FileCont.Messages[targetModel.MessageIndex].Pages[targetModel.PageIndex].SpokenLine = tarText;
                     mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
                     break;
                 default:

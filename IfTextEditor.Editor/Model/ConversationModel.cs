@@ -5,6 +5,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+using IfTextEditor.Editor.Model.YamlTypeConverters;
+using YamlDotNet.Serialization;
 
 namespace IfTextEditor.Editor.Model
 {
@@ -82,19 +85,30 @@ namespace IfTextEditor.Editor.Model
             format = ConversationFormat.Type1;
         }
 
-        #region Open/Close
+        #region Open/Save
 
         internal bool LoadFromFile(string path)
         {
-            //if (!Directory.Exists(path))
-            //    return false;
-
-            FileCont = new FileContainer {FilePath = path};
-
             byte[] fileBytes = File.ReadAllBytes(path);
             string convertedString = Encoding.UTF8.GetString(fileBytes);
 
-            string[] splitFile = convertedString.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+            if (Path.GetExtension(path) == ".fe")
+            {
+                try
+                {
+                    Deserializer yDeserializer = new DeserializerBuilder().WithTypeConverter(new ContainerTypeConverter()).Build();
+                    FileCont = yDeserializer.Deserialize<FileContainer>(convertedString);
+                    FileCont.Path = path;
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            string[] splitFile = convertedString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            FileCont = new FileContainer { Path = path };
             return FileCont.PopulateContainer(splitFile);
         }
 
@@ -102,6 +116,13 @@ namespace IfTextEditor.Editor.Model
         {
             try
             {
+                if (content.Contains("- " + nameof(FileContainer.Message.Page.SpokenLine)))
+                {
+                    Deserializer yDeserializer = new DeserializerBuilder().WithTypeConverter(new ContainerTypeConverter()).Build();
+                    FileCont = yDeserializer.Deserialize<FileContainer>(content);
+                    return true;
+                }
+
                 string[] splitContent = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 return FileCont.PopulateContainer(splitContent);
             }
@@ -116,16 +137,48 @@ namespace IfTextEditor.Editor.Model
             if (path == string.Empty)
                 return false;
 
-            FileCont.FilePath = path;
+            FileCont.Path = path;
 
-            string compiledFileText = FileCont.CompileFileText();
+            string compiledFileText = FileCont.ToString();
             if (compiledFileText == string.Empty)
                 return false;
 
-            File.WriteAllText(FileCont.FilePath, compiledFileText);
+            File.WriteAllText(FileCont.Path, compiledFileText);
             return true;
         }
         #endregion
+
+        internal string ExportYaml()
+        {
+            try
+            {
+                Serializer ySerializer = new SerializerBuilder().WithTypeConverter(new ContainerTypeConverter()).Build();
+                return ySerializer.Serialize(FileCont);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        internal bool ExportYaml(string path)
+        {
+            try
+            {
+                using (StreamWriter writer = File.CreateText(path))
+                {
+                    Serializer ySerializer = new SerializerBuilder().WithTypeConverter(new ContainerTypeConverter()).Build();
+                    ySerializer.Serialize(writer, FileCont);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
+        }
 
         internal bool RemoveMessage(int index)
         {
@@ -290,8 +343,7 @@ namespace IfTextEditor.Editor.Model
             {
                 UpdatePageCommands(i);
 
-                List<string> lines = FileCont.Messages[messageIndex].Pages[i].SpokenText.Select(entry => entry.Value).ToList();
-                text = ParseInlineCommands(string.Join(Environment.NewLine, lines));
+                text = ParseInlineCommands(string.Join(Environment.NewLine, FileCont.Messages[messageIndex].Pages[i].SpokenLine));
 
                 if (pFormat == PreviewFormat.TopBottom && activeChar == charA)
                     topLine = text;

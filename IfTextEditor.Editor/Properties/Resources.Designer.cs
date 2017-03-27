@@ -61,6 +61,25 @@ namespace IfTextEditor.Editor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exit Program.
+        /// </summary>
+        internal static string ExitPromptTitle {
+            get {
+                return ResourceManager.GetString("ExitPromptTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have unsaved changes.
+        ///Are you sure you want to exit?.
+        /// </summary>
+        internal static string ExitWarning {
+            get {
+                return ResourceManager.GetString("ExitWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon ITE {

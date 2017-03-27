@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace IfTextEditor.Editor.Model
 {
-    internal partial class FileContainer
+    public partial class FileContainer
     {
-        internal partial class Message
+        public partial class Message
         {
-            internal class Page
+            public class Page : IEnumerable<Command>
             {
                 //Page fields
-                internal List<Command> Commands { get; }
-                internal Dictionary<int, string> ExtraComment { get; set; }
-                internal Dictionary<int, string> SpokenText { get; set; }
+                public List<Command> Commands { get; } = new List<Command>();
+                public Dictionary<int, string> Comments { get; set; } = new Dictionary<int, string>();
+                public List<string> SpokenLine { get; set; } = new List<string>();
 
                 internal Page()
                 {
@@ -23,8 +25,8 @@ namespace IfTextEditor.Editor.Model
                 internal Page(string speech)
                 {
                     Commands = new List<Command>();
-                    ExtraComment = new Dictionary<int, string>();
-                    SpokenText = new Dictionary<int, string>();
+                    Comments = new Dictionary<int, string>();
+                    SpokenLine = new List<string>();
                     string newText = speech;
 
                     var starterCmdFound = false;
@@ -61,30 +63,28 @@ namespace IfTextEditor.Editor.Model
                         i--;
                     }
 
-                    string[] text = newText.Split(new[] {"\\n"}, StringSplitOptions.RemoveEmptyEntries);
-                    for (int i = 0; i < text.Length; i++)
-                    {
-                        SpokenText.Add(i, text[i]);
-                    }
+                    string[] tempText = newText.Split(new[] {"\\n"}, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (SpokenText.Count < 1 && ExtraComment.Count < 1)
+                    foreach (string str in tempText)
+                        SpokenLine.Add(str.Trim());
+
+                    if (SpokenLine.Count < 1 && Comments.Count < 1)
                     {
-                        ExtraComment.Add(0, "//This page was imported without speech.");
-                        ExtraComment.Add(1, "//There may be code attached to it.");
+                        Comments.Add(0, "//This page was imported without speech.");
+                        Comments.Add(1, "//There may be code attached to it.");
                     }
                 }
 
-                internal string GetCompiledPage()
+                public override string ToString()
                 {
                     //This will be our compiled string
-                    string comp = string.Empty;
-                    
+                    var comp = new StringBuilder();
+
                     //Commands
-                    comp += Commands.Aggregate(string.Empty, (current, c) => current + c.CompileCommand());
+                    comp.Append(Commands.Aggregate(string.Empty, (current, c) => current + c.ToString()));
 
                     //Lines
-                    List<string> lines = SpokenText.Select(entry => entry.Value).ToList();
-                    return comp + string.Join("\\n", lines) + GetLineEnd();
+                    return comp + string.Join("\\n", SpokenLine) + GetLineEnd();
                 }
 
                 private string GetLineEnd()
@@ -96,6 +96,16 @@ namespace IfTextEditor.Editor.Model
                     }
 
                     return string.Empty;
+                }
+
+                public IEnumerator<Command> GetEnumerator()
+                {
+                    return ((IEnumerable<Command>)Commands).GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return ((IEnumerable<Command>)Commands).GetEnumerator();
                 }
             }
         }

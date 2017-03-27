@@ -4,6 +4,8 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using IfTextEditor.Editor.View.Lexers;
+using ScintillaNET;
 
 namespace IfTextEditor.Editor.View
 {
@@ -11,6 +13,12 @@ namespace IfTextEditor.Editor.View
     {
         //Fields
         private MainController cont;
+        private readonly YamlLexer yLex = new YamlLexer();
+
+        private bool sourceTextDirty,
+                     sourceRawDirty,
+                     targetTextDirty,
+                     targetRawDirty;
 
         #region Properties
 
@@ -57,6 +65,7 @@ namespace IfTextEditor.Editor.View
 
         public int SourcePageCount
         {
+            get { return Convert.ToInt32(SL_Source.Text.Substring(SL_Source.Text.IndexOf('/') + 1)); }
             set { SL_Source.Text = $"Source: {SourcePageIndex + 1}/{value}"; }
         }
 
@@ -64,6 +73,12 @@ namespace IfTextEditor.Editor.View
         {
             get { return TB_SourceText.Text; }
             set { TB_SourceText.Text = value; }
+        }
+
+        public string SourceParsed
+        {
+            get { return TB_SourceRaw.Text; }
+            set { TB_SourceRaw.Text = value; }
         }
 
         public bool SourceNextLine
@@ -106,6 +121,7 @@ namespace IfTextEditor.Editor.View
 
         public int TargetPageCount
         {
+            get { return Convert.ToInt32(SL_Target.Text.Substring(SL_Target.Text.IndexOf('/') + 1)); }
             set { SL_Target.Text = $"Target: {TargetPageIndex + 1}/{value}"; }
         }
 
@@ -113,6 +129,12 @@ namespace IfTextEditor.Editor.View
         {
             get { return TB_TargetText.Text; }
             set { TB_TargetText.Text = value; }
+        }
+
+        public string TargetParsed
+        {
+            get { return TB_TargetRaw.Text; }
+            set { TB_TargetRaw.Text = value; }
         }
 
         public bool TargetNextLine
@@ -198,28 +220,104 @@ namespace IfTextEditor.Editor.View
                 DG_SourceMessageList.DataSource = messageTable;
         }
 
+        #region Yaml
+
+        private void SetEditorBoxStyle(Scintilla tb)
+        {
+            tb.StyleResetDefault();
+            tb.Styles[Style.Default].Font = "Verdana";
+            tb.Styles[Style.Default].Size = 11;
+            tb.StyleClearAll();
+        }
+
+        private void SetYamlStyle(Scintilla tb)
+        {
+            tb.StyleResetDefault();
+            tb.Styles[Style.Default].Font = "Consolas";
+            tb.Styles[Style.Default].Size = 10;
+            tb.StyleClearAll();
+
+            tb.Styles[YamlLexer.StyleDefault].ForeColor = Color.Black;
+            tb.Styles[YamlLexer.StyleKey].ForeColor = Color.Brown;
+            tb.Styles[YamlLexer.StyleValue].ForeColor = Color.DarkSlateBlue;
+            tb.Styles[YamlLexer.StyleString].ForeColor = Color.DarkBlue;
+            tb.Styles[YamlLexer.StyleLiteral].ForeColor = Color.Black;
+            tb.Styles[YamlLexer.StyleComment].ForeColor = Color.LightGray;
+
+            tb.Lexer = Lexer.Container;
+        }
+
+        private void TB_SourceRaw_StyleNeeded(object sender, StyleNeededEventArgs e)
+        {
+            var box = (Scintilla)sender;
+            int startPos = box.GetEndStyled();
+            int endPos = e.Position;
+
+            yLex.Style(box, startPos, endPos);
+        }
+
+        private void TB_TargetRaw_StyleNeeded(object sender, StyleNeededEventArgs e)
+        {
+            var box = (Scintilla)sender;
+            int startPos = box.GetEndStyled();
+            int endPos = e.Position;
+
+            yLex.Style(box, startPos, endPos);
+        }
+        #endregion
+
         #region Events
+
+        #region Form
+
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            //Raws
+            SetYamlStyle(TB_SourceRaw);
+            SetYamlStyle(TB_TargetRaw);
+
+            //Line Editors
+            SetEditorBoxStyle(TB_SourceText);
+            SetEditorBoxStyle(TB_TargetText);
+        }
+
+        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if ((sourceTextDirty || targetTextDirty || sourceRawDirty || targetRawDirty)
+                && MessageBox.Show(Properties.Resources.ExitWarning, Properties.Resources.ExitPromptTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                e.Cancel = true;
+        }
+
+        private void MainView_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+        #endregion
 
         #region Opening
 
         private void MI_SourceOpen_Click(object sender, EventArgs e)
         {
             AppStatus = cont.OpenFile(ModelType.Source) ? "Source file opened successfully." : "Source file could not be opened.";
+            sourceTextDirty = false;
         }
 
         private void MI_TargetOpen_Click(object sender, EventArgs e)
         {
             AppStatus = cont.OpenFile(ModelType.Target) ? "Target file opened successfully." : "Target file could not be opened";
+            targetTextDirty = false;
         }
 
         private void MI_SourceImport_Click(object sender, EventArgs e)
         {
             cont.OpenFromString(ModelType.Source);
+            sourceTextDirty = false;
         }
 
         private void MI_TargetImport_Click(object sender, EventArgs e)
         {
             cont.OpenFromString(ModelType.Target);
+            targetTextDirty = false;
         }
         #endregion
 
@@ -227,22 +325,26 @@ namespace IfTextEditor.Editor.View
 
         private void MI_SourceSave_Click(object sender, EventArgs e)
         {
-            cont.SaveFile(ModelType.Source);
+            if (cont.SaveFile(ModelType.Source))
+                sourceTextDirty = false;
         }
 
         private void MI_TargetSave_Click(object sender, EventArgs e)
         {
-            cont.SaveFile(ModelType.Target);
+            if (cont.SaveFile(ModelType.Target))
+                targetTextDirty = false;
         }
 
         private void MI_SourceSaveAs_Click(object sender, EventArgs e)
         {
-            cont.SaveFileAs(ModelType.Source);
+            if (cont.SaveFileAs(ModelType.Source))
+                sourceTextDirty = false;
         }
 
         private void MI_TargetSaveAs_Click(object sender, EventArgs e)
         {
-            cont.SaveFileAs(ModelType.Target);
+            if (cont.SaveFileAs(ModelType.Target))
+                targetTextDirty = false;
         }
 
         private void MI_SourceExport_Click(object sender, EventArgs e)
@@ -270,12 +372,16 @@ namespace IfTextEditor.Editor.View
 
         private void DG_SourceMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
+            bool dirty = sourceTextDirty;
             cont.SetMessage(SourceMsgIndex, ModelType.Source);
+            sourceTextDirty = dirty;
         }
 
         private void DG_TargetMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
+            bool dirty = targetTextDirty;
             cont.SetMessage(TargetMsgIndex, ModelType.Target);
+            targetTextDirty = dirty;
         }
 
         private void DG_SourceMessageList_KeyDown(object sender, KeyEventArgs e)
@@ -325,23 +431,98 @@ namespace IfTextEditor.Editor.View
 
         #region Editing
 
+        private void TB_SourceText_TextChanged(object sender, EventArgs e)
+        {
+            cont.OnTextChanged(ModelType.Source);
+            sourceTextDirty = true;
+        }
+
+        private void TB_TargetText_TextChanged(object sender, EventArgs e)
+        {
+            cont.OnTextChanged(ModelType.Target);
+            targetTextDirty = true;
+        }
+
         private void TB_PlayerName_TextChanged(object sender, EventArgs e)
         {
             cont.OnNameChanged();
         }
         #endregion
 
+        #region Direct Edit
+
+        private void TB_SourceRaw_TextChanged(object sender, EventArgs e)
+        {
+            if (!sourceRawDirty)
+                sourceRawDirty = true;
+        }
+
+        private void TB_TargetRaw_TextChanged(object sender, EventArgs e)
+        {
+            if (!targetRawDirty)
+                targetRawDirty = true;
+        }
+
+        private void TC_Source_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var tc = (TabControl)sender;
+            if (tc.SelectedIndex == 0 && sourceRawDirty)
+            {
+                sourceRawDirty = false;
+
+                int curMsg = SourceMsgIndex;
+                int curPage = SourcePageIndex;
+
+                if (!cont.SetFileRaw(ModelType.Source))
+                    MessageBox.Show("An error occured while parsing text. Changes made may have been lost.");
+
+                if (curMsg > DG_SourceMessageList.RowCount - 1)
+                    curMsg = DG_SourceMessageList.RowCount - 1;
+                if (curPage > SourcePageCount - 1)
+                    curPage = SourcePageCount - 1;
+
+                cont.SetMessage(curMsg, ModelType.Source);
+                cont.GoToPage(curPage, ModelType.Source);
+                return;
+            }
+
+            SourceParsed = cont.GetFileRaw(ModelType.Source);
+            TB_SourceRaw.EmptyUndoBuffer();
+            sourceRawDirty = false;
+        }
+
+        private void TC_Target_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var tc = (TabControl)sender;
+            if (tc.SelectedIndex == 0 && targetRawDirty)
+            {
+                targetRawDirty = false;
+
+                int curMsg = TargetMsgIndex;
+                int curPage = TargetPageIndex;
+
+                if (!cont.SetFileRaw(ModelType.Target))
+                    MessageBox.Show("An error occured while parsing text. Changes made may have been lost.");
+
+                if (curMsg > DG_TargetMessageList.RowCount - 1)
+                    curMsg = DG_TargetMessageList.RowCount - 1;
+                if (curPage > TargetPageCount - 1)
+                    curPage = TargetPageCount - 1;
+
+                cont.SetMessage(curMsg, ModelType.Target);
+                cont.GoToPage(curPage, ModelType.Target);
+                return;
+            }
+
+            TargetParsed = cont.GetFileRaw(ModelType.Target);
+            TB_TargetRaw.EmptyUndoBuffer();
+            targetRawDirty = false;
+        }
+
+
+        #endregion
+        
         #region Navigation
-
-        private void TB_SourceText_TextChanged(object sender, EventArgs e)
-        {
-            cont.OnTextChanged(ModelType.Source);
-        }
-
-        private void TB_TargetText_TextChanged(object sender, EventArgs e)
-        {
-            cont.OnTextChanged(ModelType.Target);
-        }
 
         private void B_SourceNext_Click(object sender, EventArgs e)
         {
@@ -435,10 +616,7 @@ namespace IfTextEditor.Editor.View
         }
         #endregion
 
-        private void MainView_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
         #endregion
+
     }
 }

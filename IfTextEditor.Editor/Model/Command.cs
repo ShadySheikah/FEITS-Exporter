@@ -1,18 +1,49 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace IfTextEditor.Editor.Model
 {
-    internal class Command
+    public class Command : IEnumerable<string>
     {
-        internal string Symbol { get; } = string.Empty;
-        internal string[] Parameters { get; }
-        internal CommandType Type { get; }
+        public string Symbol { get; } = string.Empty;
+        public string[] Parameters { get; }
+        public CommandType Type { get; }
 
-        internal Command()
+        internal Command(string symbol, string[] parameters, CommandType type)
         {
-            
+            if (symbol == string.Empty)
+            {
+                switch (type)
+                {
+                    case CommandType.Portrait:
+                        Symbol = "$Wm";
+                        break;
+                    case CommandType.Speaker:
+                        Symbol = "$Ws";
+                        break;
+                    case CommandType.Emotion:
+                        Symbol = "$E";
+                        break;
+                    case CommandType.CharExit:
+                        Symbol = "$Wd";
+                        break;
+                    case CommandType.NamePerms:
+                        Symbol = "$a";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                }
+            }
+            else
+            {
+                Symbol = symbol;
+            }
+
+            Parameters = parameters;
+            Type = type;
         }
 
         internal Command(string content, out string updatedText)
@@ -128,29 +159,40 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
-        internal string CompileCommand()
+        public override string ToString()
         {
             if (Symbol == string.Empty || Type == CommandType.PageEnd)
                 return string.Empty;
 
-            string cmdLine = Symbol;
+            var cmdLine = new StringBuilder();
+            cmdLine.Append(Symbol);
 
             if (Parameters.Length > 0)
             {
                 for (int i = 0; i < Parameters.Length; i++)
                 {
                     if (Symbol == "$Wm" && i == 1)
-                        cmdLine += Parameters[i];
+                        cmdLine.Append(Parameters[i]);
                     else
-                        cmdLine += Parameters[i] + '|';
+                        cmdLine.Append(Parameters[i] + '|');
                 }
             }
 
-            return cmdLine;
+            return cmdLine.ToString();
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            return ((IEnumerable<string>)Parameters).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<string>)Parameters).GetEnumerator();
         }
     }
 
-    internal enum CommandType
+    public enum CommandType
     {
         // ReSharper disable once InconsistentNaming
         UNKNOWN_TYPE,

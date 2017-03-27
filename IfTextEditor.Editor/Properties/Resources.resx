@@ -137,4 +137,11 @@ Are you sure you want to remove the currently selected message?</value>
   <data name="SaveFileDialogFilter" xml:space="preserve">
     <value>Text files (*.txt)|*.txt|Parsed text (*.fe)|*.fe</value>
   </data>
+  <data name="ExitWarning" xml:space="preserve">
+    <value>You have unsaved changes.
+Are you sure you want to exit?</value>
+  </data>
+  <data name="ExitPromptTitle" xml:space="preserve">
+    <value>Exit Program</value>
+  </data>
 </root>

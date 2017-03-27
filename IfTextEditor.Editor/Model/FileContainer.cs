@@ -2,19 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace IfTextEditor.Editor.Model
 {
-    internal partial class FileContainer : IEnumerable<FileContainer.Message>
+    public partial class FileContainer : IEnumerable<FileContainer.Message>
     {
         //Fields
-        internal string FileName { get; set; }
-        internal string FilePath { get; set; }
-        internal List<Message> Messages { get; }
+        public string Name { get; set; }
+        internal string Path { get; set; }
+        public List<Message> Messages { get; }
 
         internal FileContainer()
         {
-            FileName = FilePath = string.Empty;
+            Name = "Untitled";
+            Path = string.Empty;
             Messages = new List<Message>();
         }
 
@@ -29,11 +31,11 @@ namespace IfTextEditor.Editor.Model
                     if (fileMsgs[i].StartsWith("MID_") || fileMsgs[i].StartsWith("MKID_"))
                     {
                         int tOffset = fileMsgs[i].IndexOf(':');
-                        newMessage.MessageName = fileMsgs[i].Substring(0, tOffset);
+                        newMessage.MsgName = fileMsgs[i].Substring(0, tOffset);
                         fileMsgs[i] = fileMsgs[i].Substring(tOffset + 2);   //": "
                     }
                     else
-                        newMessage.MessageName = "Imported Message" + (i > 0 ? " " + i : "");
+                        newMessage.MsgName = "Imported Message" + (i > 0 ? " " + i : "");
 
                     newMessage.ParseMessage(fileMsgs[i]);
                     Messages.Add(newMessage);
@@ -41,7 +43,7 @@ namespace IfTextEditor.Editor.Model
                 return true;
             }
 
-            FileName = fileMsgs[0].Substring(13);
+            Name = fileMsgs[0].Substring(13);
 
             int offset = -1;
             for (int i = 0; i < fileMsgs.Length; i++)
@@ -66,7 +68,7 @@ namespace IfTextEditor.Editor.Model
                 {
                     var newMessage = new Message();
                     int prefixIndex = fileMsgs[i].IndexOf(':');
-                    newMessage.MessageName = fileMsgs[i].Substring(0, prefixIndex);
+                    newMessage.MsgName = fileMsgs[i].Substring(0, prefixIndex);
 
                     //Message will take it from here
                     newMessage.ParseMessage(fileMsgs[i].Substring(prefixIndex + 2));
@@ -79,29 +81,28 @@ namespace IfTextEditor.Editor.Model
             return true;
         }
 
-        internal string CompileFileText()
+        public override string ToString()
         {
-            var newFileText = string.Empty;
+            var textBuilder = new StringBuilder();
 
-            if (FileName != string.Empty)
+            if (Name != string.Empty)
             {
                 //Generate and add header
-                string h1 = "MESS_ARCHIVE_" + FileName + Environment.NewLine;
-                string h2 = "Message Name: Message" + Environment.NewLine;
-                newFileText += h1 + Environment.NewLine + h2 + Environment.NewLine;
+                textBuilder.Append("MESS_ARCHIVE_" + Name + Environment.NewLine);
+                textBuilder.Append(Environment.NewLine + Environment.NewLine);
+                textBuilder.Append("Message Name: Message" + Environment.NewLine);
+                textBuilder.Append(Environment.NewLine + Environment.NewLine);
             }
 
             //Compile and add all messages
             for (int i = 0; i < Messages.Count; i++)
             {
-                string compiledMsg = Messages[i].Compile();
-                newFileText += compiledMsg + (i < Messages.Count - 1 ? Environment.NewLine : string.Empty);
+                string compiledMsg = Messages[i].ToString(true);
+                textBuilder.Append(compiledMsg + (i < Messages.Count - 1 ? Environment.NewLine : string.Empty));
             }
 
-            return newFileText;
+            return textBuilder.ToString();
         }
-
-        #region Enumerator
 
         public IEnumerator<Message> GetEnumerator()
         {
@@ -112,6 +113,5 @@ namespace IfTextEditor.Editor.Model
         {
             return ((IEnumerable<Message>)Messages).GetEnumerator();
         }
-        #endregion
     }
 }
