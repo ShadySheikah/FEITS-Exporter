@@ -239,6 +239,13 @@ namespace IfTextEditor.Editor.Controller
 
         public void ExportCompiledText(ModelType type)
         {
+            if ((type == ModelType.Source && sourceModel.FileCont.Messages.Count <= 0) ||
+                (type == ModelType.Target && targetModel.FileCont.Messages.Count <= 0))
+            {
+                MessageBox.Show(Properties.Resources.ExportFail, Properties.Resources.ExportFailedTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             using (var exporter = new Import())
             {
                 if (type == ModelType.Source)

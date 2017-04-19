@@ -31,7 +31,6 @@
             this.B_Import = new System.Windows.Forms.Button();
             this.B_Cancel = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.TB_Input = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.GB_Scope = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
@@ -43,6 +42,8 @@
             this.RB_FormatSerialized = new System.Windows.Forms.RadioButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.L_CharCount = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.TB_Input = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.GB_Scope.SuspendLayout();
@@ -50,6 +51,7 @@
             this.GB_Format.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // B_Import
@@ -79,8 +81,8 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
-            this.tableLayoutPanel1.Controls.Add(this.TB_Input, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -89,20 +91,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(464, 606);
             this.tableLayoutPanel1.TabIndex = 2;
-            // 
-            // TB_Input
-            // 
-            this.TB_Input.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TB_Input.Location = new System.Drawing.Point(6, 6);
-            this.TB_Input.MaxLength = 250000;
-            this.TB_Input.Multiline = true;
-            this.TB_Input.Name = "TB_Input";
-            this.TB_Input.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TB_Input.Size = new System.Drawing.Size(305, 597);
-            this.TB_Input.TabIndex = 1;
-            this.TB_Input.TextChanged += new System.EventHandler(this.TB_Input_TextChanged);
             // 
             // tableLayoutPanel2
             // 
@@ -231,6 +219,26 @@
             this.L_CharCount.Size = new System.Drawing.Size(0, 13);
             this.L_CharCount.TabIndex = 2;
             // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.TB_Input);
+            this.panel2.Location = new System.Drawing.Point(3, 3);
+            this.panel2.Margin = new System.Windows.Forms.Padding(0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(311, 565);
+            this.panel2.TabIndex = 3;
+            // 
+            // TB_Input
+            // 
+            this.TB_Input.Location = new System.Drawing.Point(3, 3);
+            this.TB_Input.MaxLength = 250000;
+            this.TB_Input.Multiline = true;
+            this.TB_Input.Name = "TB_Input";
+            this.TB_Input.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TB_Input.Size = new System.Drawing.Size(305, 559);
+            this.TB_Input.TabIndex = 2;
+            this.TB_Input.TextChanged += new System.EventHandler(this.TB_Input_TextChanged);
+            // 
             // Import
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -244,7 +252,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Import";
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.GB_Scope.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
@@ -254,6 +261,8 @@
             this.flowLayoutPanel1.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -264,7 +273,6 @@
         private System.Windows.Forms.Button B_Cancel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox TB_Input;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.GroupBox GB_Format;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
@@ -275,5 +283,7 @@
         private System.Windows.Forms.RadioButton RB_ScopeFile;
         private System.Windows.Forms.RadioButton RB_ScopeMessage;
         private System.Windows.Forms.Label L_CharCount;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox TB_Input;
     }
 }

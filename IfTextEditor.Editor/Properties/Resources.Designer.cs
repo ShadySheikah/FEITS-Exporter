@@ -80,6 +80,24 @@ namespace IfTextEditor.Editor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no text to export..
+        /// </summary>
+        internal static string ExportFail {
+            get {
+                return ResourceManager.GetString("ExportFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Failed.
+        /// </summary>
+        internal static string ExportFailedTitle {
+            get {
+                return ResourceManager.GetString("ExportFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon ITE {

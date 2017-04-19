@@ -72,7 +72,7 @@
             this.B_SourceNext = new System.Windows.Forms.ToolStripButton();
             this.TB_SourcePage = new System.Windows.Forms.ToolStripTextBox();
             this.B_SourcePrev = new System.Windows.Forms.ToolStripButton();
-            this.B_SyncNavigation = new System.Windows.Forms.ToolStripButton();
+            this.B_Sync = new System.Windows.Forms.ToolStripButton();
             this.DG_SourceMessageList = new System.Windows.Forms.DataGridView();
             this.TP_SourceRaw = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -391,6 +391,7 @@
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // SS_Status
             // 
@@ -554,7 +555,7 @@
             this.B_SourceNext,
             this.TB_SourcePage,
             this.B_SourcePrev,
-            this.B_SyncNavigation});
+            this.B_Sync});
             this.TS_SourceTools.Location = new System.Drawing.Point(0, 142);
             this.TS_SourceTools.Name = "TS_SourceTools";
             this.TS_SourceTools.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -599,19 +600,18 @@
             this.B_SourcePrev.ToolTipText = "Previous page";
             this.B_SourcePrev.Click += new System.EventHandler(this.B_SourcePrev_Click);
             // 
-            // B_SyncNavigation
+            // B_Sync
             // 
-            this.B_SyncNavigation.Checked = true;
-            this.B_SyncNavigation.CheckOnClick = true;
-            this.B_SyncNavigation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.B_SyncNavigation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.B_SyncNavigation.Enabled = false;
-            this.B_SyncNavigation.Image = ((System.Drawing.Image)(resources.GetObject("B_SyncNavigation.Image")));
-            this.B_SyncNavigation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.B_SyncNavigation.Name = "B_SyncNavigation";
-            this.B_SyncNavigation.Size = new System.Drawing.Size(60, 22);
-            this.B_SyncNavigation.Text = "Nav Sync";
-            this.B_SyncNavigation.ToolTipText = "Synchronize navigation controls";
+            this.B_Sync.Checked = true;
+            this.B_Sync.CheckOnClick = true;
+            this.B_Sync.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.B_Sync.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.B_Sync.Image = ((System.Drawing.Image)(resources.GetObject("B_Sync.Image")));
+            this.B_Sync.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.B_Sync.Name = "B_Sync";
+            this.B_Sync.Size = new System.Drawing.Size(60, 22);
+            this.B_Sync.Text = "Nav Sync";
+            this.B_Sync.ToolTipText = "Synchronize navigation controls";
             // 
             // DG_SourceMessageList
             // 
@@ -1178,7 +1178,7 @@
         private System.Windows.Forms.ToolStripButton B_SourceNext;
         private System.Windows.Forms.ToolStripTextBox TB_SourcePage;
         private System.Windows.Forms.ToolStripButton B_SourcePrev;
-        private System.Windows.Forms.ToolStripButton B_SyncNavigation;
+        private System.Windows.Forms.ToolStripButton B_Sync;
         private System.Windows.Forms.DataGridView DG_SourceMessageList;
         private System.Windows.Forms.TabPage TP_SourceRaw;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;

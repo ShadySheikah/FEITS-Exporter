@@ -172,8 +172,8 @@ namespace IfTextEditor.Editor.View
 
         public bool SyncNavigation
         {
-            get { return B_SyncNavigation.Checked; }
-            set { B_SyncNavigation.Checked = value; }
+            get { return B_Sync.Checked; }
+            set { B_Sync.Checked = value; }
         }
 
         public int CurrentTextboxTheme
@@ -372,16 +372,30 @@ namespace IfTextEditor.Editor.View
 
         private void DG_SourceMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
-            bool dirty = sourceTextDirty;
+            bool sDirty = sourceTextDirty;
             cont.SetMessage(SourceMsgIndex, ModelType.Source);
-            sourceTextDirty = dirty;
+            sourceTextDirty = sDirty;
+
+            if (!B_Sync.Checked || DG_TargetMessageList.Rows.Count <= 0)
+                return;
+
+            bool tDirty = targetTextDirty;
+            cont.SetMessage(SourceMsgIndex, ModelType.Target);
+            targetTextDirty = tDirty;
         }
 
         private void DG_TargetMessageList_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
-            bool dirty = targetTextDirty;
+            bool tDirty = targetTextDirty;
             cont.SetMessage(TargetMsgIndex, ModelType.Target);
-            targetTextDirty = dirty;
+            targetTextDirty = tDirty;
+
+            if (!B_Sync.Checked || DG_SourceMessageList.Rows.Count <= 0)
+                return;
+
+            bool sDirty = sourceTextDirty;
+            cont.SetMessage(TargetMsgIndex, ModelType.Source);
+            sourceTextDirty = sDirty;
         }
 
         private void DG_SourceMessageList_KeyDown(object sender, KeyEventArgs e)
@@ -527,49 +541,81 @@ namespace IfTextEditor.Editor.View
         private void B_SourceNext_Click(object sender, EventArgs e)
         {
             cont.NextPage(ModelType.Source);
+
+            if (B_Sync.Checked)
+                cont.NextPage(ModelType.Target);
         }
 
         private void B_TargetNext_Click(object sender, EventArgs e)
         {
             cont.NextPage(ModelType.Target);
+
+            if (B_Sync.Checked)
+                cont.NextPage(ModelType.Source);
         }
 
         private void B_SourcePrev_Click(object sender, EventArgs e)
         {
             cont.PrevPage(ModelType.Source);
+
+            if (B_Sync.Checked)
+                cont.PrevPage(ModelType.Target);
         }
 
         private void B_TargetPrev_Click(object sender, EventArgs e)
         {
             cont.PrevPage(ModelType.Target);
+
+            if (B_Sync.Checked)
+                cont.PrevPage(ModelType.Source);
         }
 
         private void TB_SourcePage_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-                cont.GoToPage(int.Parse(TB_SourcePage.Text) - 1, ModelType.Source);
+            {
+                int newPage = int.Parse(TB_SourcePage.Text) - 1;
+                cont.GoToPage(newPage, ModelType.Source);
+
+                if (B_Sync.Checked)
+                    cont.GoToPage(newPage, ModelType.Target);
+            }
         }
 
         private void TB_TargetPage_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-                cont.GoToPage(int.Parse(TB_TargetPage.Text) - 1, ModelType.Target);
+            {
+                int newPage = int.Parse(TB_TargetPage.Text) - 1;
+                cont.GoToPage(newPage, ModelType.Target);
+
+                if(B_Sync.Checked)
+                    cont.GoToPage(newPage, ModelType.Source);
+            }
         }
 
         private void TB_SourcePage_Leave(object sender, EventArgs e)
         {
             int newPage = int.Parse(TB_SourcePage.Text) - 1;
+            if (newPage == SourcePageIndex)
+                return;
 
-            if (newPage != SourcePageIndex)
-                cont.GoToPage(newPage, ModelType.Source);
+            cont.GoToPage(newPage, ModelType.Source);
+
+            if (B_Sync.Checked)
+                cont.GoToPage(newPage, ModelType.Target);
         }
 
         private void TB_TargetPage_Leave(object sender, EventArgs e)
         {
             int newPage = int.Parse(TB_TargetPage.Text) - 1;
+            if (newPage == TargetPageIndex)
+                return;
 
-            if (newPage != TargetPageIndex)
-                cont.GoToPage(newPage, ModelType.Target);
+            cont.GoToPage(newPage, ModelType.Target);
+
+            if (B_Sync.Checked)
+                cont.GoToPage(newPage, ModelType.Source);
         }
         #endregion
 
@@ -578,6 +624,14 @@ namespace IfTextEditor.Editor.View
         private void MI_EnableBackgrounds_CheckedChanged(object sender, EventArgs e)
         {
             cont.OnBackgroundEnabledChanged();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var aboutBox = new AboutBox())
+            {
+                aboutBox.ShowDialog();
+            }
         }
 
         private void MI_TwoPanes_CheckedChanged(object sender, EventArgs e)

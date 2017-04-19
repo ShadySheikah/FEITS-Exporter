@@ -65,7 +65,7 @@ namespace IfTextEditor.Update.View
         private void TB_Input_TextChanged(object sender, EventArgs e)
         {
             ImportedText = TB_Input.Text;
-            L_CharCount.Text = RB_FormatPlaintext.Checked ? "Character count: " + TB_Input.Text.Length : "Character count not available for serialized text.";
+            L_CharCount.Text = GB_Scope.Enabled ? (RB_FormatPlaintext.Checked ? "Character count: " + TB_Input.Text.Length : "Character count not available for serialized text.") : string.Empty;
         }
 
         private void RB_ScopeMessage_CheckedChanged(object sender, EventArgs e)

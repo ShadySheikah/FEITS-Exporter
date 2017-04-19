@@ -144,4 +144,10 @@ Are you sure you want to exit?</value>
   <data name="ExitPromptTitle" xml:space="preserve">
     <value>Exit Program</value>
   </data>
+  <data name="ExportFail" xml:space="preserve">
+    <value>There is no text to export.</value>
+  </data>
+  <data name="ExportFailedTitle" xml:space="preserve">
+    <value>Export Failed</value>
+  </data>
 </root>
