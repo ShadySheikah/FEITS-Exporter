@@ -2,6 +2,7 @@
 using IfTextEditor.Editor.Controller.Interface;
 using System;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using IfTextEditor.Editor.View.Lexers;
@@ -15,6 +16,7 @@ namespace IfTextEditor.Editor.View
         private MainController cont;
         private readonly YamlLexer yLex = new YamlLexer();
 
+        private ModelType lastNavigated = ModelType.Target;
         private bool sourceTextDirty,
                      sourceRawDirty,
                      targetTextDirty,
@@ -535,11 +537,50 @@ namespace IfTextEditor.Editor.View
 
 
         #endregion
-        
+
         #region Navigation
+
+        private void MainView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.Shift && e.KeyCode == Keys.Return)
+            {
+                if (TB_SourceText.Focused || TB_TargetText.Focused)
+                {
+                    cont.PrevPage(TB_SourceText.Focused ? ModelType.Source : ModelType.Target);
+                    if (B_Sync.Checked)
+                        cont.PrevPage(TB_SourceText.Focused ? ModelType.Target : ModelType.Source);
+                }
+                else
+                {
+                    cont.PrevPage(lastNavigated);
+                    if (B_Sync.Checked)
+                        cont.PrevPage(lastNavigated != ModelType.Source ? ModelType.Source : ModelType.Target);
+                }
+
+                e.SuppressKeyPress = true;
+            }
+            else if (e.Shift && e.KeyCode == Keys.Return)
+            {
+                if (TB_SourceText.Focused || TB_TargetText.Focused)
+                {
+                    cont.NextPage(TB_SourceText.Focused ? ModelType.Source : ModelType.Target);
+                    if (B_Sync.Checked)
+                        cont.NextPage(TB_SourceText.Focused ? ModelType.Target : ModelType.Source);
+                }
+                else
+                {
+                    cont.NextPage(lastNavigated);
+                    if (B_Sync.Checked)
+                        cont.NextPage(lastNavigated != ModelType.Source ? ModelType.Source : ModelType.Target);
+                }
+
+                e.SuppressKeyPress = true;
+            }
+        }
 
         private void B_SourceNext_Click(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Source;
             cont.NextPage(ModelType.Source);
 
             if (B_Sync.Checked)
@@ -548,6 +589,7 @@ namespace IfTextEditor.Editor.View
 
         private void B_TargetNext_Click(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Target;
             cont.NextPage(ModelType.Target);
 
             if (B_Sync.Checked)
@@ -556,6 +598,7 @@ namespace IfTextEditor.Editor.View
 
         private void B_SourcePrev_Click(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Source;
             cont.PrevPage(ModelType.Source);
 
             if (B_Sync.Checked)
@@ -564,6 +607,7 @@ namespace IfTextEditor.Editor.View
 
         private void B_TargetPrev_Click(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Target;
             cont.PrevPage(ModelType.Target);
 
             if (B_Sync.Checked)
@@ -574,6 +618,7 @@ namespace IfTextEditor.Editor.View
         {
             if (e.KeyCode == Keys.Enter)
             {
+                lastNavigated = ModelType.Source;
                 int newPage = int.Parse(TB_SourcePage.Text) - 1;
                 cont.GoToPage(newPage, ModelType.Source);
 
@@ -586,6 +631,7 @@ namespace IfTextEditor.Editor.View
         {
             if (e.KeyCode == Keys.Enter)
             {
+                lastNavigated = ModelType.Target;
                 int newPage = int.Parse(TB_TargetPage.Text) - 1;
                 cont.GoToPage(newPage, ModelType.Target);
 
@@ -596,6 +642,7 @@ namespace IfTextEditor.Editor.View
 
         private void TB_SourcePage_Leave(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Source;
             int newPage = int.Parse(TB_SourcePage.Text) - 1;
             if (newPage == SourcePageIndex)
                 return;
@@ -608,6 +655,7 @@ namespace IfTextEditor.Editor.View
 
         private void TB_TargetPage_Leave(object sender, EventArgs e)
         {
+            lastNavigated = ModelType.Target;
             int newPage = int.Parse(TB_TargetPage.Text) - 1;
             if (newPage == TargetPageIndex)
                 return;

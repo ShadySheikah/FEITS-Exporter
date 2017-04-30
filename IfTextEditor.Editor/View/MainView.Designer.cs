@@ -1076,6 +1076,7 @@
             this.Controls.Add(this.SS_Status);
             this.Controls.Add(this.MS_Top);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.MainMenuStrip = this.MS_Top;
             this.MinimumSize = new System.Drawing.Size(640, 540);
             this.Name = "MainView";
@@ -1083,6 +1084,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainView_FormClosed);
             this.Load += new System.EventHandler(this.MainView_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainView_KeyDown);
             this.MS_Top.ResumeLayout(false);
             this.MS_Top.PerformLayout();
             this.SS_Status.ResumeLayout(false);
