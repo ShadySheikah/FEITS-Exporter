@@ -28,7 +28,7 @@ namespace IfTextEditor.Editor.Model
                 for (int i = 0; i < fileMsgs.Length; i++)
                 {
                     var newMessage = new Message();
-                    if (fileMsgs[i].StartsWith("MID_") || fileMsgs[i].StartsWith("MKID_"))
+                    if (fileMsgs[i].Contains("ID_"))
                     {
                         int tOffset = fileMsgs[i].IndexOf(':');
                         newMessage.MsgName = fileMsgs[i].Substring(0, tOffset);

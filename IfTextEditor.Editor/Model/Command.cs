@@ -50,10 +50,10 @@ namespace IfTextEditor.Editor.Model
         {
             if (content.StartsWith("$"))
             {
-                var knownCommands = new Dictionary<string, int>()
+                var knownCommands = new Dictionary<string, int>
                 {
-                    {"$Wa", 0}, {"$a", 0}, {"$t0", 0}, {"$t1", 0}, {"$Wd", 0}, {"$Wc", 0}, {"$N0", 0}, {"$N1", 0}, {"$p", 0}, {"$Wv", 0},
-                    {"$E", 1}, {"$Ws", 1}, {"$Sbs", 1}, {"$Svp", 1}, {"$Sre", 1}, {"$Fw", 1}, {"$VF", 1}, {"$Ssp", 1}, {"$Fo", 1}, {"$VNMPID", 1}, {"$Fi", 1}, {"$b", 1}, {"$w", 1}, {"$l", 1},
+                    {"$Wa", 0}, {"$a", 0}, {"$t0", 0}, {"$t1", 0}, {"$Wd", 0}, {"$Wc", 0}, {"$N0", 0}, {"$N1", 0}, {"$p", 0}, {"$Wv", 0}, {"$t2", 0}, {"$t3", 0},
+                    {"$E", 1}, {"$Ws", 1}, {"$Sbs", 1}, {"$Svp", 1}, {"$Sre", 1}, {"$Fw", 1}, {"$VF", 1}, {"$Ssp", 1}, {"$Fo", 1}, {"$VNMPID", 1}, {"$Fi", 1}, {"$b", 1}, {"$w", 1}, {"$l", 1}, {"$Tc", 1}, {"$Td", 1},
                     {"$Wm", 2}, {"$Sbv", 2}, {"$Sbp", 2}, {"$Sls", 2}, {"$Slp", 2}, {"$Srp", 2}
                 };
 
@@ -70,7 +70,10 @@ namespace IfTextEditor.Editor.Model
 
                 //If no key matched, set empty params to avoid errors
                 if (Symbol == string.Empty)
+                {
+                    Debug.WriteLine("UNKNOWN COMMAND: " + content.Substring(0, 10));
                     Parameters = new string[0];
+                }
 
                 #region Set parameters
 
