@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <IfTextEditor>
   <assembly name="If Text Editor.exe">
-    <version>0.3.3.0</version>
+    <version>0.3.4.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/If%20Text%20Editor.exe</url>
-    <md5>B877BC8D089378928E4AB79C3FD5F170</md5>
+    <md5>3E7D2411B8B0D3AD6A3A43454AA438FB</md5>
   </assembly>
   <assembly name="Editor.Resources.dll">
     <version>1.0.1.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/lib/Editor.Resources.dll</url>
-    <md5>35AB0717820D810C293C19F3D45804AA</md5>
+    <md5>9BAF82BA9B03253D4084058ED315D3B1</md5>
   </assembly>
   <assembly name="Editor.Update.dll">
     <version>1.0.2.0</version>
     <url>https://raw.githubusercontent.com/ShadySheikah/IfTextEditor/master/IfTextEditor.Editor/dist/lib/Editor.Update.dll</url>
-    <md5>3E1B8EB390E31B9B4D8D953FA8D379C2</md5>
+    <md5>7EBFA65D5986F4C164B43F1E7CBF0850</md5>
   </assembly>
   <assembly name="ScintillaNET.dll">
     <version>3.6.3.0</version>
