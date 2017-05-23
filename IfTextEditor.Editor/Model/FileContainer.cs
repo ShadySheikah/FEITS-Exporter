@@ -43,7 +43,7 @@ namespace IfTextEditor.Editor.Model
                 return true;
             }
 
-            Name = fileMsgs[0].Replace("MESS_ARCHIVE_", "").Substring(1);
+            Name = fileMsgs[0].Replace("MESS_ARCHIVE_", "").Replace("\uFEFF", "");
 
             int offset = -1;
             for (int i = 0; i < fileMsgs.Length; i++)
