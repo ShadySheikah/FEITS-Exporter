@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using IfTextEditor.Editor.Model;
 using System.IO;
@@ -533,12 +534,6 @@ namespace IfTextEditor.Editor.Controller
             UpdateCurrentPage();
         }
 
-        public void OnTextboxChanged()
-        {
-            sourceModel.TextboxIndex = targetModel.TextboxIndex = mainView.CurrentTextboxTheme;
-            UpdateCurrentPage();
-        }
-
         public void OnPlayerGenderChanged()
         {
             throw new NotImplementedException();
@@ -550,33 +545,32 @@ namespace IfTextEditor.Editor.Controller
             UpdateCurrentPage();
         }
 
-        public void OnBackgroundImageChanged(DragEventArgs e)
-        {
-            string filePath = ((string[]) e.Data.GetData(DataFormats.FileDrop))[0];
-
-            if (!File.Exists(filePath))
-                return;
-
-            try
-            {
-                Image background = Image.FromFile(filePath);
-
-                if (background.Width < 1 || background.Height < 1)
-                    return;
-
-                sourceModel.BackgroundImage = targetModel.BackgroundImage = background;
-                UpdateCurrentPage();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error updating background", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void UpdateCurrentPage()
         {
             mainView.SourcePreviewImage = sourceModel.RenderPreview(sourceModel.PageIndex, PreviewFormat.Normal);
             mainView.TargetPreviewImage = targetModel.RenderPreview(targetModel.PageIndex, PreviewFormat.Normal);
+        }
+
+        public void SavePreviewImage(ModelType type)
+        {
+            if (type == ModelType.Source && mainView.SourcePreviewImage == null || type == ModelType.Target && mainView.TargetPreviewImage == null)
+            {
+                MessageBox.Show(Properties.Resources.SaveImageNull, Properties.Resources.SaveFileError);
+                return;
+            }
+
+            var sfd = new SaveFileDialog
+            {
+                Filter = Properties.Resources.SaveFileDialogImageFilter,
+                FilterIndex = 1,
+                FileName = type == ModelType.Source ? sourceModel.FileCont.Name + (mainView.SourcePageIndex + 1) : targetModel.FileCont.Name + (mainView.TargetPageIndex + 1)
+            };
+
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+
+            Image img = type == ModelType.Source ? mainView.SourcePreviewImage : mainView.TargetPreviewImage;
+            img.Save(sfd.FileName, sfd.FilterIndex == 1 ? ImageFormat.Jpeg : ImageFormat.Png);
         }
 
         public static void UpdateProgram()

@@ -349,14 +349,24 @@ namespace IfTextEditor.Editor.View
                 targetTextDirty = false;
         }
 
-        private void MI_SourceExport_Click(object sender, EventArgs e)
+        private void MI_SourceExportText_Click(object sender, EventArgs e)
         {
             cont.ExportCompiledText(ModelType.Source);
         }
 
-        private void MI_TargetExport_Click(object sender, EventArgs e)
+        private void MI_TargetExportText_Click(object sender, EventArgs e)
         {
             cont.ExportCompiledText(ModelType.Target);
+        }
+
+        private void MI_SourceExportImage_Click(object sender, EventArgs e)
+        {
+            cont.SavePreviewImage(ModelType.Source);
+        }
+
+        private void MI_TargetExportImage_Click(object sender, EventArgs e)
+        {
+            cont.SavePreviewImage(ModelType.Target);
         }
         #endregion
 

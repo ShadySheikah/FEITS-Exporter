@@ -152,5 +152,32 @@ namespace IfTextEditor.Editor.Properties {
                 return ResourceManager.GetString("SaveFileDialogFilter", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JPG files (*.jpg)|*.jpg|PNG Files (*.png)|*.png.
+        /// </summary>
+        internal static string SaveFileDialogImageFilter {
+            get {
+                return ResourceManager.GetString("SaveFileDialogImageFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to Save File.
+        /// </summary>
+        internal static string SaveFileError {
+            get {
+                return ResourceManager.GetString("SaveFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No image to save..
+        /// </summary>
+        internal static string SaveImageNull {
+            get {
+                return ResourceManager.GetString("SaveImageNull", resourceCulture);
+            }
+        }
     }
 }

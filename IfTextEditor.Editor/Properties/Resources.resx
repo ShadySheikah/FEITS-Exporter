@@ -150,4 +150,13 @@ Are you sure you want to exit?</value>
   <data name="ExportFailedTitle" xml:space="preserve">
     <value>Export Failed</value>
   </data>
+  <data name="SaveFileDialogImageFilter" xml:space="preserve">
+    <value>JPG files (*.jpg)|*.jpg|PNG Files (*.png)|*.png</value>
+  </data>
+  <data name="SaveImageNull" xml:space="preserve">
+    <value>No image to save.</value>
+  </data>
+  <data name="SaveFileError" xml:space="preserve">
+    <value>Failed to Save File</value>
+  </data>
 </root>
