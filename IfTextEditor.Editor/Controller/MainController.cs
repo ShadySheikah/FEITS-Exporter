@@ -51,34 +51,6 @@ namespace IfTextEditor.Editor.Controller
             if (ofd.ShowDialog() != DialogResult.OK)
                 return false;
 
-
-            switch (type)
-            {
-                case ModelType.Source:
-                    if (sourceModel.LoadFromFile(ofd.FileName))
-                    {
-                        if (sourceModel.FileCont.Name == null)
-                            sourceModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
-
-                        mainView.FormName = sourceModel.FileCont.Name;
-                        mainView.SetMessageList(MessageListToTable(sourceModel.FileCont.Messages), false);
-                    }
-                    return true;
-                case ModelType.Target:
-                    if (targetModel.LoadFromFile(ofd.FileName))
-                    {
-                        if (targetModel.FileCont.Name == null)
-                            targetModel.FileCont.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
-
-                        mainView.FormName = targetModel.FileCont.Name;
-                        mainView.SetMessageList(MessageListToTable(targetModel.FileCont.Messages), true);
-                    }
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-
-
             try
             {
                 switch (type)
@@ -201,7 +173,7 @@ namespace IfTextEditor.Editor.Controller
                             if (sourceModel.SaveToFile(sfd.FileName))
                             {
                                 //TODO: Name
-                                mainView.FormName = sourceModel.FileCont.Name = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                mainView.FormName = Path.GetFileNameWithoutExtension(sfd.FileName);
                                 return true;
                             }
                             break;
@@ -226,7 +198,7 @@ namespace IfTextEditor.Editor.Controller
                         default:
                             if (targetModel.SaveToFile(sfd.FileName))
                             {
-                                mainView.FormName = targetModel.FileCont.Name = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                mainView.FormName = Path.GetFileNameWithoutExtension(sfd.FileName);
                                 return true;
                             }
                             break;
