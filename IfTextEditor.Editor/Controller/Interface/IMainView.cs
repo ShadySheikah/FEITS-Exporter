@@ -35,9 +35,11 @@ namespace IfTextEditor.Editor.Controller.Interface
         string ProtagonistName { get; set; }
         bool BackgroundEnabled { get; set; }
         bool SyncNavigation { get; set; }
+        bool BackupFiles { get; set; }
         int CurrentTextboxTheme { get; set; }
 
         void SetController(MainController controller);
         void SetMessageList(DataTable messageTable, bool target);
+        void ResetTextboxUndo(ModelType type);
     }
 }

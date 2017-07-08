@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -69,6 +70,7 @@ namespace IfTextEditor.Editor.Model
                     var newMessage = new Message();
                     int prefixIndex = fileMsgs[i].IndexOf(':');
                     newMessage.MsgName = fileMsgs[i].Substring(0, prefixIndex);
+                    Debug.WriteLine(newMessage.MsgName);
 
                     //Message will take it from here
                     newMessage.ParseMessage(fileMsgs[i].Substring(prefixIndex + 2));
@@ -81,8 +83,24 @@ namespace IfTextEditor.Editor.Model
             return true;
         }
 
-        public override string ToString()
+        public string ToString(bool stripped = false)
         {
+            if (stripped)
+            {
+                var strippedBuilder = new StringBuilder();
+
+                if (Name != string.Empty)
+                    strippedBuilder.Append(Name + Environment.NewLine + Environment.NewLine);
+
+                for (int i = 0; i < Messages.Count; i++)
+                {
+                    string compiledMsg = Messages[i].ToString(true, true);
+                    strippedBuilder.Append(compiledMsg + (i < Messages.Count - 1 ? Environment.NewLine + Environment.NewLine : string.Empty));
+                }
+
+                return strippedBuilder.ToString();
+            }
+
             var textBuilder = new StringBuilder();
 
             if (Name != string.Empty)

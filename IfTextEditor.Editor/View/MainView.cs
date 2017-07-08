@@ -56,7 +56,13 @@ namespace IfTextEditor.Editor.View
                     throw new NullReferenceException("DG_SourceMessageList is null.");
                 return DG_SourceMessageList.CurrentRow.Index;
             }
-            set { DG_SourceMessageList.CurrentCell = DG_SourceMessageList[0, value]; }
+            set
+            {
+                int curRow = value;
+                if (curRow >= DG_SourceMessageList.Rows.Count)
+                    curRow = DG_SourceMessageList.Rows.Count - 1;
+                DG_SourceMessageList.CurrentCell = DG_SourceMessageList[0, curRow];
+            }
         }
 
         public int SourcePageIndex
@@ -112,7 +118,13 @@ namespace IfTextEditor.Editor.View
                     throw new NullReferenceException("DG_TargetMessageList is null.");
                 return DG_TargetMessageList.CurrentRow.Index;
             }
-            set { DG_TargetMessageList.CurrentCell = DG_TargetMessageList[0, value]; }
+            set
+            {
+                int curRow = value;
+                if (curRow >= DG_TargetMessageList.Rows.Count)
+                    curRow = DG_TargetMessageList.Rows.Count - 1;
+                DG_TargetMessageList.CurrentCell = DG_TargetMessageList[0, curRow];
+            }
         }
 
         public int TargetPageIndex
@@ -178,6 +190,12 @@ namespace IfTextEditor.Editor.View
             set { B_Sync.Checked = value; }
         }
 
+        public bool BackupFiles
+        {
+            get { return MI_ItemRecovery.Checked; }
+            set { MI_ItemRecovery.Checked = value; }
+        }
+
         public int CurrentTextboxTheme
         {
             get
@@ -220,6 +238,14 @@ namespace IfTextEditor.Editor.View
                 DG_TargetMessageList.DataSource = messageTable;
             else
                 DG_SourceMessageList.DataSource = messageTable;
+        }
+
+        public void ResetTextboxUndo(ModelType type)
+        {
+            if (type == ModelType.Source)
+                TB_SourceText.EmptyUndoBuffer();
+            else
+                TB_TargetText.EmptyUndoBuffer();
         }
 
         #region Yaml
@@ -388,7 +414,7 @@ namespace IfTextEditor.Editor.View
             cont.SetMessage(SourceMsgIndex, ModelType.Source);
             sourceTextDirty = sDirty;
 
-            if (!B_Sync.Checked || DG_TargetMessageList.Rows.Count <= 0)
+            if (!B_Sync.Checked || DG_TargetMessageList.Rows.Count <= 0 || SourceMsgIndex >= DG_TargetMessageList.Rows.Count)
                 return;
 
             bool tDirty = targetTextDirty;
@@ -402,7 +428,7 @@ namespace IfTextEditor.Editor.View
             cont.SetMessage(TargetMsgIndex, ModelType.Target);
             targetTextDirty = tDirty;
 
-            if (!B_Sync.Checked || DG_SourceMessageList.Rows.Count <= 0)
+            if (!B_Sync.Checked || DG_SourceMessageList.Rows.Count <= 0 || TargetMsgIndex >= DG_SourceMessageList.Rows.Count)
                 return;
 
             bool sDirty = sourceTextDirty;
@@ -690,6 +716,21 @@ namespace IfTextEditor.Editor.View
             {
                 aboutBox.ShowDialog();
             }
+        }
+
+        private void batchFileProcessingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var proc = new BatchProcessor())
+                proc.ShowDialog();
+        }
+
+        private void MI_ItemRecovery_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!MI_ItemRecovery.Checked)
+                return;
+
+            MessageBox.Show("Backups can be found in the \"ITE Backups\" folder in your temp directory.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            cont.AutosaveBackup();
         }
 
         private void MI_TwoPanes_CheckedChanged(object sender, EventArgs e)

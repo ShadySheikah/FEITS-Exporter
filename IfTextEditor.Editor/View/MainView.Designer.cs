@@ -118,6 +118,9 @@
             this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.toolsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.MI_ItemRecovery = new System.Windows.Forms.ToolStripMenuItem();
+            this.batchFileProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MS_Top.SuspendLayout();
             this.SS_Status.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SC_PreviewMain)).BeginInit();
@@ -165,6 +168,7 @@
             this.MI_Source,
             this.MI_Target,
             this.toolsToolStripMenuItem,
+            this.toolsToolStripMenuItem1,
             this.helpToolStripMenuItem});
             this.MS_Top.Location = new System.Drawing.Point(0, 0);
             this.MS_Top.Name = "MS_Top";
@@ -274,7 +278,7 @@
             this.MI_TargetOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MI_TargetOpen.Name = "MI_TargetOpen";
             this.MI_TargetOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.MI_TargetOpen.Size = new System.Drawing.Size(152, 22);
+            this.MI_TargetOpen.Size = new System.Drawing.Size(185, 22);
             this.MI_TargetOpen.Text = "&Open";
             this.MI_TargetOpen.Click += new System.EventHandler(this.MI_TargetOpen_Click);
             // 
@@ -282,14 +286,14 @@
             // 
             this.MI_TargetImport.Name = "MI_TargetImport";
             this.MI_TargetImport.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.MI_TargetImport.Size = new System.Drawing.Size(152, 22);
+            this.MI_TargetImport.Size = new System.Drawing.Size(185, 22);
             this.MI_TargetImport.Text = "&Import";
             this.MI_TargetImport.Click += new System.EventHandler(this.MI_TargetImport_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(182, 6);
             // 
             // MI_TargetSave
             // 
@@ -297,14 +301,14 @@
             this.MI_TargetSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MI_TargetSave.Name = "MI_TargetSave";
             this.MI_TargetSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.MI_TargetSave.Size = new System.Drawing.Size(152, 22);
+            this.MI_TargetSave.Size = new System.Drawing.Size(185, 22);
             this.MI_TargetSave.Text = "&Save";
             this.MI_TargetSave.Click += new System.EventHandler(this.MI_TargetSave_Click);
             // 
             // MI_TargetSaveAs
             // 
             this.MI_TargetSaveAs.Name = "MI_TargetSaveAs";
-            this.MI_TargetSaveAs.Size = new System.Drawing.Size(152, 22);
+            this.MI_TargetSaveAs.Size = new System.Drawing.Size(185, 22);
             this.MI_TargetSaveAs.Text = "Save &As";
             this.MI_TargetSaveAs.Click += new System.EventHandler(this.MI_TargetSaveAs_Click);
             // 
@@ -314,7 +318,7 @@
             this.MI_TargetExportText,
             this.MI_TargetExportImage});
             this.MI_TargetExport.Name = "MI_TargetExport";
-            this.MI_TargetExport.Size = new System.Drawing.Size(152, 22);
+            this.MI_TargetExport.Size = new System.Drawing.Size(185, 22);
             this.MI_TargetExport.Text = "&Export";
             // 
             // MI_TargetExportText
@@ -373,6 +377,7 @@
             this.MI_TBStyles.Name = "MI_TBStyles";
             this.MI_TBStyles.Size = new System.Drawing.Size(181, 22);
             this.MI_TBStyles.Text = "Textbox Style";
+            this.MI_TBStyles.Visible = false;
             // 
             // MI_TBNeutral
             // 
@@ -1105,6 +1110,32 @@
             this.toolStripButton4.Size = new System.Drawing.Size(25, 22);
             this.toolStripButton4.Text = "All";
             // 
+            // toolsToolStripMenuItem1
+            // 
+            this.toolsToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MI_ItemRecovery,
+            this.batchFileProcessingToolStripMenuItem});
+            this.toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
+            this.toolsToolStripMenuItem1.Size = new System.Drawing.Size(48, 20);
+            this.toolsToolStripMenuItem1.Text = "T&ools";
+            // 
+            // MI_ItemRecovery
+            // 
+            this.MI_ItemRecovery.Checked = true;
+            this.MI_ItemRecovery.CheckOnClick = true;
+            this.MI_ItemRecovery.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MI_ItemRecovery.Name = "MI_ItemRecovery";
+            this.MI_ItemRecovery.Size = new System.Drawing.Size(181, 22);
+            this.MI_ItemRecovery.Text = "Enable File Recovery";
+            this.MI_ItemRecovery.CheckedChanged += new System.EventHandler(this.MI_ItemRecovery_CheckedChanged);
+            // 
+            // batchFileProcessingToolStripMenuItem
+            // 
+            this.batchFileProcessingToolStripMenuItem.Name = "batchFileProcessingToolStripMenuItem";
+            this.batchFileProcessingToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.batchFileProcessingToolStripMenuItem.Text = "Batch File Processing...";
+            this.batchFileProcessingToolStripMenuItem.Click += new System.EventHandler(this.batchFileProcessingToolStripMenuItem_Click);
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1267,5 +1298,8 @@
         private System.Windows.Forms.ToolStripMenuItem MI_SourceExportImage;
         private System.Windows.Forms.ToolStripMenuItem MI_TargetExportText;
         private System.Windows.Forms.ToolStripMenuItem MI_TargetExportImage;
+        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem MI_ItemRecovery;
+        private System.Windows.Forms.ToolStripMenuItem batchFileProcessingToolStripMenuItem;
     }
 }

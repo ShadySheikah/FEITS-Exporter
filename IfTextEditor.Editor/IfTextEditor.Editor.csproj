@@ -114,6 +114,12 @@
     <Compile Include="View\AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\BatchProcessor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\BatchProcessor.Designer.cs">
+      <DependentUpon>BatchProcessor.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\Import.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,6 +140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\BatchProcessor.resx">
+      <DependentUpon>BatchProcessor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\Import.resx">
       <DependentUpon>Import.cs</DependentUpon>

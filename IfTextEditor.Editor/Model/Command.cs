@@ -71,7 +71,7 @@ namespace IfTextEditor.Editor.Model
                 //If no key matched, set empty params to avoid errors
                 if (Symbol == string.Empty)
                 {
-                    Debug.WriteLine("UNKNOWN COMMAND: " + content.Substring(0, 10));
+                    //Debug.WriteLine("UNKNOWN COMMAND: " + content.Substring(0, 10));
                     Parameters = new string[0];
                 }
 

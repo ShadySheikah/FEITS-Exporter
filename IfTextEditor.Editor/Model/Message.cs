@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -25,14 +26,24 @@ namespace IfTextEditor.Editor.Model
                 }
             }
 
-            internal string ToString(bool includeName)
+            internal string ToString(bool includeName, bool stripped = false)
             {
+                if (stripped)
+                {
+                    string strippedMess = string.Empty;
+
+                    if (includeName)
+                        strippedMess = (MsgName != string.Empty ? MsgName + Environment.NewLine : string.Empty);
+
+                    return Pages.Aggregate(strippedMess, (current, page) => current + page.ToString(true));
+                }
+
                 string compMess = string.Empty;
 
                 if (includeName)
                     compMess = (MsgName != string.Empty ? MsgName + ": " : string.Empty);
 
-                return Pages.Aggregate(compMess, (current, p) => current + p.ToString());
+                return Pages.Aggregate(compMess, (current, page) => current + page.ToString());
             }
 
             public IEnumerator<Page> GetEnumerator()

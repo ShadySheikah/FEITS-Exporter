@@ -180,6 +180,19 @@ namespace IfTextEditor.Editor.Model
             }
         }
 
+        internal bool ExportStrippedFile(string path)
+        {
+            if (path == string.Empty)
+                return false;
+
+            string compiledText = FileCont.ToString(true);
+            if (compiledText == string.Empty)
+                return false;
+
+            File.WriteAllText(path, compiledText);
+            return true;
+        }
+
         internal bool RemoveMessage(int index)
         {
             try
@@ -305,7 +318,7 @@ namespace IfTextEditor.Editor.Model
 
                 string substring;
                 var cmd = new Command(newSpeech.Substring(index), out substring);
-                if (cmd.Type == CommandType.UNKNOWN_TYPE && newSpeech.Count(f => f == '$') <= 1)
+                if (cmd.Type == CommandType.UNKNOWN_TYPE /*&& newSpeech.Count(f => f == '$') <= 1*/)
                     break;
 
                 newSpeech = newSpeech.Substring(0, index) + substring;

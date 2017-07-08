@@ -75,13 +75,33 @@ namespace IfTextEditor.Editor.Model
                     }
                 }
 
-                public override string ToString()
+                public string ToString(bool stripped = false)
                 {
+                    if (stripped)
+                    {
+                        var strippedComp = new StringBuilder();
+
+                        string curSpeaker = string.Empty;
+                        foreach (Command cmd in Commands)
+                        {
+                            if (cmd.Type == CommandType.Speaker)
+                                curSpeaker = cmd.Parameters[0];
+                        }
+
+                        if(curSpeaker != string.Empty)
+                            strippedComp.AppendLine(curSpeaker /*CharacterData.GetLocalizedName(curSpeaker)*/ + ":");
+
+                        foreach (string line in SpokenLine)
+                            strippedComp.AppendLine('\t' + line);
+
+                        return strippedComp.ToString();
+                    }
+
                     //This will be our compiled string
                     var comp = new StringBuilder();
 
                     //Commands
-                    comp.Append(Commands.Aggregate(string.Empty, (current, c) => current + c.ToString()));
+                    comp.Append(Commands.Aggregate(string.Empty, (current, command) => current + command.ToString()));
 
                     //Lines
                     return comp + string.Join("\\n", SpokenLine) + GetLineEnd();

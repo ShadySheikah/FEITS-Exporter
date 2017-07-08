@@ -6,7 +6,10 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using IfTextEditor.Editor.Model;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using IfTextEditor.Update.View;
 
 namespace IfTextEditor.Editor.Controller
@@ -133,15 +136,27 @@ namespace IfTextEditor.Editor.Controller
                     if (sourceModel.FileCont.Path == string.Empty)
                         return SaveFileAs(type);
 
-                    return sourceModel.SaveToFile(sourceModel.FileCont.Path);
+                    if (sourceModel.SaveToFile(sourceModel.FileCont.Path))
+                    {
+                        mainView.AppStatus = $"Source saved at {DateTime.Now:hh:mm tt}";
+                        return true;
+                    }
+                    break;
                 case ModelType.Target:
                     if (targetModel.FileCont.Path == string.Empty)
                         return SaveFileAs(type);
 
-                    return targetModel.SaveToFile(targetModel.FileCont.Path);
+                    if (targetModel.SaveToFile(targetModel.FileCont.Path))
+                    {
+                        mainView.AppStatus = $"Target saved at {DateTime.Now:hh:mm tt}";
+                        return true;
+                    }
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
+
+            return false;
         }
 
         public bool SaveFileAs(ModelType type)
@@ -166,6 +181,7 @@ namespace IfTextEditor.Editor.Controller
                             if (sourceModel.ExportYaml(sfd.FileName))
                             {
                                 MessageBox.Show("Parsed file saved to file. YAML serialization is still in development, so please be aware that there is a very good chance these files will not be supported in the future.", "Export to YAML", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                mainView.AppStatus = $"Source saved as {Path.GetFileName(sourceModel.FileCont.Path)} at {DateTime.Now:hh:mm tt}";
                                 return true;
                             }
                             break;
@@ -174,6 +190,7 @@ namespace IfTextEditor.Editor.Controller
                             {
                                 //TODO: Name
                                 mainView.FormName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                mainView.AppStatus = $"Source saved as {Path.GetFileName(sourceModel.FileCont.Path)} at {DateTime.Now:hh:mm tt}";
                                 return true;
                             }
                             break;
@@ -192,6 +209,7 @@ namespace IfTextEditor.Editor.Controller
                             if (targetModel.ExportYaml(sfd.FileName))
                             {
                                 MessageBox.Show("Parsed file saved to file. YAML serialization is still in development, so please be aware that there is a very good chance these files will not be supported in the future.", "Export to YAML", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                mainView.AppStatus = $"Target saved as {Path.GetFileName(targetModel.FileCont.Path)} at {DateTime.Now:hh:mm tt}";
                                 return true;
                             }
                             break;
@@ -199,6 +217,7 @@ namespace IfTextEditor.Editor.Controller
                             if (targetModel.SaveToFile(sfd.FileName))
                             {
                                 mainView.FormName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                                mainView.AppStatus = $"Target saved as {Path.GetFileName(targetModel.FileCont.Path)} at {DateTime.Now:hh:mm tt}";
                                 return true;
                             }
                             break;
@@ -349,6 +368,7 @@ namespace IfTextEditor.Editor.Controller
                     }
 
                     mainView.SourceText = string.Join(Environment.NewLine, srcLines);
+                    mainView.ResetTextboxUndo(ModelType.Source);
                     break;
                 case ModelType.Target:
                     targetModel.UpdatePageCommands(targetModel.PageIndex);
@@ -374,6 +394,7 @@ namespace IfTextEditor.Editor.Controller
                     }
 
                     mainView.TargetText = string.Join(Environment.NewLine, tarLines);
+                    mainView.ResetTextboxUndo(ModelType.Target);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -543,6 +564,39 @@ namespace IfTextEditor.Editor.Controller
 
             Image img = type == ModelType.Source ? mainView.SourcePreviewImage : mainView.TargetPreviewImage;
             img.Save(sfd.FileName, sfd.FilterIndex == 1 ? ImageFormat.Jpeg : ImageFormat.Png);
+        }
+
+        public async void AutosaveBackup()
+        {
+            string savePath = Path.Combine(Path.GetTempPath(), "ITE Backups");
+            if (!Directory.Exists(savePath))
+                Directory.CreateDirectory(savePath);
+
+            while (mainView.BackupFiles)
+            {
+                await Task.Delay(180000);
+
+                if (!mainView.BackupFiles)
+                    break;
+
+                List<FileInfo> tempFiles = new DirectoryInfo(savePath).GetFiles("*.txt").OrderBy(p => p.LastWriteTime).ToList();
+                while (tempFiles.Count > 9)
+                {
+                    tempFiles[0].Delete();
+                    tempFiles.RemoveAt(0);
+                }
+
+                if (sourceModel.FileCont.Messages.Count > 0)
+                {
+                    string sourcePath = Path.Combine(savePath, $"source_{DateTime.Now:MM-dd-yy_HH-mm-ss}.txt");
+                    sourceModel.SaveToFile(sourcePath);
+                }
+                if (targetModel.FileCont.Messages.Count > 0)
+                {
+                    string targetPath = Path.Combine(savePath, $"target_{DateTime.Now:MM-dd-yy_HH-mm-ss}.txt");
+                    targetModel.SaveToFile(targetPath);
+                }
+            }
         }
 
         public static void UpdateProgram()
